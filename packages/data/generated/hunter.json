@@ -42213,176 +42213,6 @@
    ]
   }
  },
- "categories": {
-  "2": {
-   "id": 2,
-   "name": "Direct Damage - Spell",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "19": {
-   "id": 19,
-   "name": "Quick Damage - Spell",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "33": {
-   "id": 33,
-   "name": "Mez",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "36": {
-   "id": 36,
-   "name": "Debuff - Spell",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "38": {
-   "id": 38,
-   "name": "Aura",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "40": {
-   "id": 40,
-   "name": "Melee (Generic)",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "44": {
-   "id": 44,
-   "name": "Speed",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "49": {
-   "id": 49,
-   "name": "Direct Damage (AE) - Ability",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "55": {
-   "id": 55,
-   "name": "Quick Buff (DPS) - Spell",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "63": {
-   "id": 63,
-   "name": "Big Direct Damage - Spell",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "65": {
-   "id": 65,
-   "name": "Melee (Special)",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "82": {
-   "id": 82,
-   "name": "Taunt/Detaunt",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "85": {
-   "id": 85,
-   "name": "Direct Damage (AE-Chain) - Ability",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "109": {
-   "id": 109,
-   "name": "Melee (Disarm)",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "133": {
-   "id": 133,
-   "name": "Global",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "411": {
-   "id": 411,
-   "name": "Fire Traps",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "911": {
-   "id": 911,
-   "name": "Distracting Shot",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "971": {
-   "id": 971,
-   "name": "Mortal Strike",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "1132": {
-   "id": 1132,
-   "name": "Intimidation",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "1135": {
-   "id": 1135,
-   "name": "Counterattack",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "1152": {
-   "id": 1152,
-   "name": "Creature Special",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "1173": {
-   "id": 1173,
-   "name": "Arcane Shot",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "2183": {
-   "id": 2183,
-   "name": "Frost Traps",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  },
-  "2368": {
-   "id": 2368,
-   "name": "Flare",
-   "flags": 0,
-   "maxCharges": 0,
-   "chargeRecoveryMs": 0
-  }
- },
  "abilities": [
   {
    "name": "Aspect of the Beast",
@@ -45868,9 +45698,6 @@
     270
    ],
    "passiveSpellId": 17223,
-   "damagePct": 0,
-   "armorPct": 5,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -45896,9 +45723,6 @@
     270
    ],
    "passiveSpellId": 17210,
-   "damagePct": 10,
-   "armorPct": 0,
-   "healthPct": -2,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -45925,9 +45749,6 @@
     270
    ],
    "passiveSpellId": 17219,
-   "damagePct": 7,
-   "armorPct": 0,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -45953,9 +45774,6 @@
     270
    ],
    "passiveSpellId": 17208,
-   "damagePct": -9,
-   "armorPct": 5,
-   "healthPct": 8,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -45982,9 +45800,6 @@
     270
    ],
    "passiveSpellId": 7000,
-   "damagePct": -10,
-   "armorPct": 9,
-   "healthPct": 4,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46010,9 +45825,6 @@
     270
    ],
    "passiveSpellId": 17212,
-   "damagePct": 0,
-   "armorPct": 10,
-   "healthPct": -5,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46038,9 +45850,6 @@
     270
    ],
    "passiveSpellId": 17209,
-   "damagePct": 0,
-   "armorPct": 5,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46067,9 +45876,6 @@
     270
    ],
    "passiveSpellId": 17211,
-   "damagePct": -5,
-   "armorPct": 13,
-   "healthPct": -4,
    "abilities": [
     "Arcane Resistance",
     "Claw",
@@ -46095,9 +45901,6 @@
     270
    ],
    "passiveSpellId": 17214,
-   "damagePct": 2,
-   "armorPct": 0,
-   "healthPct": 4,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46123,9 +45926,6 @@
     270
    ],
    "passiveSpellId": 17217,
-   "damagePct": 10,
-   "armorPct": 3,
-   "healthPct": -5,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46152,9 +45952,6 @@
     270
    ],
    "passiveSpellId": 17220,
-   "damagePct": 0,
-   "armorPct": 0,
-   "healthPct": 5,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46180,9 +45977,6 @@
     270
    ],
    "passiveSpellId": 17218,
-   "damagePct": -6,
-   "armorPct": 10,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Claw",
@@ -46208,9 +46002,6 @@
     270
    ],
    "passiveSpellId": 17221,
-   "damagePct": -10,
-   "armorPct": 13,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46236,9 +46027,6 @@
     270
    ],
    "passiveSpellId": 17206,
-   "damagePct": 7,
-   "armorPct": 0,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46264,9 +46052,6 @@
     270
    ],
    "passiveSpellId": 17215,
-   "damagePct": 0,
-   "armorPct": 5,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46292,9 +46077,6 @@
     270
    ],
    "passiveSpellId": 17216,
-   "damagePct": 7,
-   "armorPct": 0,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Claw",
@@ -46320,9 +46102,6 @@
     270
    ],
    "passiveSpellId": 17222,
-   "damagePct": 7,
-   "armorPct": 0,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46348,9 +46127,6 @@
     270
    ],
    "passiveSpellId": 444831,
-   "damagePct": 1,
-   "armorPct": 0,
-   "healthPct": 5,
    "abilities": [
     "Arcane Resistance",
     "Bite",
@@ -46374,9 +46150,6 @@
     270
    ],
    "passiveSpellId": 17223,
-   "damagePct": 0,
-   "armorPct": 5,
-   "healthPct": 0,
    "abilities": [
     "Arcane Resistance",
     "Bite",

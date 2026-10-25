@@ -92,26 +92,14 @@ export type PetFamily = {
   skillLines: number[];
   // The family's "Tamed Pet Passive": physical damage, armor and health percentages.
   passiveSpellId: number;
-  damagePct: number;
-  armorPct: number;
-  healthPct: number;
   // Pet-tab abilities this family can learn, by name.
   abilities: string[];
-};
-
-export type SpellCategory = {
-  id: number;
-  name: string;
-  flags: number;
-  maxCharges: number;
-  chargeRecoveryMs: number;
 };
 
 export type HunterData = {
   build: string;
   sources: { name: string; url: string; license?: string }[];
   spells: Record<string, Spell>;
-  categories: Record<string, SpellCategory>;
   abilities: Ability[];
   talents: Talent[];
   petFamilies: PetFamily[];

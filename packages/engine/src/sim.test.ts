@@ -49,9 +49,22 @@ test("an Aimed Shot cast delays the next Auto Shot instead of overlapping it", (
   const auto = r.abilities.find((a) => a.name === "Auto Shot")!;
   const aimed = r.abilities.find((a) => a.name === "Aimed Shot")!;
   const uninterrupted = Math.floor((600 - 0.5) / 2.8) + 1;
-  // 6 sec cooldown plus a 2 sec cast.
+  // The 6 sec cooldown starts when the 2 sec cast ends, so one cast every 8 sec at most.
   expect(aimed.castsPerFight).toBeGreaterThan(70);
+  expect(aimed.castsPerFight).toBeLessThanOrEqual(600 / 8 + 1);
   expect(auto.castsPerFight).toBeLessThan(uninterrupted);
+});
+
+test("Bestial Discipline speeds up the pet's focus regen, so it uses Claw more", () => {
+  const talents = { "Deadly Aspects": 5, "Endurance Training": 5, "Unleashed Fury": 5, Ferocity: 5 };
+  const run = (extra: Record<string, number>) =>
+    simulate(game, {
+      ...base,
+      talents: { ...talents, ...extra },
+      pet: { active: true, family: "Cat", abilities: ["claw"] },
+      fight: { durationSec: 600, iterations: 20 },
+    }).abilities.find((a) => a.name === "Pet: Claw")!.castsPerFight;
+  expect(run({ "Bestial Discipline": 2 })).toBeGreaterThan(run({}) * 1.1);
 });
 
 test("talent rules are enforced", () => {
@@ -133,4 +146,43 @@ test("gear items add their stats, convert ratings, and supply the ranged weapon"
   expect(() =>
     buildCharacter(game.data, game.overrides, game.items, SimConfig.parse({ ...base, gear: { items: { neck: 252605 } } })),
   ).toThrow(/does not go in neck/);
+});
+
+test("reapplying a pet DoT replaces it instead of stacking", () => {
+  // Scorpid Poison: 4 sec cooldown, 10 sec duration, a tick every 2 sec.
+  const r = simulate(game, {
+    ...base,
+    pet: { active: true, family: "Scorpid", abilities: ["scorpid_poison"] },
+    fight: { durationSec: 600, iterations: 5 },
+  });
+  const poison = r.abilities.find((a) => a.name === "Pet: Scorpid Poison")!;
+  expect(poison.ticksPerFight).toBeGreaterThan(200);
+  expect(poison.ticksPerFight).toBeLessThanOrEqual(600 / 2);
+});
+
+test("a condition that turns true with time alone is noticed within the reaction delay", () => {
+  // No events land between 5.3 sec and the end of this fight, so only the re-check can cast it.
+  const r = simulate(game, {
+    ...base,
+    fight: { durationSec: 5.5, iterations: 1 },
+    rotation: { actions: [{ action: "arcane_shot", if: "time > 5.3" }] },
+  });
+  expect(r.abilities.find((a) => a.name === "Arcane Shot")?.castsPerFight).toBe(1);
+});
+
+test("Intimidation's crit buff is used up by the pet's next successful attack", () => {
+  const talents = { "Deadly Aspects": 5, "Endurance Training": 5, "Bestial Swiftness": 1, "Unleashed Fury": 5, Ferocity: 5, Intimidation: 1 };
+  const run = (actions: { action: string }[]) =>
+    simulate(game, {
+      ...base,
+      talents,
+      pet: { active: true, family: "Cat", abilities: [] },
+      fight: { durationSec: 15, iterations: 200 },
+      rotation: { actions },
+    }).abilities.find((a) => a.name === "Pet: Melee")!;
+  const without = run([]);
+  const withIt = run([{ action: "intimidation" }]);
+  // One extra crit at most in about 7 landed swings (it can still glance), not every swing for 15 sec.
+  expect(withIt.critPct - without.critPct).toBeGreaterThan(2);
+  expect(withIt.critPct - without.critPct).toBeLessThan(25);
 });

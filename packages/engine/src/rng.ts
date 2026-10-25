@@ -57,6 +57,15 @@ export class Stream {
   range(min: number, max: number): number {
     return min + (max - min) * this.next();
   }
+
+  // Integer in [0, n).
+  int(n: number): number {
+    return Math.floor(this.next() * n);
+  }
+
+  pick<T>(xs: readonly T[]): T {
+    return xs[this.int(xs.length)]!;
+  }
 }
 
 export class Rng {

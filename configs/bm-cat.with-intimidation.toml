@@ -1,0 +1,33 @@
+# bm-cat casting Intimidation on cooldown. Compare with:
+#   bun run sim compare configs/bm-cat.toml configs/bm-cat.with-intimidation.toml
+extends = "bm-cat.toml"
+name = "BM cat, with Intimidation"
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "intimidation"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!dot.serpent_sting.ticking"
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "auto_shot.cooldown_remains >= cast.aimed_shot.time & mana.pct > 20"
+
+[[rotation.actions]]
+action = "multi_shot"
+if = "mana.pct > 40"
+
+[[rotation.actions]]
+action = "arcane_shot"
+if = "mana.pct > 40"

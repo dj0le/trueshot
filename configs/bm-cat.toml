@@ -12,7 +12,7 @@ race = "Orc"
 "Unleashed Fury" = 5
 "Ferocity" = 5
 "Bestial Discipline" = 2
-"Intimidation" = 1
+"Intimidation" = 1    # needed for Bestial Wrath; casting it costs DPS (see bm-cat.with-intimidation.toml)
 "Frenzy" = 5
 "Bestial Wrath" = 1
 "Lethal Attacks" = 5
@@ -57,6 +57,10 @@ iterations = 2000
 precombat = ["aspect_of_the_hawk", "hunters_mark"]
 
 [[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
 action = "bestial_wrath"
 
 [[rotation.actions]]
@@ -68,7 +72,7 @@ if = "!dot.serpent_sting.ticking"
 
 [[rotation.actions]]
 action = "aimed_shot"
-if = "auto_shot.remains >= cast.aimed_shot.time & mana.pct > 20"
+if = "auto_shot.cooldown_remains >= cast.aimed_shot.time & mana.pct > 20"
 
 [[rotation.actions]]
 action = "multi_shot"

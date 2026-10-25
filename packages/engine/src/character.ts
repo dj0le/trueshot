@@ -19,7 +19,8 @@ export type Character = {
   primary: Record<"strength" | "agility" | "stamina" | "intellect" | "spirit", number>;
   baseMana: number;
   maxMana: number;
-  // Ranged attack power from level, agility, gear and buffs. Auras add to it in combat.
+  // Ranged attack power and crit from level, stats, gear and buffs. Talent passives and auras
+  // add to them in combat.
   rangedAttackPower: number;
   critPct: number;
   hitPct: number;
@@ -97,6 +98,12 @@ export function resolveEffects(spell: Spell, talent?: Talent, rank?: number): Re
   });
 }
 
+// The highest rank of an ability known at a level.
+export function knownRank(data: HunterData, ability: HunterData["abilities"][number], level: number): Spell | undefined {
+  const rank = ability.ranks.filter((r) => r.level <= level).at(-1);
+  return rank && data.spells[String(rank.spellId)];
+}
+
 function validateTalents(data: HunterData, config: SimConfig): Talent[] {
   const errors: string[] = [];
   const chosen: Talent[] = [];
@@ -164,9 +171,9 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
   const taughtByTalent = new Set(data.talents.filter((t) => !t.passive).map((t) => t.name));
   const abilities = new Map<string, Spell>();
   for (const a of data.abilities) {
-    if (taughtByTalent.has(a.name) && !config.talents[a.name]) continue;
-    const known = a.ranks.filter((r) => r.level <= config.level).at(-1);
-    if (known) abilities.set(snake(a.name), data.spells[String(known.spellId)]!);
+    if (a.tab === "Pets" || (taughtByTalent.has(a.name) && !config.talents[a.name])) continue;
+    const known = knownRank(data, a, config.level);
+    if (known) abilities.set(snake(a.name), known);
   }
 
   const worn = gearStats(items, overrides, config);
@@ -198,9 +205,6 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     spirit: stat(Stat.Spirit, "spirit"),
   };
 
-  const passiveSum = (aura: number) =>
-    passives.flatMap((p) => p.effects).filter((e) => e.aura === aura).reduce((a, e) => a + e.value, 0);
-
   const baseMana = overrides.base.mana.value;
   const int = primary.intellect;
   const maxMana = baseMana + Math.min(20, int) + Math.max(0, int - 20) * f.manaPerIntellect.value;
@@ -209,10 +213,9 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     config.level * f.rangedAttackPowerPerLevel.value +
     primary.agility * f.rangedAttackPowerPerAgility.value +
     f.rangedAttackPowerBase.value +
-    sum("rangedAttackPower") +
-    passiveSum(Aura.ModRangedAttackPower);
+    sum("rangedAttackPower");
 
-  const critPct = f.baseCritPct.value + primary.agility / f.agilityPerCrit.value + sum("critPct") + passiveSum(Aura.ModCritPct);
+  const critPct = f.baseCritPct.value + primary.agility / f.agilityPerCrit.value + sum("critPct");
 
   return {
     config,
@@ -236,6 +239,5 @@ export function talentValue(data: HunterData, config: SimConfig, name: string, e
   const rank = config.talents[name] ?? 0;
   if (rank === 0) return 0;
   const t = data.talents.find((x) => x.name === name)!;
-  const perRank = t.rankEffects.find((r) => r.effectIndex === effectIndex);
-  return perRank?.values[rank - 1] ?? data.spells[String(t.spellId)]!.effects.find((e) => e.index === effectIndex)!.basePoints;
+  return resolveEffects(data.spells[String(t.spellId)]!, t, rank).find((e) => e.index === effectIndex)!.value;
 }

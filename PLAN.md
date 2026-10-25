@@ -27,7 +27,7 @@ client build or to an override that records where it came from.
 | 17 | SvelteKit front end with the engine in a web worker | packages/web | |
 | 18 | Target presets: normal level 60, elite 62, boss 63 (armor, level-based miss and crit) | packages/engine/src/targets | DONE |
 | 19 | Marksmanship: talents, abilities, default priority list | packages/engine/src/specs/mm | DONE |
-| 20 | Beast Mastery: pet-heavy talents, Bestial Wrath, Kill Command | packages/engine/src/specs/bm | NEXT, needs Summon Hawk, Intimidation, a pet focus-pooling option |
+| 20 | Beast Mastery: pet-heavy talents, Bestial Wrath, Kill Command | packages/engine/src/specs/bm | NEXT, needs Summon Hawk and a pet focus-pooling option. Intimidation is taken for Bestial Wrath but not cast: casting it loses DPS, see findings |
 | 21 | Survival: melee weapon, melee attack table, Raptor Strike and Mongoose Bite | packages/engine/src/specs/sv | |
 | 22 | Gear presets for all three specs at 60 from the GearQuestForever BiS lists | packages/data/presets | DONE, set bonuses and enchants are task 26 |
 | 23 | Level-aware sim: any level 10 to 60, spell ranks and target stats by level, so level 30 beta logs can check the mechanics | packages/engine | |
@@ -37,6 +37,7 @@ client build or to an override that records where it came from.
 | 27 | Item chance-on-hit procs | packages/engine | |
 | 28 | Raid buff and debuff presets, so results line up with MythicSim's party setup | packages/engine | |
 | 29 | Melee weaving: step in for Raptor Strike between Auto Shots, which MythicSim does for all three specs | packages/engine | |
+| 30 | Rotation comparison: variant configs that `extends` a base, `sim compare` with several variants and a per-ability diff, `sim value` for what each action is worth | packages/cli | DONE |
 
 Tasks 1 to 10, 18 and 19 give a working "run my setup" CLI for Marksmanship. Task 20 follows because
 pets carry the weakest data. Task 21 comes last because it needs a whole melee model.
@@ -53,6 +54,10 @@ pets carry the weakest data. Task 21 comes last because it needs a whole melee m
   https://foreverlogs.gg/api/public/v1/openapi.json. It needs a free key with the events:read scope.
   Terms: visible attribution linking back to Forever Logs, no bulk redistribution. So raw events stay in
   a gitignored local cache, and only derived numbers (hit rates, damage shares) go in the repo, credited.
+- Conditions that turn true with time alone (`time > 30`, `buff.x.remains < 2`) are noticed within a
+  100 ms reaction delay (REACTION_MS in sim.ts), not at the exact moment. The exact alternative is for
+  each time-based getter to report when it next crosses its threshold and wake the fight then. We chose
+  the simpler, human-like polling; revisit if a result ever depends on sub-100 ms timing.
 - All TypeScript on Bun. The engine is pure (no I/O), so it runs unchanged in the CLI now and in a
   SvelteKit web worker later. Rust/WASM only if the optimizer outgrows it, and then only the inner loop.
 
@@ -62,7 +67,9 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
 
 - Mana decides Marksmanship. The naive priority list is out of mana 74% of the fight; the optimized one
   drops Arcane Shot and Multi-Shot, keeps Serpent Sting up, and only casts Aimed Shot when it fits before
-  the next Auto Shot. That is +13.7% DPS (task 15). MythicSim also has Aimed Shot under 1% of damage.
+  the next Auto Shot. That is +13.1% DPS (task 15). MythicSim also has Aimed Shot under 1% of damage.
+- Intimidation costs bm-cat 1.3% DPS: 138 mana and a GCD a minute in a mana-bound build, for one
+  guaranteed pet crit, while Frenzy 5/5 already procs off the pet's ~18% crit rate.
 - With Careful Aim 5/5, intellect is worth about as much as agility for MM (task 12).
 - Serpent Sting matches the client tooltip (555 over 15 sec, no attack power scaling). MythicSim gets about
   twice our Serpent Sting DPS. Unresolved until logs exist.

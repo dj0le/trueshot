@@ -1,16 +1,28 @@
 // One fight, start to finish. The hunter acts from a priority list; everything else (auto shot,
 // regen, ticks, aura expiry) runs off the event queue.
 import type { GameData, Overrides, Spell } from "@hunter-sim/data";
-import { type ActiveSpell, type Character, type ResolvedEffect, resolveEffects, snake } from "./character";
-import { Aura, CHANNELED_FLAGS, DefenseType, Effect, IGNORED_AURAS, IGNORED_EFFECTS, ProcFlag, School, SpellModOp } from "./enums";
+import { AuraSet } from "./auras";
+import { type Character, type ResolvedEffect, resolveEffects, snake } from "./character";
+import {
+  Aura,
+  CHANNELED_FLAGS,
+  DefenseType,
+  EFFECT_VALUE_OPS,
+  Effect,
+  IGNORED_AURAS,
+  IGNORED_EFFECTS,
+  ProcFlag,
+  School,
+  SpellModOp,
+  TARGET_ENEMY,
+  TARGET_PET,
+} from "./enums";
 import { compile, type Getter } from "./expr";
 import { Pet, type PetHost } from "./pet";
 import { EventQueue } from "./queue";
 import { Rng } from "./rng";
 import { ON_LAND, type ScriptContext } from "./scripts";
 
-const TARGET_ENEMY = new Set([6, 25]);
-const TARGET_PET = 5;
 const DAMAGE_EFFECTS = new Set<number>([
   Effect.SchoolDamage,
   Effect.WeaponDamage,
@@ -26,6 +38,19 @@ const KNOWN_EFFECTS = new Set<number>([
   ...IGNORED_EFFECTS,
 ]);
 const KNOWN_AURAS = new Set<number>([...Object.values(Aura), ...IGNORED_AURAS]);
+
+// Talent passives whose auras the engine does not read, for the run's "not simulated" list.
+export function unknownPassiveAuras(ch: Character): string[] {
+  return ch.passives.flatMap((p) =>
+    p.effects.filter((e) => e.effect === Effect.ApplyAura && !KNOWN_AURAS.has(e.aura)).map((e) => `${p.source}: aura ${e.aura}`),
+  );
+}
+
+// How long the rotation takes to notice a condition that turned true just because time passed
+// (time > 30, buff.x.remains < 2): a human reaction delay. The exact alternative would have each
+// time-based getter report when it next crosses its threshold and wake the fight then; this
+// polling is simpler and arguably more realistic. Change it here if that ever matters.
+const REACTION_MS = 100;
 
 const isChanneled = (spell: Spell) => (spell.attributes[1]! & CHANNELED_FLAGS) !== 0;
 
@@ -48,8 +73,6 @@ export type FightResult = {
   oomMs: number;
 };
 
-type AuraInstance = ActiveSpell & { expiresAt: number; token: number };
-
 type Target = Overrides["targets"][string];
 
 export type { GameData };
@@ -57,21 +80,32 @@ export type { GameData };
 // The rotation, compiled once and pointed at whichever fight is running.
 export class Rotation {
   fight: Fight | null = null;
-  readonly actions: { name: string; spell: Spell | null; cond: Getter | null }[];
+  // timed: the condition reads something that changes with time alone, so the fight re-checks it
+  // every REACTION_MS while it holds the action back.
+  readonly actions: { name: string; spell: Spell | null; cond: Getter | null; timed: boolean }[];
+  // Spell ids by snake_case name, for conditions that look up auras.
+  private readonly spellIds = new Map<string, number[]>();
 
   constructor(
     private ch: Character,
     private game: GameData,
   ) {
-    const knownNames = new Set(game.data.abilities.map((a) => snake(a.name)));
+    for (const s of Object.values(game.data.spells)) {
+      const key = snake(s.name);
+      this.spellIds.set(key, [...(this.spellIds.get(key) ?? []), s.id]);
+    }
+    const knownNames = new Set(game.data.abilities.filter((a) => a.tab !== "Pets").map((a) => snake(a.name)));
     this.actions = ch.config.rotation.actions.map((a) => {
       if (!knownNames.has(a.action)) throw new Error(`rotation: unknown action "${a.action}"`);
-      return {
-        name: a.action,
-        // null when the character does not know it (level or talents); the action is skipped.
-        spell: ch.abilities.get(a.action) ?? null,
-        cond: a.if ? compile(a.if, (path) => this.resolve(path)) : null,
-      };
+      let timed = false;
+      const cond = a.if
+        ? compile(a.if, (path) => {
+            if (["time", "fight", "target"].includes(path[0]!) || path.at(-1)?.endsWith("remains")) timed = true;
+            return this.resolve(path);
+          })
+        : null;
+      // spell is null when the character does not know it (level or talents); the action is skipped.
+      return { name: a.action, spell: ch.abilities.get(a.action) ?? null, cond, timed };
     });
   }
 
@@ -81,9 +115,8 @@ export class Rotation {
 
   private resolve(path: string[]): Getter {
     const [head, name, field] = path;
-    const spellNames = new Set(Object.values(this.game.data.spells).map((s) => snake(s.name)));
     const needSpellName = () => {
-      if (!name || !spellNames.has(name)) throw new Error(`rotation: unknown spell "${name}" in ${path.join(".")}`);
+      if (!name || !this.spellIds.has(name)) throw new Error(`rotation: unknown spell "${name}" in ${path.join(".")}`);
     };
     const sec = (ms: number) => Math.max(0, ms) / 1000;
 
@@ -108,6 +141,8 @@ export class Rotation {
         return () => this.f().rangedHaste();
       case "auto_shot":
         if (name === "remains") return () => sec(this.f().autoShotFiresAt() - this.f().now);
+        // Until the wind-up starts. A cast that ends by then does not delay the shot.
+        if (name === "cooldown_remains") return () => sec(this.f().autoShotWindupAt() - this.f().now);
         if (name === "windup") return () => (this.f().auto.windup ? 1 : 0);
         break;
       case "cooldown": {
@@ -128,9 +163,13 @@ export class Rotation {
       case "dot": {
         needSpellName();
         const onTarget = head !== "buff";
+        const ids = this.spellIds.get(name!)!;
         const find = () => {
           const auras = onTarget ? this.f().targetAuras : this.f().selfAuras;
-          for (const a of auras.values()) if (snake(a.spell.name) === name) return a;
+          for (const id of ids) {
+            const a = auras.get(id);
+            if (a) return a;
+          }
           return undefined;
         };
         if (field === "up" || field === "ticking") return () => (find() ? 1 : 0);
@@ -154,17 +193,19 @@ export class Fight implements PetHost {
   lastManaSpendAt = -Infinity;
   gcdReadyAt = 0;
   casting: { spell: Spell; endsAt: number } | null = null;
-  readonly cooldowns = new Map<string, number>();
-  readonly selfAuras = new Map<number, AuraInstance>();
-  readonly targetAuras = new Map<number, AuraInstance>();
+  // Ready times by spell id, and by category for spells sharing a category cooldown.
+  private readonly spellCooldowns = new Map<number, number>();
+  private readonly categoryCooldowns = new Map<number, number>();
+  readonly selfAuras: AuraSet;
+  readonly targetAuras: AuraSet;
   readonly auto = { cooldownEnd: 0, windup: false, firesAt: Infinity, token: 0 };
-  private auraToken = 0;
   private wakeAt = -1;
   private oomSince: number | null = null;
   private oomMs = 0;
   private readonly stats = new Map<string, AbilityStats>();
   private readonly target: Target;
   private readonly autoShot: Spell;
+  readonly attackPowerPerDps: number;
   private readonly scriptContext: ScriptContext;
   readonly pet: Pet | null = null;
 
@@ -177,9 +218,12 @@ export class Fight implements PetHost {
     private unimplemented: Set<string>,
   ) {
     this.rng = new Rng(seed);
+    this.selfAuras = new AuraSet(this.queue, ch.passives, () => this.modsCache.clear());
+    this.targetAuras = new AuraSet(this.queue);
     this.mana = ch.maxMana;
     this.target = game.overrides.targets[ch.config.target.preset]!;
     this.autoShot = game.data.spells["75"]!;
+    this.attackPowerPerDps = game.overrides.formula.attackPowerPerDps.value;
     if (ch.config.pet.active) {
       const family = game.data.petFamilies.find((p) => p.name === ch.config.pet.family);
       if (!family) throw new Error(`pet: unknown family "${ch.config.pet.family}"`);
@@ -232,66 +276,43 @@ export class Fight implements PetHost {
 
   // Stats in combat ===========================================================
 
-  // Passive and self-aura effects, rebuilt only when self auras change.
-  private effectsCache: ResolvedEffect[] | null = null;
-
-  private allEffects(): ResolvedEffect[] {
-    if (this.effectsCache) return this.effectsCache;
-    const out: ResolvedEffect[] = [];
-    for (const p of this.ch.passives) out.push(...p.effects);
-    for (const a of this.selfAuras.values()) out.push(...a.effects);
-    this.effectsCache = out;
-    return out;
-  }
-
-  private sumSelf(aura: number): number {
-    return this.allEffects()
-      .filter((e) => e.aura === aura)
-      .reduce((s, e) => s + e.value, 0);
-  }
-
-  private sumTarget(aura: number): number {
-    let s = 0;
-    for (const a of this.targetAuras.values()) for (const e of a.effects) if (e.aura === aura) s += e.value;
-    return s;
-  }
+  // Spell modifier sums, rebuilt only when self auras change.
+  private readonly modsCache = new Map<number, { flat: number; pct: number }>();
 
   rangedAttackPower(): number {
-    const fromInt = (this.sumSelf(Aura.ModRangedAttackPowerOfStatPercent) / 100) * this.ch.primary.intellect;
+    const fromInt = (this.selfAuras.sum(Aura.ModRangedAttackPowerOfStatPercent) / 100) * this.ch.primary.intellect;
     return (
       this.ch.rangedAttackPower +
-      this.sumSelf(Aura.ModRangedAttackPower) +
-      this.sumTarget(Aura.RangedAttackPowerAttackerBonus) +
+      this.selfAuras.sum(Aura.ModRangedAttackPower) +
+      this.targetAuras.sum(Aura.RangedAttackPowerAttackerBonus) +
       fromInt
     );
   }
 
   rangedHaste(): number {
-    let h = 1 + this.ch.config.gear.quiverHastePct / 100;
-    for (const e of this.allEffects()) {
-      if (e.aura === Aura.ModRangedHaste || e.aura === Aura.ModRangedAmmoHaste) h *= 1 + e.value / 100;
-    }
-    return h;
+    return this.selfAuras.product([Aura.ModRangedHaste, Aura.ModRangedAmmoHaste], 1 + this.ch.config.gear.quiverHastePct / 100);
   }
 
   // Sum of AddFlatModifier and AddPctModifier values for one spell and one modifier kind.
   private mods(spell: Spell, op: number): { flat: number; pct: number } {
+    const key = spell.id * 32 + op;
+    const cached = this.modsCache.get(key);
+    if (cached) return cached;
     const mask = spell.classOptions?.mask;
     let flat = 0;
     let pct = 0;
-    if (!mask) return { flat, pct };
-    for (const e of this.allEffects()) {
-      if (e.aura !== Aura.AddFlatModifier && e.aura !== Aura.AddPctModifier) continue;
-      if (e.miscValue[0] !== op) continue;
-      if (!e.classMask.some((m, i) => (m & mask[i]!) !== 0)) continue;
-      if (e.aura === Aura.AddFlatModifier) flat += e.value;
-      else pct += e.value;
+    if (mask) {
+      for (const e of this.selfAuras.effects()) {
+        if (e.aura !== Aura.AddFlatModifier && e.aura !== Aura.AddPctModifier) continue;
+        if (e.miscValue[0] !== op) continue;
+        if (!e.classMask.some((m, i) => (m & mask[i]!) !== 0)) continue;
+        if (e.aura === Aura.AddFlatModifier) flat += e.value;
+        else pct += e.value;
+      }
     }
-    return { flat, pct };
-  }
-
-  hunterModded(base: number, spell: Spell, op: number): number {
-    return this.modded(base, spell, op);
+    const out = { flat, pct };
+    this.modsCache.set(key, out);
+    return out;
   }
 
   sharedDamagePct(): number {
@@ -313,17 +334,19 @@ export class Fight implements PetHost {
     this.unimplemented.add(what);
   }
 
-  private modded(base: number, spell: Spell, op: number): number {
+  modded(base: number, spell: Spell, op: number): number {
     const { flat, pct } = this.mods(spell, op);
     return (base + flat) * (1 + pct / 100);
   }
 
-  private damageMultiplier(school: number): number {
-    let m = 1;
-    for (const e of this.allEffects()) {
-      if (e.aura === Aura.ModDamagePercentDone && (e.miscValue[0] & school) !== 0) m *= 1 + e.value / 100;
-    }
-    return m;
+  // Effect values with the hunter's effect modifiers applied (Bestial Discipline on the pet's
+  // focus regen, Improved Aspect of the Monkey).
+  moddedEffects(spell: Spell, effects: ResolvedEffect[]): ResolvedEffect[] {
+    return effects.map((e) => {
+      const op = EFFECT_VALUE_OPS[e.index];
+      const value = this.modded(op === undefined ? e.value : this.modded(e.value, spell, op), spell, SpellModOp.AllEffects);
+      return value === e.value ? e : { ...e, value };
+    });
   }
 
   armorMultiplier(): number {
@@ -347,12 +370,8 @@ export class Fight implements PetHost {
     return hasted ? base / this.rangedHaste() : base;
   }
 
-  private cooldownKey(spell: Spell): string {
-    return spell.category && spell.categoryCooldownMs ? `cat:${spell.category}` : `spell:${spell.id}`;
-  }
-
   cooldownReadyAt(spell: Spell): number {
-    return Math.max(this.cooldowns.get(`spell:${spell.id}`) ?? 0, this.cooldowns.get(`cat:${spell.category}`) ?? 0);
+    return Math.max(this.spellCooldowns.get(spell.id) ?? 0, this.categoryCooldowns.get(spell.category) ?? 0);
   }
 
   // Acting =====================================================================
@@ -383,20 +402,27 @@ export class Fight implements PetHost {
       if (!a.spell) continue;
       const ready = this.cooldownReadyAt(a.spell);
       if (ready > this.now) next = Math.min(next, ready);
+      // Castable but held back by a time-based condition (act() just ran, so it is false).
+      else if (a.timed && this.canCast(a.spell)) next = Math.min(next, this.now + REACTION_MS);
     }
     if (next === Infinity || (this.wakeAt > this.now && this.wakeAt <= next)) return;
     this.wakeAt = next;
     this.queue.push(next, () => {});
   }
 
+  // Out of mana: free to act, and an action the list wants right now (off cooldown, condition
+  // true) costs more mana than there is. Runs after act(), so nothing wanted was castable.
   private trackOom(): void {
     const starved =
       !this.casting &&
       this.now >= this.gcdReadyAt &&
       this.rotation.actions.some(
-        (a) => a.spell && this.cooldownReadyAt(a.spell) <= this.now && this.mana < this.manaCost(a.spell),
-      ) &&
-      !this.rotation.actions.some((a) => a.spell && this.canCast(a.spell));
+        (a) =>
+          a.spell &&
+          this.cooldownReadyAt(a.spell) <= this.now &&
+          this.mana < this.manaCost(a.spell) &&
+          (!a.cond || a.cond()),
+      );
     if (starved && this.oomSince === null) this.oomSince = this.now;
     if (!starved && this.oomSince !== null) {
       this.oomMs += this.now - this.oomSince;
@@ -404,24 +430,19 @@ export class Fight implements PetHost {
     }
   }
 
+  // The GCD starts with the cast; mana and the cooldown are taken when the cast completes.
   private cast(spell: Spell): void {
-    const cost = this.manaCost(spell);
-    if (cost > 0) {
-      this.mana -= cost;
-      this.manaSpent += cost;
-      this.lastManaSpendAt = this.now;
-    }
     if (spell.gcdMs > 0) this.gcdReadyAt = this.now + spell.gcdMs;
-    const cd = Math.max(spell.cooldownMs, spell.categoryCooldownMs);
-    if (cd > 0) this.cooldowns.set(this.cooldownKey(spell), this.now + Math.max(0, this.modded(cd, spell, SpellModOp.Cooldown)));
     this.stat(spell.name).casts++;
 
     if (isChanneled(spell)) {
+      this.complete(spell);
       this.channel(spell);
       return;
     }
     const castMs = this.castTime(spell);
     if (castMs <= 0) {
+      this.complete(spell);
       this.execute(spell);
       return;
     }
@@ -431,9 +452,25 @@ export class Fight implements PetHost {
     this.casting = { spell, endsAt };
     this.queue.push(endsAt, () => {
       this.casting = null;
+      this.complete(spell);
       this.execute(spell);
       this.tryWindup();
     });
+  }
+
+  private complete(spell: Spell): void {
+    const cost = this.manaCost(spell);
+    if (cost > 0) {
+      this.mana -= cost;
+      this.manaSpent += cost;
+      this.lastManaSpendAt = this.now;
+    }
+    const cd = Math.max(spell.cooldownMs, spell.categoryCooldownMs);
+    if (cd > 0) {
+      const readyAt = this.now + Math.max(0, this.modded(cd, spell, SpellModOp.Cooldown));
+      if (spell.category && spell.categoryCooldownMs) this.categoryCooldowns.set(spell.category, readyAt);
+      else this.spellCooldowns.set(spell.id, readyAt);
+    }
   }
 
   // A channel occupies the hunter for its whole duration, like a long cast, while its auras tick.
@@ -459,6 +496,11 @@ export class Fight implements PetHost {
     if (this.auto.windup) return this.auto.firesAt;
     const start = Math.max(this.auto.cooldownEnd, this.casting?.endsAt ?? 0, this.now);
     return start + this.windupMs();
+  }
+
+  // When the next wind-up starts (now, if it already has).
+  autoShotWindupAt(): number {
+    return this.auto.windup ? this.now : this.autoShotFiresAt() - this.windupMs();
   }
 
   private tryWindup(): void {
@@ -496,7 +538,7 @@ export class Fight implements PetHost {
     const miss = Math.max(0, t.baseMissPct - Math.max(0, this.ch.hitPct - t.hitPenaltyPct));
     const crit = Math.max(
       0,
-      this.ch.critPct + this.mods(spell, SpellModOp.CritChance).flat - t.critSuppressionPct,
+      this.ch.critPct + this.selfAuras.sum(Aura.ModCritPct) + this.mods(spell, SpellModOp.CritChance).flat - t.critSuppressionPct,
     );
     const r = this.rng.stream(isAuto ? "auto" : "special").next() * 100;
     if (r < miss) return "miss";
@@ -509,8 +551,7 @@ export class Fight implements PetHost {
     const g = this.ch.config.gear;
     const w = this.ch.rangedWeapon;
     const speed = normalized ? this.game.overrides.formula.normalizedRangedSpeed.value : w.speed;
-    const apPerDps = this.game.overrides.formula.attackPowerPerDps.value;
-    return this.rng.stream("damage").range(w.min, w.max) + g.ammoDps * speed + (this.rangedAttackPower() / apPerDps) * speed;
+    return this.rng.stream("damage").range(w.min, w.max) + g.ammoDps * speed + (this.rangedAttackPower() / this.attackPowerPerDps) * speed;
   }
 
   private effectDamage(spell: Spell, e: ResolvedEffect): number {
@@ -535,7 +576,9 @@ export class Fight implements PetHost {
       if (!KNOWN_EFFECTS.has(e.effect)) this.unimplemented.add(`${spell.name} (${spell.id}): effect ${e.effect}`);
     }
     const damaging = effects.filter((e) => DAMAGE_EFFECTS.has(e.effect));
-    const outcome = isChanneled(spell) ? "hit" : this.roll(spell, isAuto);
+    // Spells that deal no damage and put nothing on the enemy (Intimidation, Bestial Wrath) cannot miss.
+    const canMiss = damaging.length > 0 || effects.some((e) => TARGET_ENEMY.has(e.implicitTarget[0]));
+    const outcome = isChanneled(spell) || !canMiss ? "hit" : this.roll(spell, isAuto);
     const s = this.stat(spell.name);
     if (outcome === "miss") {
       s.misses++;
@@ -544,7 +587,7 @@ export class Fight implements PetHost {
 
     if (damaging.length > 0) {
       let amount = damaging.reduce((sum, e) => sum + this.effectDamage(spell, e), 0);
-      amount = this.modded(amount, spell, SpellModOp.Damage) * this.damageMultiplier(spell.school);
+      amount = this.modded(amount, spell, SpellModOp.Damage) * this.selfAuras.damageMultiplier(spell.school);
       if (spell.school === School.Physical) amount *= this.armorMultiplier();
       if (outcome === "crit") {
         const bonus = this.game.overrides.formula.critDamageBonusPct.value / 100;
@@ -558,18 +601,23 @@ export class Fight implements PetHost {
       s.hits++;
     }
 
+    // Charges go after the damage they applied to and before this spell's own auras land, so a
+    // shot that grants charged buffs does not spend one itself.
+    const flag = isAuto ? ProcFlag.DoneRangedAutoAttack : ProcFlag.DoneRangedSpell;
+    if (spell.defenseType === DefenseType.Ranged) this.selfAuras.consumeCharges(flag);
     this.applyAuras(spell, effects);
     ON_LAND[spell.name]?.(this.scriptContext);
-    if (spell.defenseType === DefenseType.Ranged) {
-      this.procs(isAuto ? ProcFlag.DoneRangedAutoAttack : ProcFlag.DoneRangedSpell);
-    }
+    if (spell.defenseType === DefenseType.Ranged) this.procs(flag);
   }
 
   // Auras =====================================================================
 
   private applyAuras(spell: Spell, effects: ResolvedEffect[] | null): void {
     const all = effects ?? resolveEffects(spell);
-    const auraEffects = all.filter((e) => e.effect === Effect.ApplyAura || e.effect === Effect.ApplyAreaAuraRaid);
+    const auraEffects = this.moddedEffects(
+      spell,
+      all.filter((e) => e.effect === Effect.ApplyAura || e.effect === Effect.ApplyAreaAuraRaid),
+    );
     if (auraEffects.length === 0) return;
     for (const e of auraEffects) {
       if (!KNOWN_AURAS.has(e.aura as never)) this.unimplemented.add(`${spell.name} (${spell.id}): aura ${e.aura}`);
@@ -579,53 +627,41 @@ export class Fight implements PetHost {
     const onPet = auraEffects.filter((e) => e.implicitTarget[0] === TARGET_PET);
     const onSelf = auraEffects.filter((e) => !TARGET_ENEMY.has(e.implicitTarget[0]) && e.implicitTarget[0] !== TARGET_PET);
     const duration = spell.durationMs < 0 ? Infinity : this.modded(spell.durationMs, spell, SpellModOp.Duration);
-    if (onPet.length > 0) this.pet?.addAura(spell, onPet, duration === Infinity ? -1 : duration);
+    if (onPet.length > 0) this.pet?.addAura(spell, onPet, duration);
     if (onSelf.length > 0) this.addAura(this.selfAuras, spell, onSelf, duration);
     if (onTarget.length > 0) this.addAura(this.targetAuras, spell, onTarget, duration);
   }
 
-  private addAura(map: Map<number, AuraInstance>, spell: Spell, effects: ResolvedEffect[], duration: number): void {
-    const token = ++this.auraToken;
-    const expiresAt = this.now + duration;
-    // Periodic dummies fire a linked spell each tick (Volley), rolling and scaling like a cast.
-    for (const e of effects.filter((x) => x.aura === Aura.PeriodicDummy && x.triggerSpell)) {
-      const triggered = this.game.data.spells[String(e.triggerSpell)]!;
-      for (let t = e.periodMs; t <= duration; t += e.periodMs) {
-        this.queue.push(this.now + t, () => {
-          if (map.get(spell.id)?.token === token) this.execute(triggered);
-        });
+  private addAura(auras: AuraSet, spell: Spell, effects: ResolvedEffect[], duration: number): void {
+    auras.add(spell, effects, this.now, duration, (isLive) => {
+      // Periodic dummies fire a linked spell each tick (Volley), rolling and scaling like a cast.
+      for (const e of effects.filter((x) => x.aura === Aura.PeriodicDummy && x.triggerSpell)) {
+        const triggered = this.game.data.spells[String(e.triggerSpell)]!;
+        for (let t = e.periodMs; t <= duration; t += e.periodMs) {
+          this.queue.push(this.now + t, () => {
+            if (isLive()) this.execute(triggered);
+          });
+        }
       }
-    }
-    // Periodic damage snapshots its tick when applied.
-    const periodic = effects.filter((e) => e.aura === Aura.PeriodicDamage);
-    map.set(spell.id, { spell, effects, expiresAt, token, source: spell.name });
-    this.effectsCache = null;
-    for (const e of periodic) {
-      const tick =
-        (this.modded(e.value + e.apCoefficient * this.rangedAttackPower(), spell, SpellModOp.PeriodicDamage)) *
-        this.damageMultiplier(spell.school);
-      for (let t = e.periodMs; t <= duration; t += e.periodMs) {
-        this.queue.push(this.now + t, () => {
-          if (map.get(spell.id)?.token !== token) return;
-          const s = this.stat(spell.name);
-          s.ticks++;
-          s.damage += tick;
-        });
+      // Periodic damage snapshots its tick when applied.
+      for (const e of effects.filter((x) => x.aura === Aura.PeriodicDamage)) {
+        const tick =
+          this.modded(e.value + e.apCoefficient * this.rangedAttackPower(), spell, SpellModOp.PeriodicDamage) *
+          this.selfAuras.damageMultiplier(spell.school);
+        for (let t = e.periodMs; t <= duration; t += e.periodMs) {
+          this.queue.push(this.now + t, () => {
+            if (!isLive()) return;
+            const s = this.stat(spell.name);
+            s.ticks++;
+            s.damage += tick;
+          });
+        }
       }
-    }
-    // Scheduled after the ticks, so a tick landing exactly on expiry still happens.
-    if (duration !== Infinity) {
-      this.queue.push(expiresAt, () => {
-        if (map.get(spell.id)?.token !== token) return;
-        map.delete(spell.id);
-        this.effectsCache = null;
-      });
-    }
+    });
   }
 
   private procs(flag: number): void {
-    const sources: ActiveSpell[] = [...this.ch.passives, ...this.selfAuras.values()];
-    for (const src of sources) {
+    for (const src of this.selfAuras.sources()) {
       const proc = src.spell.proc;
       if (!proc || (proc.typeMask[0] & flag) === 0) continue;
       for (const e of src.effects) {
@@ -648,7 +684,7 @@ export class Fight implements PetHost {
     const f = this.game.overrides.formula;
     let gain = (this.ch.mp5 * 2) / 5;
     const spiritRegen = f.manaPerTickBase.value + this.ch.primary.spirit / f.spiritPerManaPerTick.value;
-    const whileCasting = Math.min(100, this.sumSelf(Aura.ModManaRegenInterrupt)) / 100;
+    const whileCasting = Math.min(100, this.selfAuras.sum(Aura.ModManaRegenInterrupt)) / 100;
     gain += this.now - this.lastManaSpendAt >= 5000 ? spiritRegen : spiritRegen * whileCasting;
     this.mana = Math.min(this.ch.maxMana, this.mana + gain);
   }

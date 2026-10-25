@@ -56,15 +56,19 @@ iterations = 2000
 precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
 
 [[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
 action = "aimed_shot"
-if = "auto_shot.remains >= cast.aimed_shot.time & mana.pct > 20"
+if = "auto_shot.cooldown_remains >= cast.aimed_shot.time & mana.pct > 20"
 
 [[rotation.actions]]
 action = "rapid_fire"
 
 [[rotation.actions]]
 action = "sniper_shot"
-if = "mana.pct > 80 & auto_shot.remains >= cast.sniper_shot.time"
+if = "mana.pct > 80 & auto_shot.cooldown_remains >= cast.sniper_shot.time"
 
 [[rotation.actions]]
 action = "serpent_sting"

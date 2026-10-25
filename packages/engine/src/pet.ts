@@ -2,8 +2,9 @@
 // reach it by modifying the shared pet passives (Unleashed Fury, Ferocity, Frenzy, Bestial
 // Discipline), exactly as the client wires them.
 import type { HunterData, Overrides, PetFamily, Spell } from "@hunter-sim/data";
-import { type ResolvedEffect, resolveEffects, snake } from "./character";
-import { Aura, DefenseType, Effect, School, SpellModOp } from "./enums";
+import { AuraSet } from "./auras";
+import { type ActiveSpell, knownRank, type ResolvedEffect, resolveEffects, snake } from "./character";
+import { Aura, DefenseType, Effect, IGNORED_AURAS, ProcFlag, School, SpellModOp, TARGET_ENEMY } from "./enums";
 import type { EventQueue } from "./queue";
 import type { Rng } from "./rng";
 
@@ -12,8 +13,10 @@ export type PetHost = {
   readonly now: number;
   readonly queue: EventQueue;
   readonly rng: Rng;
-  readonly durationMs: number;
-  hunterModded(base: number, spell: Spell, op: number): number;
+  readonly attackPowerPerDps: number;
+  // A value with the hunter's spell modifiers applied.
+  modded(base: number, spell: Spell, op: number): number;
+  moddedEffects(spell: Spell, effects: ResolvedEffect[]): ResolvedEffect[];
   rangedAttackPower(): number;
   armorMultiplier(): number;
   // Damage-done bonuses the pet shares with the hunter (Focused Fire).
@@ -21,8 +24,6 @@ export type PetHost = {
   record(name: string, outcome: "hit" | "crit" | "miss" | "glance" | "tick" | "cast", amount?: number): void;
   report(what: string): void;
 };
-
-type PetAura = { spell: Spell; effects: ResolvedEffect[]; expiresAt: number; token: number };
 
 // Default ability priority, filtered to what the family knows. Buffs first, then damage.
 const DEFAULT_PRIORITY = [
@@ -35,9 +36,16 @@ const DEFAULT_PRIORITY = [
   "claw",
 ];
 
-const IGNORED_PET_AURAS = new Set<number>([
-  13, 22, 29, 31, 49, 61, 77, 101, 118, 133, 142, 230, 563, // defensive, cosmetic or out of scope
+// Pet auras the sim reads, plus those with no effect on its damage (defensive, cosmetic or out of
+// scope). Anything else is reported.
+const KNOWN_PET_AURAS = new Set<number>([
+  Aura.PeriodicDamage,
+  Aura.ModMeleeHaste,
+  Aura.ModAttackPower,
+  Aura.ModDamagePercentDone,
   Aura.ProcTriggerSpell, // handled by the proc check
+  ...IGNORED_AURAS,
+  13, 22, 29, 31, 49, 101, 118, 133, 142, 230, 563,
 ]);
 
 export class Pet {
@@ -45,12 +53,11 @@ export class Pet {
   private focusAt = 0;
   private gcdReadyAt = 0;
   private readonly cooldowns = new Map<number, number>();
-  private readonly auras = new Map<number, PetAura>();
-  private passives: { spell: Spell; effects: ResolvedEffect[] }[] = [];
+  private readonly auras: AuraSet;
+  // The pet's DoTs on the target. Reapplying one replaces it.
+  private readonly dots: AuraSet;
   private readonly abilities: Spell[];
-  private auraToken = 0;
   private wakeAt = -1;
-  private effectsCache: ResolvedEffect[] | null = null;
 
   constructor(
     private host: PetHost,
@@ -61,19 +68,18 @@ export class Pet {
     priority: string[] | undefined,
   ) {
     // Passive values settle once, with the hunter's talents applied through spell modifiers.
-    for (const id of [...data.petPassives, family.passiveSpellId]) {
+    const passives: ActiveSpell[] = [...data.petPassives, family.passiveSpellId].map((id) => {
       const spell = data.spells[String(id)]!;
-      const effects = resolveEffects(spell).map((e) =>
-        e.index === 0 ? { ...e, value: host.hunterModded(e.value, spell, SpellModOp.Effect1) } : e,
-      );
-      this.passives.push({ spell, effects });
-    }
+      return { spell, effects: host.moddedEffects(spell, resolveEffects(spell)), source: spell.name };
+    });
+    this.auras = new AuraSet(host.queue, passives);
+    this.dots = new AuraSet(host.queue);
 
     const known = new Map<string, Spell>();
     for (const a of data.abilities) {
       if (a.tab !== "Pets" || !family.abilities.includes(a.name)) continue;
-      const rank = a.ranks.filter((r) => r.level <= level).at(-1);
-      if (rank) known.set(snake(a.name), data.spells[String(rank.spellId)]!);
+      const spell = knownRank(data, a, level);
+      if (spell) known.set(snake(a.name), spell);
     }
     const order = priority ?? DEFAULT_PRIORITY;
     for (const name of priority ?? []) {
@@ -89,49 +95,26 @@ export class Pet {
 
   // Effects and stats ==========================================================
 
-  private effects(): ResolvedEffect[] {
-    if (this.effectsCache) return this.effectsCache;
-    const out: ResolvedEffect[] = [];
-    for (const p of this.passives) out.push(...p.effects);
-    for (const a of this.auras.values()) out.push(...a.effects);
-    return (this.effectsCache = out);
-  }
-
-  private sum(aura: number, misc?: number): number {
-    let s = 0;
-    for (const e of this.effects()) if (e.aura === aura && (misc === undefined || e.miscValue[0] === misc)) s += e.value;
-    return s;
-  }
-
   attackPower(): number {
-    return this.o.baseAttackPower.value + (this.host.rangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100 + this.sum(Aura.ModAttackPower);
-  }
-
-  private haste(): number {
-    let h = 1;
-    for (const e of this.effects()) if (e.aura === Aura.ModMeleeHaste) h *= 1 + e.value / 100;
-    return h;
+    return this.o.baseAttackPower.value + (this.host.rangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100 + this.auras.sum(Aura.ModAttackPower);
   }
 
   private damageMultiplier(school: number): number {
-    let m = (1 + this.o.happinessDamagePct.value / 100) * (1 + this.host.sharedDamagePct() / 100);
-    for (const e of this.effects()) {
-      if (e.aura === Aura.ModDamagePercentDone && (e.miscValue[0] & school) !== 0) m *= 1 + e.value / 100;
-    }
-    return m;
+    const shared = (1 + this.o.happinessDamagePct.value / 100) * (1 + this.host.sharedDamagePct() / 100);
+    return shared * this.auras.damageMultiplier(school);
   }
 
   private critPct(): number {
-    return this.o.baseCritPct.value + this.sum(Aura.ModCritPct);
+    return this.o.baseCritPct.value + this.auras.sum(Aura.ModCritPct);
   }
 
   private focusNow(): number {
-    const regen = this.o.focusPerSecond.value * (1 + this.sum(Aura.ModPowerRegenPercent, 2) / 100);
-    return Math.min(100, this.focus + (regen * (this.host.now - this.focusAt)) / 1000);
+    return Math.min(100, this.focus + this.focusRate() * (this.host.now - this.focusAt));
   }
 
+  // Focus per millisecond.
   private focusRate(): number {
-    return (this.o.focusPerSecond.value * (1 + this.sum(Aura.ModPowerRegenPercent, 2) / 100)) / 1000;
+    return (this.o.focusPerSecond.value * (1 + this.auras.sum(Aura.ModPowerRegenPercent, 2) / 100)) / 1000;
   }
 
   // White swings ===============================================================
@@ -147,8 +130,9 @@ export class Pet {
     if (rng < dodge) {
       this.host.record("Pet: Melee", "miss");
     } else {
+      this.auras.consumeCharges(ProcFlag.DoneMeleeAutoAttack);
       const base = this.host.rng.stream("pet-damage").range(this.o.baseDamage.min, this.o.baseDamage.max);
-      let amount = (base + (this.attackPower() / 14) * speed) * this.damageMultiplier(School.Physical) * this.host.armorMultiplier();
+      let amount = (base + (this.attackPower() / this.host.attackPowerPerDps) * speed) * this.damageMultiplier(School.Physical) * this.host.armorMultiplier();
       if (rng < glance) {
         amount *= 1 - this.o.glancingPenaltyPct.value / 100;
         this.host.record("Pet: Melee", "glance", amount);
@@ -159,17 +143,17 @@ export class Pet {
         this.host.record("Pet: Melee", "hit", amount);
       }
     }
-    this.host.queue.push(this.host.now + (speed * 1000) / this.haste(), () => this.swing());
+    this.host.queue.push(this.host.now + (speed * 1000) / this.auras.product([Aura.ModMeleeHaste]), () => this.swing());
   }
 
   // Frenzy and anything like it: the client marks no "on crit" flag, the tooltips do.
   private onCrit(): void {
-    for (const p of this.passives) {
+    for (const p of this.auras.passives) {
       const proc = p.spell.proc;
       if (!proc) continue;
       for (const e of p.effects) {
         if (e.aura !== Aura.ProcTriggerSpell || !e.triggerSpell) continue;
-        const chance = this.host.hunterModded(proc.chance, p.spell, SpellModOp.ProcChance);
+        const chance = this.host.modded(proc.chance, p.spell, SpellModOp.ProcChance);
         if (!this.host.rng.stream(`pet-proc:${p.spell.id}`).chance(chance)) continue;
         const triggered = this.data.spells[String(e.triggerSpell)]!;
         this.addAura(triggered, resolveEffects(triggered), triggered.durationMs);
@@ -243,18 +227,24 @@ export class Pet {
         this.host.record(name, "hit", amount);
       }
     }
+    // After the crit roll, which the charge applied to.
+    if (spell.defenseType === DefenseType.Melee) this.auras.consumeCharges(ProcFlag.DoneMeleeSpell);
 
     for (const e of auraEffects) {
-      if (!IGNORED_PET_AURAS.has(e.aura) && e.aura !== Aura.PeriodicDamage && e.aura !== Aura.ModMeleeHaste && e.aura !== Aura.ModAttackPower && e.aura !== Aura.ModDamagePercentDone) {
-        this.host.report(`${name} (${spell.id}): aura ${e.aura}`);
-      }
+      if (!KNOWN_PET_AURAS.has(e.aura)) this.host.report(`${name} (${spell.id}): aura ${e.aura}`);
     }
     const dots = auraEffects.filter((e) => e.aura === Aura.PeriodicDamage);
-    for (const e of dots) {
-      const tick = e.value * this.damageMultiplier(spell.school);
-      for (let t = e.periodMs; t <= spell.durationMs; t += e.periodMs) {
-        if (this.host.now + t < this.host.durationMs) this.host.queue.push(this.host.now + t, () => this.host.record(name, "tick", tick));
-      }
+    if (dots.length > 0) {
+      this.dots.add(spell, dots, this.host.now, spell.durationMs, (isLive) => {
+        for (const e of dots) {
+          const tick = e.value * this.damageMultiplier(spell.school);
+          for (let t = e.periodMs; t <= spell.durationMs; t += e.periodMs) {
+            this.host.queue.push(this.host.now + t, () => {
+              if (isLive()) this.host.record(name, "tick", tick);
+            });
+          }
+        }
+      });
     }
     // Buffs on the pet itself (Trickster's Dance, Furious Howl).
     const buffs = auraEffects.filter((e) => e.aura !== Aura.PeriodicDamage && !TARGET_ENEMY.has(e.implicitTarget[0]));
@@ -263,19 +253,8 @@ export class Pet {
 
   // Auras ======================================================================
 
+  // A duration below zero, as the client stores "until cancelled", lasts the whole fight.
   addAura(spell: Spell, effects: ResolvedEffect[], durationMs: number): void {
-    const token = ++this.auraToken;
-    const expiresAt = this.host.now + (durationMs < 0 ? Infinity : durationMs);
-    this.auras.set(spell.id, { spell, effects, expiresAt, token });
-    this.effectsCache = null;
-    if (expiresAt !== Infinity) {
-      this.host.queue.push(expiresAt, () => {
-        if (this.auras.get(spell.id)?.token !== token) return;
-        this.auras.delete(spell.id);
-        this.effectsCache = null;
-      });
-    }
+    this.auras.add(spell, effects, this.host.now, durationMs < 0 ? Infinity : durationMs);
   }
 }
-
-const TARGET_ENEMY = new Set([6, 25]);

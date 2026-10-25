@@ -46,6 +46,10 @@ export const IGNORED_EFFECTS = new Set<number>([
   179, // Volley: creates the ground area; damage comes from the linked tick spell
 ]);
 
+// Implicit targets: the enemy (6, 25) and the hunter's pet (5). Anything else lands on the caster.
+export const TARGET_ENEMY = new Set([6, 25]);
+export const TARGET_PET = 5;
+
 // Attributes_1 flags marking a channeled spell.
 export const CHANNELED_FLAGS = 0x4 | 0x40;
 
@@ -56,13 +60,19 @@ export const SpellModOp = {
   Effect1: 3,
   Range: 5,
   CritChance: 7,
+  AllEffects: 8,
   CastTime: 10,
   Cooldown: 11,
+  Effect2: 12,
   Cost: 14,
   CritDamageBonus: 15,
   ProcChance: 18,
   PeriodicDamage: 22,
+  Effect3: 23,
 } as const;
+
+// The modifier that changes one effect's value, by effect index.
+export const EFFECT_VALUE_OPS = [SpellModOp.Effect1, SpellModOp.Effect2, SpellModOp.Effect3];
 
 export const DefenseType = { None: 0, Magic: 1, Melee: 2, Ranged: 3 } as const;
 

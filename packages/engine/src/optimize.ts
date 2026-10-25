@@ -5,7 +5,9 @@
 // beats the best by more than the noise. Every candidate runs on the same fights (same seed),
 // so comparisons are paired and cheap. The winner is then re-checked on fresh fights, because a
 // search can overfit to the exact fights it was scored on.
-import { snake } from "./character";
+import { buildCharacter, snake } from "./character";
+import { SimConfig } from "./config";
+import { Effect, TARGET_ENEMY } from "./enums";
 import type { ActionConfig, SimConfigInput } from "./config";
 import { Stream } from "./rng";
 import { compareResults, simulate, type SimResult } from "./run";
@@ -14,23 +16,23 @@ import type { GameData } from "./sim";
 export type Term =
   | { kind: "manaAbove"; pct: number }
   | { kind: "fightRemainsAbove"; sec: number }
-  // Only start a cast that ends before the next Auto Shot would fire.
+  // Only start a cast that ends before the next Auto Shot wind-up, so the shot is not delayed.
   | { kind: "noClip" }
-  // Only when the action's own DoT is not on the target.
-  | { kind: "dotDown" };
+  // Only when the action's own debuff or DoT is not on the target.
+  | { kind: "debuffDown" };
 
 export type Gene = { action: string; enabled: boolean; terms: Term[] };
 
-export function termToExpr(action: string, t: Term): string {
+function termToExpr(action: string, t: Term): string {
   switch (t.kind) {
     case "manaAbove":
       return `mana.pct > ${t.pct}`;
     case "fightRemainsAbove":
       return `fight.remains > ${t.sec}`;
     case "noClip":
-      return `auto_shot.remains >= cast.${action}.time`;
-    case "dotDown":
-      return `!dot.${action}.ticking`;
+      return `auto_shot.cooldown_remains >= cast.${action}.time`;
+    case "debuffDown":
+      return `!debuff.${action}.up`;
   }
 }
 
@@ -55,8 +57,8 @@ export function actionsToGenes(actions: ActionConfig[]): { genes: Gene[]; droppe
       let m: RegExpExecArray | null;
       if ((m = /^mana\.pct > (\d+)$/.exec(part))) terms.push({ kind: "manaAbove", pct: Number(m[1]) });
       else if ((m = /^fight\.remains > (\d+)$/.exec(part))) terms.push({ kind: "fightRemainsAbove", sec: Number(m[1]) });
-      else if (part === `auto_shot.remains >= cast.${a.action}.time`) terms.push({ kind: "noClip" });
-      else if (part === `!dot.${a.action}.ticking`) terms.push({ kind: "dotDown" });
+      else if (part === `auto_shot.cooldown_remains >= cast.${a.action}.time`) terms.push({ kind: "noClip" });
+      else if (part === `!dot.${a.action}.ticking` || part === `!debuff.${a.action}.up`) terms.push({ kind: "debuffDown" });
       else dropped.push(`${a.action}: ${part}`);
     }
     return { action: a.action, enabled: true, terms };
@@ -65,7 +67,8 @@ export function actionsToGenes(actions: ActionConfig[]): { genes: Gene[]; droppe
 }
 
 export type OptimizeOptions = {
-  // Extra actions the search may add, disabled at the start.
+  // Extra actions the search may add, disabled at the start. Ones the character does not know
+  // (level, talents) are skipped.
   pool: string[];
   // Fights per candidate during the search.
   iterations: number;
@@ -83,19 +86,19 @@ export type OptimizeResult = {
   best: Gene[];
   bestActions: ActionConfig[];
   evaluated: number;
-  // On fresh fights: the original rotation, the winner, and the paired difference.
+  // On fresh fights: the rotation as written (unsearchable conditions included), the winner, and
+  // the paired difference.
   confirm: { before: SimResult; after: SimResult; delta: number; error95: number; pct: number };
 };
 
-function mutate(genes: Gene[], rng: Stream, castActions: Set<string>, dotActions: Set<string>): Gene[] {
+function mutate(genes: Gene[], rng: Stream, castActions: Set<string>, debuffActions: Set<string>): Gene[] {
   const g: Gene[] = structuredClone(genes);
-  const pick = <T>(xs: T[]): T => xs[Math.floor(rng.next() * xs.length)]!;
-  const i = Math.floor(rng.next() * g.length);
+  const i = rng.int(g.length);
   const gene = g[i]!;
 
-  switch (pick(["swap", "swap", "toggle", "addTerm", "dropTerm", "tune", "tune"])) {
+  switch (rng.pick(["swap", "swap", "toggle", "addTerm", "dropTerm", "tune", "tune"])) {
     case "swap": {
-      const j = Math.floor(rng.next() * g.length);
+      const j = rng.int(g.length);
       [g[i], g[j]] = [g[j]!, g[i]!];
       break;
     }
@@ -105,22 +108,22 @@ function mutate(genes: Gene[], rng: Stream, castActions: Set<string>, dotActions
     case "addTerm": {
       if (gene.terms.length >= 2) break;
       const options: Term[] = [
-        { kind: "manaAbove", pct: pick([10, 20, 30, 40, 50, 60, 70, 80]) },
-        { kind: "fightRemainsAbove", sec: pick([3, 6, 9, 12, 15]) },
+        { kind: "manaAbove", pct: rng.pick([10, 20, 30, 40, 50, 60, 70, 80]) },
+        { kind: "fightRemainsAbove", sec: rng.pick([3, 6, 9, 12, 15]) },
       ];
       if (castActions.has(gene.action)) options.push({ kind: "noClip" });
-      if (dotActions.has(gene.action)) options.push({ kind: "dotDown" });
-      const term = pick(options);
+      if (debuffActions.has(gene.action)) options.push({ kind: "debuffDown" });
+      const term = rng.pick(options);
       if (!gene.terms.some((t) => t.kind === term.kind)) gene.terms.push(term);
       break;
     }
     case "dropTerm":
-      if (gene.terms.length) gene.terms.splice(Math.floor(rng.next() * gene.terms.length), 1);
+      if (gene.terms.length) gene.terms.splice(rng.int(gene.terms.length), 1);
       break;
     case "tune": {
       const t = gene.terms.find((x) => x.kind === "manaAbove" || x.kind === "fightRemainsAbove");
-      if (t?.kind === "manaAbove") t.pct = Math.min(95, Math.max(5, t.pct + pick([-10, -5, 5, 10])));
-      if (t?.kind === "fightRemainsAbove") t.sec = Math.max(1, t.sec + pick([-3, -1, 1, 3]));
+      if (t?.kind === "manaAbove") t.pct = Math.min(95, Math.max(5, t.pct + rng.pick([-10, -5, 5, 10])));
+      if (t?.kind === "fightRemainsAbove") t.sec = Math.max(1, t.sec + rng.pick([-3, -1, 1, 3]));
       break;
     }
   }
@@ -139,18 +142,19 @@ export function optimize(game: GameData, config: SimConfigInput, opts: OptimizeO
   const { genes: fromConfig, dropped } = actionsToGenes(config.rotation.actions);
   for (const d of dropped) log(`note: condition not searchable, dropped: ${d}`);
   const present = new Set(fromConfig.map((g) => g.action));
+  const known = buildCharacter(game.data, game.overrides, game.items, SimConfig.parse(config)).abilities;
   const start = [
     ...fromConfig,
-    ...opts.pool.filter((a) => !present.has(a)).map((action) => ({ action, enabled: false, terms: [] })),
+    ...opts.pool.filter((a) => !present.has(a) && known.has(a)).map((action) => ({ action, enabled: false, terms: [] })),
   ];
 
-  // Which actions have a cast time worth not clipping, or a DoT worth not reapplying.
+  // Which actions have a cast time worth not clipping, or a debuff worth not reapplying.
   const castActions = new Set<string>();
-  const dotActions = new Set<string>();
+  const debuffActions = new Set<string>();
   for (const a of game.data.abilities) {
     const top = game.data.spells[String(a.ranks.at(-1)!.spellId)]!;
     if (top.castTimeMs > 0) castActions.add(snake(a.name));
-    if (top.effects.some((e) => e.aura === 3)) dotActions.add(snake(a.name));
+    if (top.effects.some((e) => e.effect === Effect.ApplyAura && TARGET_ENEMY.has(e.implicitTarget[0]))) debuffActions.add(snake(a.name));
   }
 
   const rng = new Stream(`${opts.seed}/mutations`);
@@ -167,10 +171,11 @@ export function optimize(game: GameData, config: SimConfigInput, opts: OptimizeO
     let roundBest: { genes: Gene[]; result: SimResult; delta: number } | null = null;
     for (let m = 0; m < opts.mutantsPerRound && evaluated < opts.budget; m++, attempts++) {
       // Sometimes stack two mutations to step over a dip.
-      let candidate = mutate(best, rng, castActions, dotActions);
-      if (rng.next() < 0.3) candidate = mutate(candidate, rng, castActions, dotActions);
-      const key = JSON.stringify(genesToActions(candidate));
-      if (seen.has(key) || genesToActions(candidate).length === 0) continue;
+      let candidate = mutate(best, rng, castActions, debuffActions);
+      if (rng.next() < 0.3) candidate = mutate(candidate, rng, castActions, debuffActions);
+      const actions = genesToActions(candidate);
+      const key = JSON.stringify(actions);
+      if (seen.has(key) || actions.length === 0) continue;
       seen.add(key);
       const result = run(candidate, opts.iterations, searchSeed);
       evaluated++;
@@ -185,7 +190,7 @@ export function optimize(game: GameData, config: SimConfigInput, opts: OptimizeO
   }
 
   const confirmSeed = `${opts.seed}/confirm`;
-  const before = run(start, opts.confirmIterations, confirmSeed);
+  const before = simulate(game, { ...config, fight: { ...config.fight, iterations: opts.confirmIterations, seed: confirmSeed } });
   const after = run(best, opts.confirmIterations, confirmSeed);
   const c = compareResults(before, after);
   return { start, best, bestActions: genesToActions(best), evaluated, confirm: { before, after, ...c } };
