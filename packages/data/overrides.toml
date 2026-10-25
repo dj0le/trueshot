@@ -224,3 +224,77 @@ effectIndex = 1
 basePoints = 143
 confidence = "reported"
 source = "foreverchanges.pro patch notes: Hunter's Mark rank 4 gives 143 ranged AP instead of 71. Not in Blizzard's notes"
+
+# Talents whose client data does more than their tooltip says. The tooltip wins (PLAN.md, task 16).
+
+# Ranged Weapon Specialization: "+5% damage with ranged weapons". The client aura covers every school,
+# so it also raised Arcane Shot, Serpent Sting and Volley. Physical only, as weapon damage.
+[[hotfix]]
+spell = 19507
+effectIndex = 0
+miscValue = 1
+confidence = "reported"
+source = "Ranged Weapon Specialization tooltip: damage with ranged weapons. Client aura 79 has school mask 127 (all)"
+
+[[hotfix]]
+spell = 13165
+procTypeMask = 64
+confidence = "reported"
+source = "Aspect of the Hawk (level 10) with Deadly Aspects: the tooltip procs Quick Shots from Auto Shot. Client listens for ranged spells too (320)"
+
+[[hotfix]]
+spell = 14318
+procTypeMask = 64
+confidence = "reported"
+source = "Aspect of the Hawk (level 18) with Deadly Aspects: the tooltip procs Quick Shots from Auto Shot. Client listens for ranged spells too (320)"
+
+[[hotfix]]
+spell = 14319
+procTypeMask = 64
+confidence = "reported"
+source = "Aspect of the Hawk (level 28) with Deadly Aspects: the tooltip procs Quick Shots from Auto Shot. Client listens for ranged spells too (320)"
+
+[[hotfix]]
+spell = 14320
+procTypeMask = 64
+confidence = "reported"
+source = "Aspect of the Hawk (level 38) with Deadly Aspects: the tooltip procs Quick Shots from Auto Shot. Client listens for ranged spells too (320)"
+
+[[hotfix]]
+spell = 14321
+procTypeMask = 64
+confidence = "reported"
+source = "Aspect of the Hawk (level 48) with Deadly Aspects: the tooltip procs Quick Shots from Auto Shot. Client listens for ranged spells too (320)"
+
+[[hotfix]]
+spell = 14322
+procTypeMask = 64
+confidence = "reported"
+source = "Aspect of the Hawk (level 58) with Deadly Aspects: the tooltip procs Quick Shots from Auto Shot. Client listens for ranged spells too (320)"
+
+[[hotfix]]
+spell = 25296
+procTypeMask = 64
+confidence = "reported"
+source = "Aspect of the Hawk (level 60) with Deadly Aspects: the tooltip procs Quick Shots from Auto Shot. Client listens for ranged spells too (320)"
+
+[[hotfix]]
+spell = 1293241
+effectIndex = 0
+apCoefficient = 0.05
+confidence = "confirmed"
+source = "Summon Hawk (level 25) tooltip: plus 5% of your Ranged Attack Power, as rank 4; the client effect has no coefficient"
+
+[[hotfix]]
+spell = 1293525
+effectIndex = 0
+apCoefficient = 0.05
+confidence = "confirmed"
+source = "Summon Hawk (level 36) tooltip: plus 5% of your Ranged Attack Power, as rank 4; the client effect has no coefficient"
+
+[[hotfix]]
+spell = 1293526
+effectIndex = 0
+apCoefficient = 0.05
+confidence = "confirmed"
+source = "Summon Hawk (level 48) tooltip: plus 5% of your Ranged Attack Power, as rank 4; the client effect has no coefficient"

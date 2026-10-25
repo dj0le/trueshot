@@ -215,7 +215,8 @@ export class Fight implements PetHost {
   casting: { spell: Spell; endsAt: number } | null = null;
   // Ready times by spell id, and by category for spells sharing a category cooldown.
   private readonly spellCooldowns = new Map<number, number>();
-  private readonly categoryCooldowns = new Map<number, number>();
+  // A shared cooldown: when the category comes back, and when the spell that started it does.
+  private readonly categoryCooldowns = new Map<number, { readyAt: number; by: number; ownReadyAt: number }>();
   readonly selfAuras: AuraSet;
   readonly targetAuras: AuraSet;
   readonly auto = { cooldownEnd: 0, windup: false, firesAt: Infinity, token: 0 };
@@ -428,7 +429,9 @@ export class Fight implements PetHost {
   }
 
   cooldownReadyAt(spell: Spell): number {
-    return Math.max(this.spellCooldowns.get(spell.id) ?? 0, this.categoryCooldowns.get(spell.category) ?? 0);
+    const c = this.categoryCooldowns.get(spell.category);
+    const shared = c ? (c.by === spell.id ? c.ownReadyAt : c.readyAt) : 0;
+    return Math.max(this.spellCooldowns.get(spell.id) ?? 0, shared);
   }
 
   // Acting =====================================================================
@@ -524,8 +527,11 @@ export class Fight implements PetHost {
     const cd = Math.max(spell.cooldownMs, spell.categoryCooldownMs);
     if (cd > 0) {
       const readyAt = this.now + Math.max(0, this.modded(cd, spell, SpellModOp.Cooldown));
-      if (spell.category && spell.categoryCooldownMs) this.categoryCooldowns.set(spell.category, readyAt);
-      else this.spellCooldowns.set(spell.id, readyAt);
+      // Cooldown modifiers shorten the spell's own cooldown, not the one its category shares
+      // (Improved Arcane Shot: "shared cooldowns are not affected").
+      if (spell.category && spell.categoryCooldownMs) {
+        this.categoryCooldowns.set(spell.category, { readyAt: this.now + cd, by: spell.id, ownReadyAt: readyAt });
+      } else this.spellCooldowns.set(spell.id, readyAt);
     }
   }
 
@@ -593,7 +599,8 @@ export class Fight implements PetHost {
   private roll(spell: Spell, isAuto: boolean): "miss" | "hit" | "crit" {
     if (spell.defenseType === DefenseType.None) return "hit";
     const t = this.target.table;
-    const miss = Math.max(0, t.missPct - Math.max(0, this.ch.hitPct - t.hitPenaltyPct));
+    const hit = this.ch.hitPct + this.selfAuras.sum(Aura.ModHitChance);
+    const miss = Math.max(0, t.missPct - Math.max(0, hit - t.hitPenaltyPct));
     const total = this.ch.critPct + this.selfAuras.sum(Aura.ModCritPct) + this.mods(spell, SpellModOp.CritChance).flat;
     const auraCrit = total - this.ch.agilityCritPct;
     const crit = Math.max(0, total - t.critSuppressionPct - Math.min(Math.max(0, auraCrit), t.auraCritSuppressionPct));

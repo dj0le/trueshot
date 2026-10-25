@@ -34,6 +34,7 @@ export const Aura = {
   ModRangedAmmoHaste: 141,
   PeriodicDummy: 226,
   ModCritPct: 290,
+  ModHitChance: 54,
   // Melee haste: Rapid Fire's melee half, the pet's Frenzy and Trickster's Dance.
   ModMeleeHaste: 319,
   // Melee and ranged haste together (Wind Blessed).

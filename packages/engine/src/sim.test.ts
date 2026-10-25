@@ -243,6 +243,25 @@ test("a level 30 hunter knows level 30 ranks, has level 30 stats, and fights a l
   expect(() => simulate(game, { ...base, level: 30, gear: { items: { ranged: 18680 } } })).toThrow(/needs level/);
 });
 
+test("Improved Arcane Shot shortens Arcane Shot's own cooldown, not the one Summon Hawk shares", () => {
+  const talents = { "Lethal Attacks": 5, Efficiency: 5, "Improved Arcane Shot": 5, "Deadly Aspects": 5, "Endurance Training": 5, "Bestial Swiftness": 1, "Unleashed Fury": 5, "Summon Hawk": 1 };
+  const run = (actions: { action: string; if?: string }[], durationSec: number) =>
+    simulate(game, {
+      ...base,
+      talents,
+      gear: { ...base.gear!, stats: { hitPct: 9, mp5: 10000 } },
+      pet: { active: true, family: "Cat" },
+      fight: { durationSec, iterations: 5 },
+      rotation: { actions },
+    }).abilities;
+  // Arcane alone comes back every 4.5 sec.
+  const arcane = run([{ action: "arcane_shot" }], 60).find((a) => a.name === "Arcane Shot")!;
+  expect(arcane.castsPerFight).toBe(14);
+  // One Arcane at 0, then Summon Hawk from 6 sec, not 4.5: at 6, 12 ... 54, nine casts, not ten.
+  const both = run([{ action: "arcane_shot", if: "casts.arcane_shot < 1" }, { action: "summon_hawk" }], 60);
+  expect(both.find((a) => a.name === "Summon Hawk")!.castsPerFight).toBe(9);
+});
+
 test("support presets add outside mana, and the raid's Judgement of Wisdom pays out per hit", () => {
   // Serpent Sting on every GCD runs a solo hunter dry.
   const spam = { ...base, fight: { durationSec: 120, iterations: 50 }, rotation: { actions: [{ action: "serpent_sting" }] } };

@@ -22,6 +22,13 @@ test("hotfixes replace effect base points without touching the input", async () 
   expect(d.spells["14325"]!.effects[1]!.basePoints).toBe(71);
 });
 
+test("talent hotfixes follow the tooltip: weapon-only damage, Auto Shot-only procs", async () => {
+  const patched = applyHotfixes(d, await loadOverrides());
+  expect(patched.spells["19507"]!.effects[0]!.miscValue[0]).toBe(1);
+  expect(patched.spells["25296"]!.proc!.typeMask[0]).toBe(0x40);
+  expect(patched.spells["1293241"]!.effects[0]!.apCoefficient).toBe(0.05);
+});
+
 test("a hotfix the client already has is rejected as stale", async () => {
   const o = await loadOverrides();
   o.hotfix = [{ spell: 14325, effectIndex: 1, basePoints: 71, confidence: "reported", source: "test" }];

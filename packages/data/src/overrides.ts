@@ -66,12 +66,24 @@ const Overrides = z.object({
     z
       .object({
         spell: z.number(),
-        effectIndex: z.number(),
+        // Effect fields (basePoints, apCoefficient, miscValue) need the effect; procTypeMask is the spell's.
+        effectIndex: z.number().optional(),
         basePoints: z.number().optional(),
         apCoefficient: z.number().optional(),
+        // The effect's first misc value, such as a damage aura's school mask.
+        miscValue: z.number().optional(),
+        // Which hits the spell's proc listens for (ProcFlag bits).
+        procTypeMask: z.number().optional(),
         ...provenance,
       })
-      .refine((h) => h.basePoints !== undefined || h.apCoefficient !== undefined, "a hotfix needs basePoints or apCoefficient"),
+      .refine(
+        (h) => [h.basePoints, h.apCoefficient, h.miscValue, h.procTypeMask].some((v) => v !== undefined),
+        "a hotfix needs basePoints, apCoefficient, miscValue or procTypeMask",
+      )
+      .refine(
+        (h) => h.effectIndex !== undefined || [h.basePoints, h.apCoefficient, h.miscValue].every((v) => v === undefined),
+        "an effect hotfix needs effectIndex",
+      ),
   ),
 });
 export type Overrides = z.infer<typeof Overrides> & { levels: Levels };
@@ -106,16 +118,30 @@ export function atLevel(levels: Levels, values: readonly number[], level: number
 // override is then stale and should be deleted).
 export function applyHotfixes(data: HunterData, o: Overrides): HunterData {
   const spells = structuredClone(data.spells);
-  for (const h of o.hotfix) {
-    const effect = spells[String(h.spell)]?.effects.find((e) => e.index === h.effectIndex);
+  const stale = (what: string, value: number) => {
+    throw new Error(`hotfix: spell ${h.spell}${what} already has ${value} in the client; remove the override`);
+  };
+  let h: Overrides["hotfix"][number];
+  for (h of o.hotfix) {
+    const spell = spells[String(h.spell)];
+    if (!spell) throw new Error(`hotfix: spell ${h.spell} is not in the client data`);
+    if (h.procTypeMask !== undefined) {
+      if (!spell.proc) throw new Error(`hotfix: spell ${h.spell} has no proc`);
+      if (spell.proc.typeMask[0] === h.procTypeMask) stale(" proc typeMask", h.procTypeMask);
+      spell.proc = { ...spell.proc, typeMask: [h.procTypeMask, spell.proc.typeMask[1]!] };
+    }
+    if (h.effectIndex === undefined) continue;
+    const effect = spell.effects.find((e) => e.index === h.effectIndex);
     if (!effect) throw new Error(`hotfix: spell ${h.spell} effect ${h.effectIndex} is not in the client data`);
     for (const key of ["basePoints", "apCoefficient"] as const) {
       const value = h[key];
       if (value === undefined) continue;
-      if (effect[key] === value) {
-        throw new Error(`hotfix: spell ${h.spell} effect ${h.effectIndex} already has ${value} (${key}) in the client; remove the override`);
-      }
+      if (effect[key] === value) stale(` effect ${h.effectIndex} ${key}`, value);
       effect[key] = value;
+    }
+    if (h.miscValue !== undefined) {
+      if (effect.miscValue[0] === h.miscValue) stale(` effect ${h.effectIndex} miscValue`, h.miscValue);
+      effect.miscValue = [h.miscValue, effect.miscValue[1]!];
     }
   }
   return { ...data, spells };
