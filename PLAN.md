@@ -43,6 +43,8 @@ client build or to an override that records where it came from.
 | 33 | Forever food and campfire buffs (Well Fed agility/attack power foods, campfire tiers, Camp Benefits) as support options; several food spells carry placeholder values of 1 and campfire effects are server-side, so values need a source | packages/data, packages/engine | |
 | 34 | GearQuest Forever importer: read the addon's hunter picks (per spec, faction, level band, ranked, levels 10-60) from the local install into gear presets by tier (best, good, average), so any level can be simmed with realistic gear | packages/data | |
 | 35 | Estimate vs actual: sim my character's real gear and talents next to a log of the same boss, and the tier presets, to split the gap into execution and gear | packages/cli | BLOCKED, needs task 25 or 13 for my logs, and task 23 below level 60 |
+| 36 | Racials: Skyborne Wind Blessed (+3% haste, from the talentsforever racials list), Troll Berserking, Orc Blood Fury and pet bonus, Dwarf and Troll weapon skills; plus a haste stat in gear and buffs | packages/engine | |
+| 37 | items.json carries Season of Discovery items (ids 23xxxx, item level 80+, many with +% haste) because they sit in Forever's Item table; check which really exist in Forever and drop the rest | packages/data/src/build-items.ts | |
 
 Tasks 1 to 10, 18 and 19 give a working "run my setup" CLI for Marksmanship. Task 20 follows because
 pets carry the weakest data. Task 21 comes last because it needs a whole melee model.
@@ -80,6 +82,8 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
 - Outside mana decides the "hold vs fire on cooldown" question. Solo, holding Arcane above 40% mana
   wins by 3.7%; with a paladin's Blessing of Wisdom the gap is 0.3%; in a raid, Judgement of Wisdom
   (100% per hit in the Forever client) makes mana effectively unlimited.
+- 3% ranged haste (Skyborne's Wind Blessed) is worth about as much as 20 agility: +1.5% DPS for BM and
+  +2.1% for MM solo, up to +2.4% for MM in a raid, where mana no longer limits the extra shots.
 - Intimidation costs bm-cat 1.3% DPS: 138 mana and a GCD a minute in a mana-bound build, for one
   guaranteed pet crit, while Frenzy 5/5 already procs off the pet's ~18% crit rate.
 - With Careful Aim 5/5, intellect is worth about as much as agility for MM (task 12).
