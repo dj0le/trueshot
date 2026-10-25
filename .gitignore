@@ -1,0 +1,6 @@
+node_modules/
+# Downloaded upstream files. Rebuildable with `bun run fetch`.
+packages/data/raw/
+.env
+# Forever Logs events. Their terms forbid bulk redistribution, so they never go in the repo.
+packages/data/foreverlogs-cache/

@@ -1,0 +1,71 @@
+# Deep Marksmanship with Lone Wolf (no pet) against a raid boss.
+name = "MM Lone Wolf, MythicSim gear"
+level = 60
+race = "Orc"
+
+[talents]
+"Hawk Eye" = 3
+"Lethal Attacks" = 5
+"Improved Stings" = 3
+"Efficiency" = 5
+"Careful Aim" = 5
+"Rapid Killing" = 2
+"Improved Arcane Shot" = 5
+"Lone Wolf" = 1
+"Trueshot Aura" = 1
+"Mortal Shots" = 5
+"Rapid Recuperation" = 2
+"Barrage" = 3
+"Ranged Weapon Specialization" = 5
+"Sniper Shot" = 1
+"Deadly Aspects" = 5
+
+[gear]
+ammoDps = 17.5
+quiverHastePct = 15
+
+# MythicSim's tier-list gear for its hunter sims (2026-10-21), so results can be compared.
+[gear.items]
+head = 252605      # Black Dragonscale Helm
+neck = 15411       # Mark of Fordring
+shoulder = 12927   # Truestrike Shoulders
+back = 13340       # Cape of the Black Baron
+chest = 252483     # Dawn Armor
+wrist = 16681      # Beaststalker's Bindings
+hands = 16676      # Beaststalker's Gloves
+waist = 272397     # Ranger's Belt
+legs = 16678       # Beaststalker's Pants
+feet = 13967       # Windreaver Greaves
+finger1 = 18500    # Tarnished Elven Ring
+finger2 = 18500    # Tarnished Elven Ring
+mainHand = 18520   # Barbarous Blade
+ranged = 18680     # Ancient Bone Bow
+
+[pet]
+active = false
+
+[target]
+preset = "boss"
+
+[fight]
+durationSec = 180
+durationVariancePct = 10
+iterations = 2000
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "auto_shot.remains >= cast.aimed_shot.time & mana.pct > 20"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "sniper_shot"
+if = "mana.pct > 80 & auto_shot.remains >= cast.sniper_shot.time"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!dot.serpent_sting.ticking"

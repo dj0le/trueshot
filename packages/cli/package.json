@@ -1,0 +1,10 @@
+{
+  "name": "@hunter-sim/cli",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@hunter-sim/data": "workspace:*",
+    "@hunter-sim/engine": "workspace:*"
+  }
+}

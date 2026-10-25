@@ -1,0 +1,252 @@
+# Every number the sim uses that is NOT in the Forever client tables.
+#
+# Each value carries where it came from and how much to trust it:
+#   confirmed  Blizzard's notes or measured in game
+#   reported   third-party patch notes or community reports, not confirmed by Blizzard
+#   classic    Classic Era value, assumed unchanged in Forever
+#   guess      a placeholder until someone measures it
+#
+# `bun run sim` reports which guesses a result leans on. Replace a guess the moment
+# better data exists, and update `source`.
+
+# Character base values at level 60 =========================================
+
+[base.health]
+value = 1467
+confidence = "classic"
+source = "Classic hunter base health at 60, via wow-forever-rotation.vercel.app"
+
+[base.mana]
+value = 1720
+confidence = "classic"
+source = "Classic hunter base mana at 60, via wow-forever-rotation.vercel.app"
+
+# [strength, agility, stamina, intellect, spirit], naked, at level 60.
+# Classic numbers for the races that could be hunters in Classic. Human was derived from those
+# using Classic's fixed race offsets (dwarf and orc both give the same answer).
+[races.Dwarf]
+stats = [57, 121, 93, 64, 69]
+confidence = "classic"
+source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
+
+[races."Night Elf"]
+stats = [52, 130, 89, 65, 70]
+confidence = "classic"
+source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
+
+[races.Orc]
+stats = [58, 122, 92, 62, 73]
+confidence = "classic"
+source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
+
+[races.Tauren]
+stats = [60, 120, 92, 60, 72]
+confidence = "classic"
+source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
+
+[races.Troll]
+stats = [56, 127, 91, 61, 71]
+confidence = "classic"
+source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
+
+[races.Human]
+stats = [55, 125, 90, 65, 71]
+confidence = "guess"
+source = "Human hunters are new in Forever. Derived from Classic race offsets: dwarf - (22,16,23,19,19) + (20,20,20,20,21)"
+
+[races.Skyborne]
+stats = [55, 125, 90, 65, 71]
+confidence = "guess"
+source = "New race, no data. Copied from Human"
+
+# Formulas ===================================================================
+
+[formula.rangedAttackPowerPerAgility]
+value = 2
+confidence = "classic"
+source = "Classic: hunter ranged AP = level * 2 + agility * 2 - 10"
+
+[formula.rangedAttackPowerBase]
+value = -10
+confidence = "classic"
+source = "Classic: hunter ranged AP = level * 2 + agility * 2 - 10"
+
+[formula.rangedAttackPowerPerLevel]
+value = 2
+confidence = "classic"
+source = "Classic: hunter ranged AP = level * 2 + agility * 2 - 10"
+
+[formula.agilityPerCrit]
+value = 53
+confidence = "classic"
+source = "Classic: hunters get 1% crit per 53 agility at level 60"
+
+[formula.attackPowerPerDps]
+value = 14
+confidence = "classic"
+source = "Classic: 14 attack power adds 1 DPS to a weapon"
+
+[formula.baseCritPct]
+value = 0
+confidence = "classic"
+source = "Classic: hunters have no ranged crit beyond agility at 60"
+
+[formula.critDamageBonusPct]
+value = 100
+confidence = "classic"
+source = "Classic: ranged and melee crits deal 200% damage before talents"
+
+[formula.armorConstantBase]
+value = 400
+confidence = "classic"
+source = "Classic: reduction = armor / (armor + 400 + 85 * attacker level)"
+
+[formula.armorConstantPerLevel]
+value = 85
+confidence = "classic"
+source = "Classic: reduction = armor / (armor + 400 + 85 * attacker level)"
+
+[formula.normalizedRangedSpeed]
+value = 2.8
+confidence = "guess"
+source = "Forever shots use normalized weapon damage (effect 121), which Classic did not have. 2.8 sec is TBC's ranged normalization"
+
+[formula.critRatingPerPct]
+value = 14
+confidence = "guess"
+source = "Forever items carry crit as rating. Item allocations land on multiples of 14 where Classic items had +1% crit, so 14 rating = 1% at level 60"
+
+[formula.hitRatingPerPct]
+value = 10
+confidence = "guess"
+source = "Forever items carry hit as rating. Item allocations land on multiples of 10 where Classic items had +1% hit, so 10 rating = 1% at level 60"
+
+[formula.autoShotStandStillMs]
+value = 500
+confidence = "confirmed"
+source = "Blizzard 15 Oct beta notes, build 70425: stand still 0.5 sec before Auto Shot fires (via talentsforever.com)"
+
+[formula.rangedHasteAffectsCastTime]
+value = 1
+confidence = "guess"
+source = "Whether Rapid Fire and quiver haste shorten Aimed Shot's cast. 1 = yes, 0 = no"
+
+[formula.manaPerTickBase]
+value = 15
+confidence = "classic"
+source = "Classic hunter regen per 2 sec tick outside the five second rule: 15 + spirit / 5. Unverified"
+
+[formula.spiritPerManaPerTick]
+value = 5
+confidence = "classic"
+source = "Classic hunter regen per 2 sec tick outside the five second rule: 15 + spirit / 5. Unverified"
+
+[formula.manaPerIntellect]
+value = 15
+confidence = "classic"
+source = "Classic: each point of intellect past the first 20 gives 15 mana"
+
+# Targets ====================================================================
+# Ranged attack table against each preset. miss = max(0, baseMissPct - max(0, hit - hitPenaltyPct)).
+
+[targets.normal]
+level = 60
+armor = 3000
+baseMissPct = 5
+hitPenaltyPct = 0
+critSuppressionPct = 0
+confidence = "guess"
+source = "Level 60 normal mob. Miss and crit from Classic level rules; armor is a round guess"
+
+[targets.elite]
+level = 62
+armor = 3400
+baseMissPct = 6
+hitPenaltyPct = 0
+critSuppressionPct = 0.4
+confidence = "guess"
+source = "Level 62 elite. Miss and crit from Classic level rules; armor is a round guess"
+
+[targets.boss]
+level = 63
+armor = 3731
+baseMissPct = 8
+hitPenaltyPct = 1
+critSuppressionPct = 0.6
+confidence = "classic"
+source = "Classic raid boss: 3731 armor, 8% miss with the first 1% of hit ignored, crit -0.6% from the 15 point weapon skill gap"
+
+# Pets =======================================================================
+
+# How much of the hunter's ranged AP the pet gains. Classic pets did not scale with hunter gear at all;
+# scaling arrived in TBC. Forever behaviour unknown.
+[pet.inheritRangedAttackPowerPct]
+value = 10
+confidence = "guess"
+source = "wow-forever-rotation.vercel.app assumption"
+
+[pet.baseAttackPower]
+value = 200
+confidence = "guess"
+source = "wow-forever-rotation.vercel.app assumption"
+
+# Pet white damage, per 2.0 sec swing, before attack power. Classic pets keep their native attack
+# speed but damage per hit scales so DPS is the same; the sim normalizes everything to 2.0 sec.
+[pet.baseDamage]
+min = 25
+max = 35
+confidence = "guess"
+source = "Scaled from wow-forever-rotation.vercel.app's cat (15-21 per 1.2 sec swing) to a 2.0 sec swing"
+
+[pet.focusPerSecond]
+value = 10
+confidence = "guess"
+source = "wow-forever-rotation.vercel.app uses 10 per sec. Classic's rate is not pinned down; measure in game"
+
+[pet.happinessDamagePct]
+value = 25
+confidence = "classic"
+source = "Classic: a happy pet deals 125% damage"
+
+# Pet attack table against each target preset is not in the client. Classic-ish guesses.
+[pet.missPct]
+value = 8
+confidence = "guess"
+source = "Pet melee miss chance against a level 63 boss. Classic players' 8% (300 weapon skill vs 315 defense)"
+
+[pet.dodgePct]
+value = 6.5
+confidence = "guess"
+source = "Boss dodge against melee, Classic's 5% + 0.1% per defense point over the attacker's skill"
+
+[pet.glancingPct]
+value = 40
+confidence = "guess"
+source = "Classic: 40% of white hits glance against a level 63 target. Whether pets glance is not confirmed"
+
+[pet.glancingPenaltyPct]
+value = 35
+confidence = "guess"
+source = "Classic: glancing blows deal about 65% damage at 300 skill"
+
+[pet.baseCritPct]
+value = 5
+confidence = "guess"
+source = "Pet base melee crit, unknown"
+
+[pet.attackSpeedSec]
+value = 2.0
+confidence = "classic"
+source = "Classic normalizes pet DPS to a 2.0 sec swing whatever the native speed"
+
+# Family damage modifiers come from the client (each family's Tamed Pet Passive), not from here.
+
+# Hotfixes ===================================================================
+# Server-side changes the client tables do not have. Each one replaces one spell effect's base points.
+
+[[hotfix]]
+spell = 14325
+effectIndex = 1
+basePoints = 143
+confidence = "reported"
+source = "foreverchanges.pro patch notes: Hunter's Mark rank 4 gives 143 ranged AP instead of 71. Not in Blizzard's notes"
