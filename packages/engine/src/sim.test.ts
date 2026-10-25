@@ -206,6 +206,17 @@ test("a pet ability sent with Intimidation goes out at once and takes the guaran
   );
 });
 
+test("a pet attacking half the fight does about half its damage", () => {
+  const run = (attackingPct: number) =>
+    simulate(game, { ...base, pet: { active: true, family: "Cat", attackingPct }, fight: { durationSec: 120, iterations: 100 } })
+      .abilities.filter((a) => a.name.startsWith("Pet:"))
+      .reduce((s, a) => s + a.dps, 0);
+  const ratio = run(50) / run(100);
+  expect(ratio).toBeGreaterThan(0.45);
+  expect(ratio).toBeLessThan(0.55);
+  expect(run(0)).toBe(0);
+});
+
 test("support presets add outside mana, and the raid's Judgement of Wisdom pays out per hit", () => {
   // Serpent Sting on every GCD runs a solo hunter dry.
   const spam = { ...base, fight: { durationSec: 120, iterations: 50 }, rotation: { actions: [{ action: "serpent_sting" }] } };

@@ -67,6 +67,8 @@ export class Pet {
     readonly family: PetFamily,
     level: number,
     priority: string[] | undefined,
+    // When the pet stops attacking for the rest of the fight (pet.attackingPct).
+    private readonly attackingUntil: number,
   ) {
     // Passive values settle once, with the hunter's talents applied through spell modifiers.
     const passives: ActiveSpell[] = [...data.petPassives, family.passiveSpellId].map((id) => {
@@ -123,6 +125,7 @@ export class Pet {
   // White swings ===============================================================
 
   private swing(): void {
+    if (!this.attacking()) return;
     this.whiteHit("Pet: Melee", "pet", 1, true);
     const speed = this.o.attackSpeedSec.value;
     this.host.queue.push(this.host.now + (speed * 1000) / this.auras.product([Aura.ModMeleeHaste]), () => this.swing());
@@ -221,11 +224,16 @@ export class Pet {
   // An ability sent from the hunter's macro. It goes out now if the pet can, or not at all.
   command(name: string): void {
     const spell = this.known.get(name)!;
-    if (this.host.now >= this.gcdReadyAt && this.tryUse(spell) === 0) this.wake(this.gcdReadyAt);
+    if (this.attacking() && this.host.now >= this.gcdReadyAt && this.tryUse(spell) === 0) this.wake(this.gcdReadyAt);
   }
 
   // Autocast: the first ability in priority order that is off cooldown and affordable.
+  private attacking(): boolean {
+    return this.host.now < this.attackingUntil;
+  }
+
   private act(): void {
+    if (!this.attacking()) return;
     const now = this.host.now;
     if (now < this.gcdReadyAt) return this.wake(this.gcdReadyAt);
 

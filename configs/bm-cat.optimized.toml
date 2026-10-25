@@ -1,0 +1,93 @@
+# Deep Beast Mastery with a cat against a raid boss.
+name = "BM cat, MythicSim gear"
+level = 60
+race = "Orc"
+
+[talents]
+"Deadly Aspects" = 5
+"Endurance Training" = 1
+"Focused Fire" = 2
+"Improved Aspect of the Monkey" = 2
+"Bestial Swiftness" = 1
+"Unleashed Fury" = 5
+"Ferocity" = 5
+"Summon Hawk" = 1
+"Bestial Discipline" = 2
+"Intimidation" = 1    # needed for Bestial Wrath; casting it costs DPS (see bm-cat.with-intimidation.toml)
+"Frenzy" = 5
+"Bestial Wrath" = 1
+"Lethal Attacks" = 5
+"Efficiency" = 5
+"Careful Aim" = 5
+"Improved Arcane Shot" = 5
+
+[gear]
+ammoDps = 17.5
+quiverHastePct = 15
+
+# MythicSim's tier-list gear for its hunter sims (2026-10-21), so results can be compared.
+[gear.items]
+head = 252605      # Black Dragonscale Helm
+neck = 15411       # Mark of Fordring
+shoulder = 12927   # Truestrike Shoulders
+back = 13340       # Cape of the Black Baron
+chest = 252483     # Dawn Armor
+wrist = 16681      # Beaststalker's Bindings
+hands = 16676      # Beaststalker's Gloves
+waist = 272397     # Ranger's Belt
+legs = 16678       # Beaststalker's Pants
+feet = 13967       # Windreaver Greaves
+finger1 = 18500    # Tarnished Elven Ring
+finger2 = 18500    # Tarnished Elven Ring
+mainHand = 18520   # Barbarous Blade
+ranged = 18680     # Ancient Bone Bow
+
+[pet]
+active = true
+family = "Cat"
+
+[target]
+preset = "boss"
+
+[fight]
+durationSec = 180
+durationVariancePct = 10
+iterations = 2000
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "hunters_mark"]
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "berserking"
+
+[[rotation.actions]]
+action = "elunes_light"
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "mana.pct > 20"
+
+[[rotation.actions]]
+action = "multi_shot"
+if = "mana.pct > 40"
+
+[[rotation.actions]]
+action = "arcane_shot"
+if = "mana.pct > 50"
+
+[[rotation.actions]]
+action = "bestial_wrath"

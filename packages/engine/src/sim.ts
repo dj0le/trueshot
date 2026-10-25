@@ -251,7 +251,8 @@ export class Fight implements PetHost {
     if (ch.config.pet.active) {
       const family = game.data.petFamilies.find((p) => p.name === ch.config.pet.family);
       if (!family) throw new Error(`pet: unknown family "${ch.config.pet.family}"`);
-      this.pet = new Pet(this, game.data, game.overrides.pet, family, ch.level, ch.config.pet.abilities);
+      const attackingUntil = (durationMs * ch.config.pet.attackingPct) / 100;
+      this.pet = new Pet(this, game.data, game.overrides.pet, family, ch.level, ch.config.pet.abilities, attackingUntil);
       for (const a of ch.config.rotation.actions) {
         if (a.pet && !this.pet.knows(a.pet)) throw new Error(`rotation: a ${family.name} does not know "${a.pet}" (${a.action})`);
       }

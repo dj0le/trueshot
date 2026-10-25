@@ -91,6 +91,9 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
 - Intimidation on cooldown costs bm-cat 1.5% DPS: 138 mana and a GCD a minute in a mana-bound build,
   for one guaranteed pet crit, while Frenzy 5/5 already procs off the pet's ~18% crit rate. As a
   one-off opener macro with Bite it costs 0.2% (bm-cat.with-intimidation.toml).
+- MM Lone Wolf beats BM in boss fights even with the pet attacking all fight (optimized rotations,
+  260.0 vs 259.0 DPS over 180 sec). Each 10% of the fight the pet is out of action (dead, pulled back)
+  costs BM about 2.5% more: -2.7% at 90%, -6.7% at 75% (`pet.attackingPct`).
 - With Careful Aim 5/5, intellect is worth about as much as agility for MM (task 12).
 - Serpent Sting matches the client tooltip (555 over 15 sec, no attack power scaling). MythicSim gets about
   twice our Serpent Sting DPS. Unresolved until logs exist.

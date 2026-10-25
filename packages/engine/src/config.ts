@@ -69,6 +69,9 @@ export const SimConfig = z.object({
       family: z.string().default("Cat"),
       // Ability priority by snake_case name. Defaults to the family's damage abilities.
       abilities: z.array(z.string()).optional(),
+      // Share of the fight the pet spends attacking. It drops out for good after that (killed by
+      // the boss, or pulled back), which is what a boss fight's pet trouble costs on average.
+      attackingPct: z.number().min(0).max(100).default(100),
     })
     .default({}),
   target: z
