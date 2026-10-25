@@ -77,6 +77,10 @@ export const SimConfig = z.object({
   target: z
     .object({
       preset: z.enum(["normal", "elite", "boss"]).default("boss"),
+      // A specific creature instead of the preset's: its level, and its armor (by default a
+      // warrior-class creature's at that level).
+      level: z.number().int().min(1).max(63).optional(),
+      armor: z.number().min(0).optional(),
       // Sunder Armor, Faerie Fire, Curse of Recklessness and friends, summed.
       armorReduction: z.number().default(0),
     })

@@ -1,4 +1,4 @@
-// Builds generated/items.json: every item a level 40+ hunter could wear, with stats computed the
+// Builds generated/items.json: every uncommon or better item a hunter could wear, with stats computed the
 // way the Forever client stores them. Cross-checks the formulas against Classic Era's explicit
 // values for items both clients share, and fails if they drift.
 import type { Row } from "./csv";
@@ -156,7 +156,6 @@ function buildItem(r: Row, source: "forever" | "classic"): Item | null {
   const subclass = num(base.SubclassID);
   const inv = num(r.InventoryType);
   if (inv === 0 || num(r.OverallQualityID) < 2) return null;
-  if (num(r.RequiredLevel) < 40 && num(r.ItemLevel) < 50) return null;
   if (classId === 4 && !ARMOR_OK.has(subclass)) return null;
   if (classId === 2 && !WEAPON_OK.has(subclass)) return null;
   if (classId !== 2 && classId !== 4) return null;

@@ -1,6 +1,6 @@
 // One fight, start to finish. The hunter acts from a priority list; everything else (auto shot,
 // regen, ticks, aura expiry) runs off the event queue.
-import type { GameData, Overrides, Spell } from "@hunter-sim/data";
+import { atLevel, type GameData, type Overrides, type Spell } from "@hunter-sim/data";
 import { AuraSet } from "./auras";
 import { actionNames, type Character, type ResolvedEffect, resolveEffects, snake } from "./character";
 import {
@@ -19,6 +19,7 @@ import {
   TARGET_PET,
 } from "./enums";
 import { compile, type Getter } from "./expr";
+import { type AttackTable, attackTable } from "./levels";
 import { Pet, type PetHost } from "./pet";
 import { EventQueue } from "./queue";
 import { Rng } from "./rng";
@@ -78,7 +79,7 @@ export type FightResult = {
   oomMs: number;
 };
 
-type Target = Overrides["targets"][string];
+type Target = { level: number; armor: number; table: AttackTable };
 
 export type { GameData };
 
@@ -241,7 +242,14 @@ export class Fight implements PetHost {
     this.selfAuras = new AuraSet(this.queue, ch.passives, () => this.modsCache.clear());
     this.targetAuras = new AuraSet(this.queue);
     this.mana = ch.maxMana;
-    this.target = game.overrides.targets[ch.config.target.preset]!;
+    const lv = game.overrides.levels;
+    const t = ch.config.target;
+    const targetLevel = t.level ?? ch.level + game.overrides.targets[t.preset]!.levelOffset;
+    this.target = {
+      level: targetLevel,
+      armor: t.armor ?? atLevel(lv, lv.creatureArmor.values, targetLevel),
+      table: attackTable(game.overrides.formula, ch.level, targetLevel),
+    };
     this.autoShot = game.data.spells["75"]!;
     this.attackPowerPerDps = game.overrides.formula.attackPowerPerDps.value;
     const preset = ch.config.support;
@@ -252,7 +260,8 @@ export class Fight implements PetHost {
       const family = game.data.petFamilies.find((p) => p.name === ch.config.pet.family);
       if (!family) throw new Error(`pet: unknown family "${ch.config.pet.family}"`);
       const attackingUntil = (durationMs * ch.config.pet.attackingPct) / 100;
-      this.pet = new Pet(this, game.data, game.overrides.pet, family, ch.level, ch.config.pet.abilities, attackingUntil);
+      const pet = { level: ch.level, baseAttackPower: atLevel(lv, lv.pet.attackPower.values, ch.level), table: this.target.table };
+      this.pet = new Pet(this, game.data, game.overrides.pet, family, pet, ch.config.pet.abilities, attackingUntil);
       for (const a of ch.config.rotation.actions) {
         if (a.pet && !this.pet.knows(a.pet)) throw new Error(`rotation: a ${family.name} does not know "${a.pet}" (${a.action})`);
       }
@@ -583,12 +592,11 @@ export class Fight implements PetHost {
 
   private roll(spell: Spell, isAuto: boolean): "miss" | "hit" | "crit" {
     if (spell.defenseType === DefenseType.None) return "hit";
-    const t = this.target;
-    const miss = Math.max(0, t.baseMissPct - Math.max(0, this.ch.hitPct - t.hitPenaltyPct));
-    const crit = Math.max(
-      0,
-      this.ch.critPct + this.selfAuras.sum(Aura.ModCritPct) + this.mods(spell, SpellModOp.CritChance).flat - t.critSuppressionPct,
-    );
+    const t = this.target.table;
+    const miss = Math.max(0, t.missPct - Math.max(0, this.ch.hitPct - t.hitPenaltyPct));
+    const total = this.ch.critPct + this.selfAuras.sum(Aura.ModCritPct) + this.mods(spell, SpellModOp.CritChance).flat;
+    const auraCrit = total - this.ch.agilityCritPct;
+    const crit = Math.max(0, total - t.critSuppressionPct - Math.min(Math.max(0, auraCrit), t.auraCritSuppressionPct));
     const r = this.rng.stream(isAuto ? "auto" : "special").next() * 100;
     if (r < miss) return "miss";
     // Auto attacks use one roll for the whole table; special attacks roll crit separately.

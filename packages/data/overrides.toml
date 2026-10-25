@@ -9,55 +9,7 @@
 # `bun run sim` reports which guesses a result leans on. Replace a guess the moment
 # better data exists, and update `source`.
 
-# Character base values at level 60 =========================================
-
-[base.health]
-value = 1467
-confidence = "classic"
-source = "Classic hunter base health at 60, via wow-forever-rotation.vercel.app"
-
-[base.mana]
-value = 1720
-confidence = "classic"
-source = "Classic hunter base mana at 60, via wow-forever-rotation.vercel.app"
-
-# [strength, agility, stamina, intellect, spirit], naked, at level 60.
-# Classic numbers for the races that could be hunters in Classic. Human was derived from those
-# using Classic's fixed race offsets (dwarf and orc both give the same answer).
-[races.Dwarf]
-stats = [57, 121, 93, 64, 69]
-confidence = "classic"
-source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
-
-[races."Night Elf"]
-stats = [52, 130, 89, 65, 70]
-confidence = "classic"
-source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
-
-[races.Orc]
-stats = [58, 122, 92, 62, 73]
-confidence = "classic"
-source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
-
-[races.Tauren]
-stats = [60, 120, 92, 60, 72]
-confidence = "classic"
-source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
-
-[races.Troll]
-stats = [56, 127, 91, 61, 71]
-confidence = "classic"
-source = "Classic hunter base stats, via wow-forever-rotation.vercel.app"
-
-[races.Human]
-stats = [55, 125, 90, 65, 71]
-confidence = "guess"
-source = "Human hunters are new in Forever. Derived from Classic race offsets: dwarf - (22,16,23,19,19) + (20,20,20,20,21)"
-
-[races.Skyborne]
-stats = [55, 125, 90, 65, 71]
-confidence = "guess"
-source = "New race, no data. Copied from Human"
+# Base stats, base mana and agility per crit change with level: they are in levels.toml.
 
 # Formulas ===================================================================
 
@@ -75,11 +27,6 @@ source = "Classic: hunter ranged AP = level * 2 + agility * 2 - 10"
 value = 2
 confidence = "classic"
 source = "Classic: hunter ranged AP = level * 2 + agility * 2 - 10"
-
-[formula.agilityPerCrit]
-value = 53
-confidence = "classic"
-source = "Classic: hunters get 1% crit per 53 agility at level 60"
 
 [formula.attackPowerPerDps]
 value = 14
@@ -147,34 +94,37 @@ confidence = "classic"
 source = "Classic: each point of intellect past the first 20 gives 15 mana"
 
 # Targets ====================================================================
-# Ranged attack table against each preset. miss = max(0, baseMissPct - max(0, hit - hitPenaltyPct)).
+# Each preset is a level above the hunter. Armor is a warrior-class creature's at that level
+# (levels.toml); the attack table follows from the level gap (see attackTable in the engine).
 
 [targets.normal]
-level = 60
-armor = 3000
-baseMissPct = 5
-hitPenaltyPct = 0
-critSuppressionPct = 0
-confidence = "guess"
-source = "Level 60 normal mob. Miss and crit from Classic level rules; armor is a round guess"
+levelOffset = 0
+confidence = "classic"
+source = "A normal mob at the hunter's level"
 
 [targets.elite]
-level = 62
-armor = 3400
-baseMissPct = 6
-hitPenaltyPct = 0
-critSuppressionPct = 0.4
+levelOffset = 2
 confidence = "guess"
-source = "Level 62 elite. Miss and crit from Classic level rules; armor is a round guess"
+source = "An elite two levels up, like a dungeon mob near the top of its range"
 
 [targets.boss]
-level = 63
-armor = 3731
-baseMissPct = 8
-hitPenaltyPct = 1
-critSuppressionPct = 0.6
+levelOffset = 3
 confidence = "classic"
-source = "Classic raid boss: 3731 armor, 8% miss with the first 1% of hit ignored, crit -0.6% from the 15 point weapon skill gap"
+source = "Classic raid bosses are level 63 against level 60 players"
+
+# Crit lost against higher-level targets. Classic Era and both 1.12 server cores agree on 1% per level
+# (0.2% per point of defense over the attacker's weapon skill).
+[formula.critSuppressionPerLevelPct]
+value = 1
+confidence = "classic"
+source = "vmangos Unit::GetUnitCriticalChance, cmangos-classic the same; Blizzard: crit modifiers are reduced against enemies 3 levels higher"
+
+# Against targets 3 or more levels up, crit from auras (talents, buffs) is suppressed by a further
+# amount, on top of the per-level loss. Not in either server core; measured in Classic.
+[formula.auraCritSuppressionPct]
+value = 1.8
+confidence = "reported"
+source = "Classic beta testing, 60k+ hits: ~1.8% more on aura crit, ~4.8% total against level 63 (us.forums.blizzard.com/en/wow/t/crit-auras-and-raid-bosses/222790). Blizzard called it 1.12 behaviour; one fit gave 1.58%"
 
 # Pets =======================================================================
 
@@ -185,18 +135,14 @@ value = 10
 confidence = "guess"
 source = "wow-forever-rotation.vercel.app assumption"
 
-[pet.baseAttackPower]
-value = 200
-confidence = "guess"
-source = "wow-forever-rotation.vercel.app assumption"
-
-# Pet white damage, per 2.0 sec swing, before attack power. Classic pets keep their native attack
-# speed but damage per hit scales so DPS is the same; the sim normalizes everything to 2.0 sec.
-[pet.baseDamage]
-min = 25
-max = 35
-confidence = "guess"
-source = "Scaled from wow-forever-rotation.vercel.app's cat (15-21 per 1.2 sec swing) to a 2.0 sec swing"
+# Pet white damage per 2.0 sec swing at the pet's base attack power, per pet level. Attack power
+# above base scales it by 0.7 + 0.3 * AP / baseAP. Pets keep their native speed with damage scaled
+# to it, so the sim normalizes everything to 2.0 sec.
+[pet.baseDamagePerLevel]
+min = 1.2075
+max = 1.5225
+confidence = "classic"
+source = "vmangos Pet::InitStatsForLevel (L * 1.15 * 1.05 to L * 1.45 * 1.05), 'from vanilla pet tab screenshots'; 72-91 at 60. cmangos uses 0.75-1.125 * L + AP/14 instead"
 
 [pet.focusPerSecond]
 value = 10
@@ -208,26 +154,8 @@ value = 25
 confidence = "classic"
 source = "Classic: a happy pet deals 125% damage"
 
-# Pet attack table against each target preset is not in the client. Classic-ish guesses.
-[pet.missPct]
-value = 8
-confidence = "guess"
-source = "Pet melee miss chance against a level 63 boss. Classic players' 8% (300 weapon skill vs 315 defense)"
-
-[pet.dodgePct]
-value = 6.5
-confidence = "guess"
-source = "Boss dodge against melee, Classic's 5% + 0.1% per defense point over the attacker's skill"
-
-[pet.glancingPct]
-value = 40
-confidence = "guess"
-source = "Classic: 40% of white hits glance against a level 63 target. Whether pets glance is not confirmed"
-
-[pet.glancingPenaltyPct]
-value = 35
-confidence = "guess"
-source = "Classic: glancing blows deal about 65% damage at 300 skill"
+# The pet's miss, dodge and glancing follow from the level gap like the hunter's (attackTable in
+# the engine). Whether pets glance is not confirmed.
 
 [pet.baseCritPct]
 value = 5

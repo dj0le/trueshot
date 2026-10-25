@@ -1,6 +1,6 @@
 // Turns a config into a character: validated talents, the spells it knows, and its stats before
 // any in-combat auras. Pure: everything comes in as arguments.
-import type { HunterData, Item, Overrides, Spell, SpellEffect, Talent } from "@hunter-sim/data";
+import { atLevel, type HunterData, type Item, type Overrides, type Spell, type SpellEffect, type Talent } from "@hunter-sim/data";
 import { Aura, Stat } from "./enums";
 import type { GEAR_SLOTS, SimConfig, StatBlock } from "./config";
 
@@ -23,6 +23,8 @@ export type Character = {
   // add to them in combat.
   rangedAttackPower: number;
   critPct: number;
+  // The part of critPct from agility; the rest counts as aura crit against high-level targets.
+  agilityCritPct: number;
   hitPct: number;
   hastePct: number;
   mp5: number;
@@ -65,7 +67,8 @@ function gearStats(
   let rangedWeapon: Character["rangedWeapon"] | undefined;
   for (const [slot, id] of Object.entries(config.gear.items) as [keyof typeof SLOT_TYPES, number][]) {
     const item = items.get(id);
-    if (!item) throw new Error(`gear: item ${id} in ${slot} is not in items.json (hunter-usable, level 40+)`);
+    if (!item) throw new Error(`gear: item ${id} in ${slot} is not in items.json (hunter-usable, uncommon or better)`);
+    if (item.requiredLevel > config.level) throw new Error(`gear: ${item.name} needs level ${item.requiredLevel}`);
     if (!SLOT_TYPES[slot].includes(item.inventoryType)) throw new Error(`gear: ${item.name} does not go in ${slot}`);
     const s = item.stats;
     stats.strength += s.strength ?? 0;
@@ -169,9 +172,10 @@ export function actionNames(data: HunterData): Set<string> {
 
 export function buildCharacter(data: HunterData, overrides: Overrides, items: Map<number, Item>, config: SimConfig): Character {
   const f = overrides.formula;
-  const raceKey = Object.keys(overrides.races).find((r) => config.race.startsWith(r));
-  if (!raceKey) throw new Error(`no base stats for race "${config.race}" in overrides.toml`);
-  const race = overrides.races[raceKey]!;
+  const lv = overrides.levels;
+  const raceKey = Object.keys(lv.hunter.races).find((r) => config.race.startsWith(r));
+  if (!raceKey) throw new Error(`no base stats for race "${config.race}" in levels.toml`);
+  const raceStats = lv.hunter.races[raceKey]!.stats[config.level - lv.firstLevel]!;
 
   const passives: ActiveSpell[] = [];
   for (const t of validateTalents(data, config)) {
@@ -234,7 +238,7 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
       }
     }
   }
-  const stat = (i: number, key: keyof StatBlock) => Math.floor((race.stats[i]! + sum(key)) * (1 + statPct[i]! / 100));
+  const stat = (i: number, key: keyof StatBlock) => Math.floor((raceStats[i]! + sum(key)) * (1 + statPct[i]! / 100));
   const primary = {
     strength: stat(Stat.Strength, "strength"),
     agility: stat(Stat.Agility, "agility"),
@@ -243,7 +247,7 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     spirit: stat(Stat.Spirit, "spirit"),
   };
 
-  const baseMana = overrides.base.mana.value;
+  const baseMana = atLevel(lv, lv.hunter.baseMana.values, config.level);
   const int = primary.intellect;
   const maxMana = baseMana + Math.min(20, int) + Math.max(0, int - 20) * f.manaPerIntellect.value;
 
@@ -253,7 +257,8 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     f.rangedAttackPowerBase.value +
     sum("rangedAttackPower");
 
-  const critPct = f.baseCritPct.value + primary.agility / f.agilityPerCrit.value + sum("critPct");
+  const agilityCritPct = primary.agility / atLevel(lv, lv.hunter.agilityPerCrit.values, config.level);
+  const critPct = f.baseCritPct.value + agilityCritPct + sum("critPct");
 
   return {
     config,
@@ -265,6 +270,7 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     maxMana,
     rangedAttackPower,
     critPct,
+    agilityCritPct,
     hitPct: sum("hitPct"),
     hastePct: sum("hastePct"),
     mp5: sum("mp5"),

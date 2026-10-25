@@ -10,14 +10,28 @@ const provenance = { confidence: Confidence, source: z.string().min(1) };
 const Value = z.object({ value: z.number(), ...provenance });
 const Range = z.object({ min: z.number(), max: z.number(), ...provenance });
 
+const Table = z.object({ values: z.array(z.number()), ...provenance });
+const StatRow = z.tuple([z.number(), z.number(), z.number(), z.number(), z.number()]);
+
+// levels.toml: values by level, from firstLevel on.
+const Levels = z.object({
+  firstLevel: z.number().int(),
+  hunter: z.object({
+    baseMana: Table,
+    agilityPerCrit: Table,
+    // str, agi, sta, int, spi
+    races: z.record(z.object({ stats: z.array(StatRow), ...provenance })),
+  }),
+  pet: z.object({ attackPower: Table }),
+  creatureArmor: Table,
+});
+export type Levels = z.infer<typeof Levels>;
+
 const Overrides = z.object({
-  base: z.object({ health: Value, mana: Value }),
-  races: z.record(z.object({ stats: z.tuple([z.number(), z.number(), z.number(), z.number(), z.number()]), ...provenance })),
   formula: z.object({
     rangedAttackPowerPerAgility: Value,
     rangedAttackPowerBase: Value,
     rangedAttackPowerPerLevel: Value,
-    agilityPerCrit: Value,
     attackPowerPerDps: Value,
     baseCritPct: Value,
     critDamageBonusPct: Value,
@@ -31,27 +45,17 @@ const Overrides = z.object({
     manaPerTickBase: Value,
     spiritPerManaPerTick: Value,
     manaPerIntellect: Value,
+    critSuppressionPerLevelPct: Value,
+    auraCritSuppressionPct: Value,
   }),
-  targets: z.record(
-    z.object({
-      level: z.number(),
-      armor: z.number(),
-      baseMissPct: z.number(),
-      hitPenaltyPct: z.number(),
-      critSuppressionPct: z.number(),
-      ...provenance,
-    }),
-  ),
+  // Target presets as levels above the hunter; the attack table follows from the difference.
+  targets: z.record(z.object({ levelOffset: z.number().int(), ...provenance })),
   pet: z.object({
     inheritRangedAttackPowerPct: Value,
-    baseAttackPower: Value,
-    baseDamage: Range,
+    // Damage per 2.0 sec swing at base attack power, per pet level.
+    baseDamagePerLevel: Range,
     focusPerSecond: Value,
     happinessDamagePct: Value,
-    missPct: Value,
-    dodgePct: Value,
-    glancingPct: Value,
-    glancingPenaltyPct: Value,
     baseCritPct: Value,
     attackSpeedSec: Value,
     hawk: z.object({ arrivalSec: Value, durationSec: Value, maxActive: Value, hitPctOfPetMelee: Value, attackIntervalSec: Value }),
@@ -70,12 +74,31 @@ const Overrides = z.object({
       .refine((h) => h.basePoints !== undefined || h.apCoefficient !== undefined, "a hotfix needs basePoints or apCoefficient"),
   ),
 });
-export type Overrides = z.infer<typeof Overrides>;
+export type Overrides = z.infer<typeof Overrides> & { levels: Levels };
 
 export const OVERRIDES_PATH = join(import.meta.dir, "..", "overrides.toml");
+export const LEVELS_PATH = join(import.meta.dir, "..", "levels.toml");
 
-export async function loadOverrides(path = OVERRIDES_PATH): Promise<Overrides> {
-  return Overrides.parse(Bun.TOML.parse(await Bun.file(path).text()));
+export async function loadOverrides(path = OVERRIDES_PATH, levelsPath = LEVELS_PATH): Promise<Overrides> {
+  const overrides = Overrides.parse(Bun.TOML.parse(await Bun.file(path).text()));
+  const levels = Levels.parse(Bun.TOML.parse(await Bun.file(levelsPath).text()));
+  const hunterLevels = 60 - levels.firstLevel + 1;
+  const check = (name: string, n: number, want: number) => {
+    if (n !== want) throw new Error(`levels.toml: ${name} has ${n} levels, expected ${want}`);
+  };
+  check("hunter.baseMana", levels.hunter.baseMana.values.length, hunterLevels);
+  check("hunter.agilityPerCrit", levels.hunter.agilityPerCrit.values.length, hunterLevels);
+  check("pet.attackPower", levels.pet.attackPower.values.length, hunterLevels);
+  check("creatureArmor", levels.creatureArmor.values.length, hunterLevels + 3);
+  for (const [race, r] of Object.entries(levels.hunter.races)) check(`hunter.races.${race}`, r.stats.length, hunterLevels);
+  return { ...overrides, levels };
+}
+
+// A level table's value at a level.
+export function atLevel(levels: Levels, values: readonly number[], level: number): number {
+  const v = values[level - levels.firstLevel];
+  if (v === undefined) throw new Error(`level ${level} is outside the level tables (${levels.firstLevel} and up)`);
+  return v;
 }
 
 // Returns a copy of the data with each hotfix applied. Fails loudly when a hotfix points at a spell

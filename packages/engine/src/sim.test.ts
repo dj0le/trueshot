@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { loadGameData } from "@hunter-sim/data";
 import { buildCharacter, SimConfig, simulate, type SimConfigInput } from "./index";
+import { attackTable } from "./levels";
 
 const game = await loadGameData();
 
@@ -13,13 +14,17 @@ const base: SimConfigInput = {
 
 test("auto shot alone matches the hand-calculated DPS", () => {
   const f = game.overrides.formula;
-  const t = game.overrides.targets.boss!;
-  const [, agility] = game.overrides.races.Orc!.stats;
+  const lv = game.overrides.levels;
+  const armor63 = lv.creatureArmor.values.at(-1)!;
+  const [, agility] = lv.hunter.races.Orc!.stats.at(-1)!;
   const rap = 60 * f.rangedAttackPowerPerLevel.value + agility * f.rangedAttackPowerPerAgility.value + f.rangedAttackPowerBase.value;
   const perShot = (61 + 114) / 2 + (rap / f.attackPowerPerDps.value) * 2.8;
-  const armor = 1 - t.armor / (t.armor + f.armorConstantBase.value + f.armorConstantPerLevel.value * 60);
-  // Orcs get Savage, +1% crit.
-  const crit = (agility / f.agilityPerCrit.value + 1 - t.critSuppressionPct) / 100;
+  const armor = 1 - armor63 / (armor63 + f.armorConstantBase.value + f.armorConstantPerLevel.value * 60);
+  // Orcs get Savage, +1% crit from an aura. A boss three levels up takes 1% per level, and up to
+  // 1.8% more off aura crit: a naked hunter is left with almost none.
+  const savage = 1;
+  const auraLoss = Math.min(savage, f.auraCritSuppressionPct.value);
+  const crit = Math.max(0, agility / lv.hunter.agilityPerCrit.values.at(-1)! + savage - 3 * f.critSuppressionPerLevelPct.value - auraLoss) / 100;
   // First shot after the 0.5 sec wind-up, then one every 2.8 sec.
   const shots = Math.floor((600 - 0.5) / 2.8) + 1;
   const expected = (perShot * armor * (1 + crit * (f.critDamageBonusPct.value / 100)) * shots) / 600;
@@ -84,7 +89,8 @@ test("rotation typos fail before any fight runs", () => {
 test("Volley channels for 6 sec and its linked spell ticks every second", () => {
   const r = simulate(game, {
     ...base,
-    gear: { ...base.gear!, stats: { hitPct: 9, mp5: 10000 } },
+    // Some gear crit, since a naked hunter barely crits a boss.
+    gear: { ...base.gear!, stats: { hitPct: 9, mp5: 10000, critPct: 5 } },
     fight: { durationSec: 60, iterations: 20 },
     rotation: { actions: [{ action: "volley" }] },
   });
@@ -137,7 +143,7 @@ test("gear items add their stats, convert ratings, and supply the ranged weapon"
     ...base,
     gear: { items: { head: 252605, chest: 252483, ranged: 18680 } },
   }));
-  const [, agility] = game.overrides.races.Orc!.stats;
+  const [, agility] = game.overrides.levels.hunter.races.Orc!.stats.at(-1)!;
   // Helm 21 + Dawn Armor 37 + Ancient Bone Bow 11.
   expect(ch.primary.agility).toBe(agility + 21 + 37 + 11);
   // Dawn Armor's 10 hit rating is 1% hit.
@@ -215,6 +221,26 @@ test("a pet attacking half the fight does about half its damage", () => {
   expect(ratio).toBeGreaterThan(0.45);
   expect(ratio).toBeLessThan(0.55);
   expect(run(0)).toBe(0);
+});
+
+test("the attack table follows the level gap", () => {
+  const f = game.overrides.formula;
+  const boss = attackTable(f, 60, 63);
+  expect(boss).toMatchObject({ missPct: 8, hitPenaltyPct: 1, critSuppressionPct: 3, auraCritSuppressionPct: 1.8, dodgePct: 6.5, glancingPct: 40 });
+  expect(boss.glancingPenaltyPct).toBeCloseTo(35, 5);
+  expect(attackTable(f, 30, 32)).toMatchObject({ missPct: 6, hitPenaltyPct: 0, critSuppressionPct: 2, auraCritSuppressionPct: 0 });
+  expect(attackTable(f, 30, 30)).toMatchObject({ missPct: 5, critSuppressionPct: 0, glancingPct: 10 });
+});
+
+test("a level 30 hunter knows level 30 ranks, has level 30 stats, and fights a level 30 target", () => {
+  const ch = buildCharacter(game.data, game.overrides, game.items, SimConfig.parse({ ...base, level: 30, gear: { rangedWeapon: { min: 20, max: 38, speed: 2.8 } } }));
+  expect(ch.primary.agility).toBe(game.overrides.levels.hunter.races.Orc!.stats[20]![1]);
+  expect(ch.baseMana).toBe(775);
+  // Aimed Shot's level 28 rank, not the level 60 one.
+  expect(ch.abilities.get("aimed_shot")!.id).toBe(20900);
+  const r = simulate(game, { ...base, level: 30, target: { preset: "normal" }, gear: { rangedWeapon: { min: 20, max: 38, speed: 2.8 } } });
+  expect(r.abilities[0]!.missPct).toBeGreaterThan(0);
+  expect(() => simulate(game, { ...base, level: 30, gear: { items: { ranged: 18680 } } })).toThrow(/needs level/);
 });
 
 test("support presets add outside mana, and the raid's Judgement of Wisdom pays out per hit", () => {

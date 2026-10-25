@@ -23,14 +23,14 @@ client build or to an override that records where it came from.
 | 13 | Combat log parser and sim vs log report | packages/data/src/combatlog | BLOCKED, needs a Forever Logs API key with events:read (task 25) or raw logs from other hunters |
 | 14 | Calibration against the MythicSim reference sims | tests/golden | |
 | 15 | Rotation optimizer: search over priority list orderings and thresholds | packages/engine/src/optimize | DONE |
-| 16 | Talent and pet sweep: rank every build and pet family for a given gear set | packages/cli | |
+| 16 | Talent optimizer and pet sweep: rank talent builds and pet families for a given gear set. Talents follow their tooltip text where the client data is bugged, so audit each talent against its description first and override the bugged ones | packages/cli | NEXT after 23 |
 | 17 | SvelteKit front end with the engine in a web worker | packages/web | |
 | 18 | Target presets: normal level 60, elite 62, boss 63 (armor, level-based miss and crit) | packages/engine/src/targets | DONE |
 | 19 | Marksmanship: talents, abilities, default priority list | packages/engine/src/specs/mm | DONE |
 | 20 | Beast Mastery: pet-heavy talents, Bestial Wrath, Kill Command | packages/engine/src/specs/bm | DONE. The pet autocasts greedily (the cheap ability starves the dear one: a cat uses Bite about twice a fight and Claw otherwise), which matches the game; no focus pooling, since the pet is not micromanaged. A rotation action can send a pet ability from the same macro (`pet = "bite"`). Summon Hawk works with guessed hawk attack values (overrides.toml pet.hawk) |
 | 21 | Survival: melee weapon, melee attack table, Raptor Strike and Mongoose Bite | packages/engine/src/specs/sv | |
 | 22 | Gear presets for all three specs at 60 from the GearQuestForever BiS lists | packages/data/presets | DONE, set bonuses and enchants are task 26 |
-| 23 | Level-aware sim: any level 10 to 60, spell ranks and target stats by level, so level 30 beta logs can check the mechanics | packages/engine | |
+| 23 | Level-aware sim: any level 10 to 60, spell ranks and target stats by level, so level 30 beta logs can check the mechanics | packages/engine | DONE, levels.toml holds base stats, base mana, agility per crit, pet attack power and creature armor by level (vmangos and cmangos databases); targets are a level offset and the attack table follows from the gap; items go down to level 10. Comparing with the beta fights in calibration/beta-level30.toml is still to do |
 | 24 | Recalibrate against real level 60 logs after launch | tests/golden | BLOCKED, needs level 60 logs, launch is 2026-11-04 |
 | 25 | Forever Logs API client: list reports, pull hunter encounter events into a local gitignored cache | packages/data/src/foreverlogs | BLOCKED, key is in .env but needs events:read, granted by hand on request |
 | 26 | Set bonuses and enchants on gear | packages/data/src/build-items.ts | |
@@ -91,9 +91,10 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
 - Intimidation on cooldown costs bm-cat 1.5% DPS: 138 mana and a GCD a minute in a mana-bound build,
   for one guaranteed pet crit, while Frenzy 5/5 already procs off the pet's ~18% crit rate. As a
   one-off opener macro with Bite it costs 0.2% (bm-cat.with-intimidation.toml).
-- MM Lone Wolf beats BM in boss fights even with the pet attacking all fight (optimized rotations,
-  260.0 vs 259.0 DPS over 180 sec). Each 10% of the fight the pet is out of action (dead, pulled back)
-  costs BM about 2.5% more: -2.7% at 90%, -6.7% at 75% (`pet.attackingPct`).
+- BM beats MM Lone Wolf by 2.9% in boss fights with the pet attacking all fight (optimized rotations,
+  257.7 vs 250.4 DPS over 180 sec) once crit suppression and pet damage follow the 1.12 servers
+  (task 23). Break-even is the pet attacking about 90% of the fight; below that MM wins
+  (`pet.attackingPct`). Before task 23, with 0.6% crit suppression and guessed pet damage, MM led by 0.3%.
 - With Careful Aim 5/5, intellect is worth about as much as agility for MM (task 12).
 - Serpent Sting matches the client tooltip (555 over 15 sec, no attack power scaling). MythicSim gets about
   twice our Serpent Sting DPS. Unresolved until logs exist.

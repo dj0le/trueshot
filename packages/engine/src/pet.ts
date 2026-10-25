@@ -3,6 +3,7 @@
 // Discipline), exactly as the client wires them.
 import type { HunterData, Overrides, PetFamily, Spell } from "@hunter-sim/data";
 import { AuraSet } from "./auras";
+import type { AttackTable } from "./levels";
 import { type ActiveSpell, knownRank, type ResolvedEffect, resolveEffects, snake } from "./character";
 import { Aura, DefenseType, Effect, IGNORED_AURAS, ProcFlag, School, SpellModOp, TARGET_ENEMY } from "./enums";
 import type { EventQueue } from "./queue";
@@ -65,7 +66,8 @@ export class Pet {
     private data: HunterData,
     private o: Overrides["pet"],
     readonly family: PetFamily,
-    level: number,
+    // The pet's level, its base attack power there, and its attack table against the target.
+    private readonly stats: { level: number; baseAttackPower: number; table: AttackTable },
     priority: string[] | undefined,
     // When the pet stops attacking for the rest of the fight (pet.attackingPct).
     private readonly attackingUntil: number,
@@ -81,12 +83,12 @@ export class Pet {
     const known = this.known;
     for (const a of data.abilities) {
       if (a.tab !== "Pets" || !family.abilities.includes(a.name)) continue;
-      const spell = knownRank(data, a, level);
+      const spell = knownRank(data, a, stats.level);
       if (spell) known.set(snake(a.name), spell);
     }
     const order = priority ?? DEFAULT_PRIORITY;
     for (const name of priority ?? []) {
-      if (!known.has(name)) throw new Error(`pet: a ${family.name} does not know "${name}" at level ${level}`);
+      if (!known.has(name)) throw new Error(`pet: a ${family.name} does not know "${name}" at level ${stats.level}`);
     }
     this.abilities = order.filter((n) => known.has(n)).map((n) => known.get(n)!);
   }
@@ -99,7 +101,7 @@ export class Pet {
   // Effects and stats ==========================================================
 
   attackPower(): number {
-    return this.o.baseAttackPower.value + (this.host.ownRangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100 + this.auras.sum(Aura.ModAttackPower);
+    return this.stats.baseAttackPower + (this.host.ownRangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100 + this.auras.sum(Aura.ModAttackPower);
   }
 
   private damageMultiplier(school: number): number {
@@ -110,7 +112,8 @@ export class Pet {
   // Crit buffs with charges (Intimidation) are spent by the pet's own next hit; hawks do not share them.
   private critPct(own: boolean): number {
     const auraCrit = this.auras.sum(Aura.ModCritPct) - (own ? 0 : this.auras.chargedSum(Aura.ModCritPct));
-    return this.o.baseCritPct.value + auraCrit;
+    const t = this.stats.table;
+    return this.o.baseCritPct.value + auraCrit - t.critSuppressionPct - Math.min(auraCrit, t.auraCritSuppressionPct);
   }
 
   private focusNow(): number {
@@ -135,23 +138,27 @@ export class Pet {
   // the pet's own damage. Only the pet's own hits spend charges and set off its crit procs.
   private whiteHit(name: string, streams: string, scale: number, own: boolean): void {
     const rng = this.host.rng.stream(`${streams}-auto`).next() * 100;
-    const dodge = this.o.missPct.value + this.o.dodgePct.value;
-    const glance = dodge + this.o.glancingPct.value;
+    const t = this.stats.table;
+    const dodge = t.missPct + t.dodgePct;
+    const glance = dodge + t.glancingPct;
     const crit = glance + this.critPct(own);
     if (rng < dodge) {
       this.host.record(name, "miss");
       return;
     }
     if (own) this.auras.consumeCharges(ProcFlag.DoneMeleeAutoAttack);
-    const speed = this.o.attackSpeedSec.value;
-    const base = this.host.rng.stream(`${streams}-damage`).range(this.o.baseDamage.min, this.o.baseDamage.max);
+    // Base damage already carries the pet's base attack power; the rest scales it (vmangos).
+    const perLevel = this.o.baseDamagePerLevel;
+    const speedScale = this.o.attackSpeedSec.value / 2;
+    const base = this.host.rng.stream(`${streams}-damage`).range(perLevel.min, perLevel.max) * this.stats.level * speedScale;
     let amount =
-      (base + (this.attackPower() / this.host.attackPowerPerDps) * speed) *
+      base *
+      (0.7 + (0.3 * this.attackPower()) / this.stats.baseAttackPower) *
       this.damageMultiplier(School.Physical) *
       this.host.armorMultiplier() *
       scale;
     if (rng < glance) {
-      amount *= 1 - this.o.glancingPenaltyPct.value / 100;
+      amount *= 1 - t.glancingPenaltyPct / 100;
       this.host.record(name, "glance", amount);
     } else if (rng < crit) {
       this.host.record(name, "crit", amount * 2);
@@ -278,7 +285,8 @@ export class Pet {
 
     if (spell.defenseType !== DefenseType.None) {
       const r = this.host.rng.stream("pet-special").next() * 100;
-      const avoid = this.o.missPct.value + (spell.defenseType === DefenseType.Melee ? this.o.dodgePct.value : 0);
+      const t = this.stats.table;
+      const avoid = t.missPct + (spell.defenseType === DefenseType.Melee ? t.dodgePct : 0);
       if (r < avoid) {
         this.host.record(name, "miss");
         return;

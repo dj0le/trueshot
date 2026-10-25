@@ -7,8 +7,12 @@ const d = data as unknown as HunterData;
 
 test("overrides.toml validates", async () => {
   const o = await loadOverrides();
-  expect(o.races.Orc!.stats).toEqual([58, 122, 92, 62, 73]);
-  expect(o.targets.boss!.armor).toBe(3731);
+  const lv = o.levels;
+  // Level 60 rows match Classic's known values.
+  expect(lv.hunter.races.Orc!.stats.at(-1)).toEqual([58, 122, 92, 62, 73]);
+  expect(lv.hunter.baseMana.values.at(-1)).toBe(1720);
+  expect(lv.creatureArmor.values.at(-1)).toBe(3731);
+  expect(o.targets.boss!.levelOffset).toBe(3);
 });
 
 test("hotfixes replace effect base points without touching the input", async () => {
@@ -26,7 +30,7 @@ test("a hotfix the client already has is rejected as stale", async () => {
 
 test("unconfirmed lists guesses with their keys", async () => {
   const keys = unconfirmed(await loadOverrides()).map((u) => u.key);
-  expect(keys).toContain("races.Human");
-  expect(keys).toContain("pet.baseDamage");
+  expect(keys).toContain("levels.hunter.races.Human");
+  expect(keys).toContain("pet.focusPerSecond");
   expect(keys).not.toContain("formula.autoShotStandStillMs");
 });
