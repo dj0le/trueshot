@@ -158,6 +158,8 @@ function explicitStats(r: Row): { stats: ItemStats; unparsed: number[] } {
 function buildItem(r: Row, source: "forever" | "classic"): Item | null {
   const base = items.get(r.ID!);
   if (!base) return null;
+  // Developer placeholders shipped in the client ("Test Dagger", "... test copy").
+  if (/\btest\b/i.test(r.Display_lang ?? "")) return null;
   const classId = num(base.ClassID);
   const subclass = num(base.SubclassID);
   const inv = num(r.InventoryType);
@@ -222,8 +224,13 @@ for (const r of db.ItemSparse) {
   if (item) out.push(item);
 }
 // Items Forever has (they are in its Item table) whose details only the server sends.
+// Classic Era's client also carries Season of Discovery items (ids 200000-249999). Forever's Item
+// table lists them too, but Forever's own new items start at 250000 and ship in its client, so these
+// are not Forever gear.
+const SOD_IDS = { from: 200000, to: 250000 };
 for (const r of era.ItemSparse) {
   if (shipped.has(r.ID!) || !items.has(r.ID!)) continue;
+  if (num(r.ID) >= SOD_IDS.from && num(r.ID) < SOD_IDS.to) continue;
   const item = buildItem(r, "classic");
   if (item) out.push(item);
 }

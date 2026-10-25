@@ -44,7 +44,7 @@ client build or to an override that records where it came from.
 | 34 | GearQuest Forever importer: read the addon's hunter picks (per spec, faction, level band, ranked, levels 10-60) from the local install into gear presets by tier (best, good, average), so any level can be simmed with realistic gear | packages/data | |
 | 35 | Estimate vs actual: sim my character's real gear and talents next to a log of the same boss, and the tier presets, to split the gap into execution and gear | packages/cli | BLOCKED, needs task 25 or 13 for my logs, and task 23 below level 60 |
 | 36 | Racials: Skyborne Wind Blessed (+3% haste, from the talentsforever racials list), Troll Berserking, Orc Blood Fury and pet bonus, Dwarf and Troll weapon skills; plus a haste stat in gear and buffs | packages/engine | |
-| 37 | items.json carries Season of Discovery items (ids 23xxxx, item level 80+, many with +% haste) because they sit in Forever's Item table; check which really exist in Forever and drop the rest | packages/data/src/build-items.ts | |
+| 37 | items.json carries Season of Discovery items (ids 23xxxx, item level 80+, many with +% haste) because they sit in Forever's Item table; check which really exist in Forever and drop the rest | DONE, 3,274 SoD items and the client's test items dropped; no +% haste gear is left in Forever's data |
 
 Tasks 1 to 10, 18 and 19 give a working "run my setup" CLI for Marksmanship. Task 20 follows because
 pets carry the weakest data. Task 21 comes last because it needs a whole melee model.
