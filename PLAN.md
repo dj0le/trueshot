@@ -40,6 +40,7 @@ client build or to an override that records where it came from.
 | 30 | Rotation comparison: variant configs that `extends` a base, `sim compare` with several variants and a per-ability diff, `sim value` for what each action is worth | packages/cli | DONE |
 | 31 | Fight-length presets: level 30 dungeon trash and bosses (mostly under 60 sec on Forever Logs), level 60 dungeon, raid boss | configs | |
 | 32 | Procs that need a crit (Resourcefulness): fire only on critical strikes | packages/engine | |
+| 33 | Forever food and campfire buffs (Well Fed agility/attack power foods, campfire tiers, Camp Benefits) as support options; several food spells carry placeholder values of 1 and campfire effects are server-side, so values need a source | packages/data, packages/engine | |
 
 Tasks 1 to 10, 18 and 19 give a working "run my setup" CLI for Marksmanship. Task 20 follows because
 pets carry the weakest data. Task 21 comes last because it needs a whole melee model.

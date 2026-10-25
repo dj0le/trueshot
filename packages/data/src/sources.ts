@@ -40,6 +40,8 @@ export const DB2_TABLES = [
   "Item",
   "ItemSparse",
   "ItemEffect",
+  // Forever links items to their effects here; ItemEffect has no ParentItemID column, unlike Classic Era.
+  "ItemXItemEffect",
   "RandPropPoints",
   "ItemDamageRanged",
   "ItemDamageThrown",

@@ -219,6 +219,13 @@
       "fetchedAt": "2026-10-25T14:17:46.484Z"
     },
     {
+      "file": "ItemXItemEffect.csv",
+      "url": "https://wago.tools/db2/ItemXItemEffect/csv?build=1.60.1.70532",
+      "bytes": 253530,
+      "sha256": "d9c2721f9a59e9ac2ad71b62a1856e23bfd0f75e466cf06a5a731f7e6f4d3a8b",
+      "fetchedAt": "2026-10-25T18:08:07.747Z"
+    },
+    {
       "file": "RandPropPoints.csv",
       "url": "https://wago.tools/db2/RandPropPoints/csv?build=1.60.1.70532",
       "bytes": 32214,
