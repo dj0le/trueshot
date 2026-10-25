@@ -23,6 +23,8 @@ export type SimResult = {
   samples: number[];
   abilities: AbilitySummary[];
   manaSpentPerFight: number;
+  // Average mana left unused at the end, as a share of the mana bar.
+  manaLeftPct: number;
   oomPct: number;
   // Effects and auras the setup used that the engine does not implement yet.
   unimplemented: string[];
@@ -48,6 +50,7 @@ export function simulate(game: GameData, input: SimConfigInput): SimResult {
   const totals = new Map<string, { damage: number; casts: number; hits: number; crits: number; misses: number; ticks: number }>();
   let totalMs = 0;
   let manaSpent = 0;
+  let manaLeft = 0;
   let oomMs = 0;
 
   for (let i = 0; i < iterations; i++) {
@@ -57,6 +60,7 @@ export function simulate(game: GameData, input: SimConfigInput): SimResult {
     dps.push(r.damage / (ms / 1000));
     totalMs += ms;
     manaSpent += r.manaSpent;
+    manaLeft += r.manaLeft;
     oomMs += r.oomMs;
     for (const a of r.abilities) {
       const t = totals.get(a.name) ?? { damage: 0, casts: 0, hits: 0, crits: 0, misses: 0, ticks: 0 };
@@ -97,6 +101,7 @@ export function simulate(game: GameData, input: SimConfigInput): SimResult {
     samples: dps,
     abilities,
     manaSpentPerFight: manaSpent / iterations,
+    manaLeftPct: (100 * manaLeft) / iterations / ch.maxMana,
     oomPct: (100 * oomMs) / totalMs,
     unimplemented: [...new Set([...ch.gearNotes, ...unknownPassiveAuras(ch), ...unimplemented])].sort(),
   };

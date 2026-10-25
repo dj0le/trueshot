@@ -32,7 +32,9 @@ function print(r: SimResult): void {
   console.log(
     `DPS ${fmt(r.dps.mean)} ± ${fmt(r.dps.error95)} (95%), sd ${fmt(r.dps.stdDev)}, range ${fmt(r.dps.min)} to ${fmt(r.dps.max)}, ${r.iterations} fights`,
   );
-  console.log(`Mana spent per fight ${fmt(r.manaSpentPerFight, 0)}, out of mana ${fmt(r.oomPct)}% of the time\n`);
+  console.log(
+    `Mana spent per fight ${fmt(r.manaSpentPerFight, 0)}, ${fmt(r.manaLeftPct, 0)}% left unused at the end, out of mana ${fmt(r.oomPct)}% of the time\n`,
+  );
   console.log(
     table([
       ["Ability", "DPS", "Share", "Casts", "Crit%", "Miss%", "Avg hit"],
@@ -116,6 +118,7 @@ function printDiff(base: SimResult, other: SimResult): void {
       ["Ability", "DPS", "Casts"],
       ...rows.map((r) => [r.name, signed(r.dps), signed(r.casts)]),
       ["Out of mana %", signed(other.oomPct - base.oomPct), ""],
+      ["Mana left %", signed(other.manaLeftPct - base.manaLeftPct), ""],
     ]),
   );
 }

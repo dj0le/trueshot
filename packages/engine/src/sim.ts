@@ -72,6 +72,8 @@ export type FightResult = {
   damage: number;
   abilities: AbilityStats[];
   manaSpent: number;
+  // Mana still in the bar when the fight ends: spent on nothing.
+  manaLeft: number;
   // Time spent able to act but without the mana to cast anything on the list.
   oomMs: number;
 };
@@ -302,6 +304,7 @@ export class Fight implements PetHost {
       damage: abilities.reduce((s, a) => s + a.damage, 0),
       abilities,
       manaSpent: this.manaSpent,
+      manaLeft: this.mana,
       oomMs: this.oomMs,
     };
   }
