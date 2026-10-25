@@ -6,7 +6,7 @@ import type { Row } from "./csv";
 import { GENERATED_PATH } from "./index";
 import type { Ability, Consumable, HunterData, PetFamily, Racial, Spell, SpellEffect, Talent, TalentRankEffect } from "./schema";
 import { HUNTER_TRAIT_TREE_ID, TALENTSFOREVER_HUNTER_URL, WOWF_BUILD } from "./sources";
-import { RAW_DIR, byId, bySpell, groupBy, num, tables } from "./tables";
+import { RAW_DIR, byId, bySpell, effectsByItem, groupBy, num, tables } from "./tables";
 
 // Spells the server triggers by script, so the client tables do not link them. Each link is
 // written onto the source effect's triggerSpell and, for hunter spells, checked against the
@@ -352,11 +352,10 @@ for (const r of db.CreatureFamily.filter((r) => num(r.PetFoodMask) !== 0)) {
 
 // Consumables =================================================================
 
-const itemEffects = byId(db.ItemEffect);
-const effectsOfItem = groupBy(db.ItemXItemEffect, (r) => r.ItemID!);
+const effectsOfItem = effectsByItem(db.ItemXItemEffect, db.ItemEffect);
 const itemNames = new Map(db.ItemSparse.map((r) => [r.ID!, r.Display_lang!]));
 const consumables: Consumable[] = CONSUMABLE_ITEMS.flatMap((itemId) => {
-  const use = (effectsOfItem.get(String(itemId)) ?? []).map((x) => itemEffects.get(x.ItemEffectID!)!).find((e) => e.TriggerType === "0");
+  const use = (effectsOfItem.get(String(itemId)) ?? []).find((e) => e.TriggerType === "0");
   if (!use) {
     problems.push(`consumable ${itemId}: no on-use effect`);
     return [];

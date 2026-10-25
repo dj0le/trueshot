@@ -240,6 +240,11 @@ confidence = "classic"
 source = "Classic normalizes pet DPS to a 2.0 sec swing whatever the native speed"
 
 # Summon Hawk's hawk. Its attacks are server-side, so nothing about them is in the client.
+[pet.hawk.arrivalSec]
+value = 1.0
+confidence = "reported"
+source = "In game the cast is instant and the hawk takes about a second to fly in. The dive's missile speed is 35 yd/sec, about 1 sec from max range"
+
 [pet.hawk.durationSec]
 value = 18
 confidence = "confirmed"

@@ -43,6 +43,16 @@ export class AuraSet {
     return s;
   }
 
+  // The part of sum() that comes from auras with charges left.
+  chargedSum(aura: number): number {
+    let s = 0;
+    for (const a of this.active.values()) {
+      if (a.charges === 0) continue;
+      for (const e of a.effects) if (e.aura === aura) s += e.value;
+    }
+    return s;
+  }
+
   // Percentage auras that multiply together onto a base, such as haste.
   product(auras: readonly number[], base = 1): number {
     let m = base;

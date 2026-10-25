@@ -17,7 +17,7 @@ export type PetHost = {
   // A value with the hunter's spell modifiers applied.
   modded(base: number, spell: Spell, op: number): number;
   moddedEffects(spell: Spell, effects: ResolvedEffect[]): ResolvedEffect[];
-  rangedAttackPower(): number;
+  ownRangedAttackPower(): number;
   armorMultiplier(): number;
   // Damage-done bonuses the pet shares with the hunter (Focused Fire).
   sharedDamagePct(): number;
@@ -96,7 +96,7 @@ export class Pet {
   // Effects and stats ==========================================================
 
   attackPower(): number {
-    return this.o.baseAttackPower.value + (this.host.rangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100 + this.auras.sum(Aura.ModAttackPower);
+    return this.o.baseAttackPower.value + (this.host.ownRangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100 + this.auras.sum(Aura.ModAttackPower);
   }
 
   private damageMultiplier(school: number): number {
@@ -104,8 +104,10 @@ export class Pet {
     return shared * this.auras.damageMultiplier(school);
   }
 
-  private critPct(): number {
-    return this.o.baseCritPct.value + this.auras.sum(Aura.ModCritPct);
+  // Crit buffs with charges (Intimidation) are spent by the pet's own next hit; hawks do not share them.
+  private critPct(own: boolean): number {
+    const auraCrit = this.auras.sum(Aura.ModCritPct) - (own ? 0 : this.auras.chargedSum(Aura.ModCritPct));
+    return this.o.baseCritPct.value + auraCrit;
   }
 
   private focusNow(): number {
@@ -131,7 +133,7 @@ export class Pet {
     const rng = this.host.rng.stream(`${streams}-auto`).next() * 100;
     const dodge = this.o.missPct.value + this.o.dodgePct.value;
     const glance = dodge + this.o.glancingPct.value;
-    const crit = glance + this.critPct();
+    const crit = glance + this.critPct(own);
     if (rng < dodge) {
       this.host.record(name, "miss");
       return;
@@ -161,7 +163,12 @@ export class Pet {
 
   private hawks: { expiresAt: number }[] = [];
 
+  // The hawk flies in before its time starts.
   summonHawk(): void {
+    this.host.queue.push(this.host.now + this.o.hawk.arrivalSec.value * 1000, () => this.hawkArrives());
+  }
+
+  private hawkArrives(): void {
     const h = this.o.hawk;
     // A new hawk past the limit replaces the oldest.
     if (this.hawks.length >= h.maxActive.value) this.hawks.shift();
@@ -263,7 +270,7 @@ export class Pet {
       }
       amount *= this.damageMultiplier(spell.school);
       if (spell.school === School.Physical) amount *= this.host.armorMultiplier();
-      if (this.host.rng.stream("pet-special-crit").chance(this.critPct())) {
+      if (this.host.rng.stream("pet-special-crit").chance(this.critPct(true))) {
         this.host.record(name, "crit", amount * 2);
         this.onCrit();
       } else {

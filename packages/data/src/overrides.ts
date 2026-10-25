@@ -54,7 +54,7 @@ const Overrides = z.object({
     glancingPenaltyPct: Value,
     baseCritPct: Value,
     attackSpeedSec: Value,
-    hawk: z.object({ durationSec: Value, maxActive: Value, hitPctOfPetMelee: Value, attackIntervalSec: Value }),
+    hawk: z.object({ arrivalSec: Value, durationSec: Value, maxActive: Value, hitPctOfPetMelee: Value, attackIntervalSec: Value }),
   }),
   // Buffs and debuffs other players keep up, by preset name, as client spell ids.
   support: z.record(z.object({ spells: z.array(z.number()), ...provenance })),

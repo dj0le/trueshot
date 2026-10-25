@@ -2,7 +2,7 @@
 // regen, ticks, aura expiry) runs off the event queue.
 import type { GameData, Overrides, Spell } from "@hunter-sim/data";
 import { AuraSet } from "./auras";
-import { type Character, type ResolvedEffect, resolveEffects, snake } from "./character";
+import { actionNames, type Character, type ResolvedEffect, resolveEffects, snake } from "./character";
 import {
   Aura,
   CHANNELED_FLAGS,
@@ -88,6 +88,7 @@ export class Rotation {
   readonly actions: { name: string; spell: Spell | null; cond: Getter | null; timed: boolean }[];
   // Spell ids by snake_case name, for conditions that look up auras.
   private readonly spellIds = new Map<string, number[]>();
+  private readonly actionNames: Set<string>;
 
   constructor(
     private ch: Character,
@@ -97,13 +98,9 @@ export class Rotation {
       const key = snake(s.name);
       this.spellIds.set(key, [...(this.spellIds.get(key) ?? []), s.id]);
     }
-    const knownNames = new Set([
-      ...game.data.abilities.filter((a) => a.tab !== "Pets").map((a) => snake(a.name)),
-      ...game.data.consumables.map((c) => snake(c.name)),
-      ...game.data.racials.filter((r) => r.active).map((r) => snake(r.name)),
-    ]);
+    this.actionNames = actionNames(game.data);
     this.actions = ch.config.rotation.actions.map((a) => {
-      if (!knownNames.has(a.action)) throw new Error(`rotation: unknown action "${a.action}"`);
+      if (!this.actionNames.has(a.action)) throw new Error(`rotation: unknown action "${a.action}"`);
       let timed = false;
       const cond = a.if
         ? compile(a.if, (path) => {
@@ -124,6 +121,10 @@ export class Rotation {
     const [head, name, field] = path;
     const needSpellName = () => {
       if (!name || !this.spellIds.has(name)) throw new Error(`rotation: unknown spell "${name}" in ${path.join(".")}`);
+    };
+    // Cooldowns and cast counts belong to actions, which include consumables named after their item.
+    const needActionName = () => {
+      if (!name || !this.actionNames.has(name)) throw new Error(`rotation: unknown action "${name}" in ${path.join(".")}`);
     };
     const sec = (ms: number) => Math.max(0, ms) / 1000;
 
@@ -155,7 +156,7 @@ export class Rotation {
         if (name === "windup") return () => (this.f().auto.windup ? 1 : 0);
         break;
       case "cooldown": {
-        needSpellName();
+        needActionName();
         const spell = this.ch.abilities.get(name!);
         if (field === "ready") return () => (spell && this.f().cooldownReadyAt(spell) <= this.f().now ? 1 : 0);
         if (field === "remains") return () => (spell ? sec(this.f().cooldownReadyAt(spell) - this.f().now) : 1e9);
@@ -164,12 +165,12 @@ export class Rotation {
       case "casts": {
         // Times cast so far this fight, for fixed patterns: (casts.a + casts.b) % 3 < 2.
         if (field !== undefined) break;
-        needSpellName();
+        needActionName();
         const spell = this.ch.abilities.get(name!);
         return () => (spell ? this.f().castCount(spell) : 0);
       }
       case "cast": {
-        needSpellName();
+        needActionName();
         const spell = this.ch.abilities.get(name!);
         if (field === "time") return () => (spell ? this.f().castTime(spell) / 1000 : 0);
         break;
@@ -242,8 +243,9 @@ export class Fight implements PetHost {
     this.autoShot = game.data.spells["75"]!;
     this.attackPowerPerDps = game.overrides.formula.attackPowerPerDps.value;
     const preset = ch.config.support;
-    if (preset !== "solo" && !game.overrides.support[preset]) throw new Error(`support: unknown preset "${preset}"`);
-    this.support = preset === "solo" ? [] : game.overrides.support[preset]!.spells;
+    const support = preset === "solo" ? [] : game.overrides.support[preset]?.spells;
+    if (!support) throw new Error(`support: unknown preset "${preset}"`);
+    this.support = support;
     if (ch.config.pet.active) {
       const family = game.data.petFamilies.find((p) => p.name === ch.config.pet.family);
       if (!family) throw new Error(`pet: unknown family "${ch.config.pet.family}"`);
@@ -305,14 +307,17 @@ export class Fight implements PetHost {
   // Spell modifier sums, rebuilt only when self auras change.
   private readonly modsCache = new Map<number, { flat: number; pct: number }>();
 
-  rangedAttackPower(): number {
+  // The hunter's own ranged AP, which the pet inherits from.
+  ownRangedAttackPower(): number {
     const fromInt = (this.selfAuras.sum(Aura.ModRangedAttackPowerOfStatPercent) / 100) * this.ch.primary.intellect;
-    const flat =
-      this.ch.rangedAttackPower +
-      this.selfAuras.sum(Aura.ModRangedAttackPower) +
-      this.targetAuras.sum(Aura.RangedAttackPowerAttackerBonus) +
-      fromInt;
+    const flat = this.ch.rangedAttackPower + this.selfAuras.sum(Aura.ModRangedAttackPower) + fromInt;
     return flat * this.selfAuras.product([Aura.ModRangedAttackPowerPct]);
+  }
+
+  // The target's bonus to ranged attackers (Hunter's Mark) is added after the hunter's percent
+  // modifiers and only to the hunter's own shots.
+  rangedAttackPower(): number {
+    return this.ownRangedAttackPower() + this.targetAuras.sum(Aura.RangedAttackPowerAttackerBonus);
   }
 
   rangedHaste(): number {
@@ -325,16 +330,20 @@ export class Fight implements PetHost {
     const key = spell.id * 32 + op;
     const cached = this.modsCache.get(key);
     if (cached) return cached;
-    const mask = spell.classOptions?.mask;
+    const opts = spell.classOptions;
     let flat = 0;
     let pct = 0;
-    if (mask) {
-      for (const e of this.selfAuras.effects()) {
-        if (e.aura !== Aura.AddFlatModifier && e.aura !== Aura.AddPctModifier) continue;
-        if (e.miscValue[0] !== op) continue;
-        if (!e.classMask.some((m, i) => (m & mask[i]!) !== 0)) continue;
-        if (e.aura === Aura.AddFlatModifier) flat += e.value;
-        else pct += e.value;
+    if (opts) {
+      // Mask bits mean different spells in each class's family, so a modifier only reaches its own.
+      for (const src of this.selfAuras.sources()) {
+        if (src.spell.classOptions?.set !== opts.set) continue;
+        for (const e of src.effects) {
+          if (e.aura !== Aura.AddFlatModifier && e.aura !== Aura.AddPctModifier) continue;
+          if (e.miscValue[0] !== op) continue;
+          if (!e.classMask.some((m, i) => (m & opts.mask[i]!) !== 0)) continue;
+          if (e.aura === Aura.AddFlatModifier) flat += e.value;
+          else pct += e.value;
+        }
       }
     }
     const out = { flat, pct };
@@ -593,10 +602,8 @@ export class Fight implements PetHost {
         return this.weaponDamage(true) + e.value;
       case Effect.WeaponPercentDamage:
         return (this.weaponDamage(false) * e.value) / 100;
-      case Effect.SchoolDamage: {
-        const spread = e.variance ? this.rng.stream("damage").range(-e.variance / 2, e.variance / 2) : 0;
-        return e.value * (1 + spread) + e.apCoefficient * this.rangedAttackPower();
-      }
+      case Effect.SchoolDamage:
+        return this.rolled(e, "damage") + e.apCoefficient * this.rangedAttackPower();
     }
     return 0;
   }
@@ -645,9 +652,15 @@ export class Fight implements PetHost {
     this.applyAuras(spell, effects);
     ON_LAND[spell.name]?.(this.scriptContext);
     if (spell.defenseType === DefenseType.Ranged) {
-      this.procs(flag);
-      this.targetProcs(isAuto ? ProcFlag.TakenRangedAutoAttack : ProcFlag.TakenRangedSpell);
+      this.procs(this.selfAuras, flag, "proc");
+      this.procs(this.targetAuras, isAuto ? ProcFlag.TakenRangedAutoAttack : ProcFlag.TakenRangedSpell, "target-proc");
     }
+  }
+
+  // An effect's value with its variance rolled; variance is the full width as a fraction of the value.
+  private rolled(e: ResolvedEffect, stream: string): number {
+    const spread = e.variance ? this.rng.stream(stream).range(-e.variance / 2, e.variance / 2) : 0;
+    return e.value * (1 + spread);
   }
 
   private gainMana(amount: number): void {
@@ -658,8 +671,7 @@ export class Fight implements PetHost {
   private energize(spell: Spell, effects: ResolvedEffect[]): void {
     for (const e of effects) {
       if (e.effect !== Effect.Energize || e.miscValue[0] !== 0) continue;
-      const spread = e.variance ? this.rng.stream("energize").range(-e.variance / 2, e.variance / 2) : 0;
-      this.gainMana(e.value * (1 + spread));
+      this.gainMana(this.rolled(e, "energize"));
     }
   }
 
@@ -668,7 +680,10 @@ export class Fight implements PetHost {
     const effects = resolveEffects(spell);
     this.energize(spell, effects);
     for (const e of effects) {
-      if (e.effect === Effect.Dummy && e.triggerSpell) this.trigger(this.game.data.spells[String(e.triggerSpell)]!);
+      if (e.effect !== Effect.Dummy || !e.triggerSpell) continue;
+      const linked = this.game.data.spells[String(e.triggerSpell)];
+      if (linked) this.trigger(linked);
+      else this.unimplemented.add(`${spell.name}: linked spell ${e.triggerSpell} not in the data`);
     }
     this.applyAuras(spell, effects);
   }
@@ -733,32 +748,22 @@ export class Fight implements PetHost {
     });
   }
 
-  private procs(flag: number): void {
-    for (const src of this.selfAuras.sources()) {
+  // Self auras that answer the hunter's own hits, and debuffs on the target that answer being hit
+  // (Judgement of Wisdom).
+  private procs(auras: AuraSet, flag: number, stream: string): void {
+    for (const src of auras.sources()) {
       const proc = src.spell.proc;
       if (!proc || (proc.typeMask[0] & flag) === 0) continue;
       for (const e of src.effects) {
         if (e.aura !== Aura.ProcTriggerSpell || !e.triggerSpell) continue;
         const chance = this.modded(proc.chance, src.spell, SpellModOp.ProcChance);
-        if (!this.rng.stream(`proc:${src.spell.id}`).chance(chance)) continue;
+        if (!this.rng.stream(`${stream}:${src.spell.id}`).chance(chance)) continue;
         const triggered = this.game.data.spells[String(e.triggerSpell)];
         if (!triggered) {
           this.unimplemented.add(`${src.spell.name}: proc spell ${e.triggerSpell} not in the data`);
           continue;
         }
         this.trigger(triggered);
-      }
-    }
-  }
-
-  // Debuffs on the target that answer the hunter's hits (Judgement of Wisdom).
-  private targetProcs(flag: number): void {
-    for (const src of this.targetAuras.sources()) {
-      const proc = src.spell.proc;
-      if (!proc || (proc.typeMask[0] & flag) === 0) continue;
-      for (const e of src.effects) {
-        if (e.aura !== Aura.ProcTriggerSpell || !e.triggerSpell) continue;
-        if (this.rng.stream(`target-proc:${src.spell.id}`).chance(proc.chance)) this.trigger(this.game.data.spells[String(e.triggerSpell)]!);
       }
     }
   }
@@ -771,7 +776,7 @@ export class Fight implements PetHost {
     const spiritRegen = f.manaPerTickBase.value + this.ch.primary.spirit / f.spiritPerManaPerTick.value;
     const whileCasting = Math.min(100, this.selfAuras.sum(Aura.ModManaRegenInterrupt)) / 100;
     gain += this.now - this.lastManaSpendAt >= 5000 ? spiritRegen : spiritRegen * whileCasting;
-    this.mana = Math.min(this.ch.maxMana, this.mana + gain);
+    this.gainMana(gain);
   }
 
   private stat(name: string): AbilityStats {

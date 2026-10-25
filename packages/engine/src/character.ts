@@ -157,6 +157,16 @@ function scriptedEffects(talent: Talent, effects: ResolvedEffect[]): ResolvedEff
   return effects.map((e) => (e.aura === Aura.Dummy ? { ...e, aura: Aura.ModDamagePercentDone, miscValue: [127, 0] } : e));
 }
 
+// Every action a rotation can name, whether or not this character knows it. Keep in step with the
+// ability sources buildCharacter assembles below.
+export function actionNames(data: HunterData): Set<string> {
+  return new Set([
+    ...data.abilities.filter((a) => a.tab !== "Pets").map((a) => snake(a.name)),
+    ...data.consumables.map((c) => snake(c.name)),
+    ...data.racials.filter((r) => r.active).map((r) => snake(r.name)),
+  ]);
+}
+
 export function buildCharacter(data: HunterData, overrides: Overrides, items: Map<number, Item>, config: SimConfig): Character {
   const f = overrides.formula;
   const raceKey = Object.keys(overrides.races).find((r) => config.race.startsWith(r));
@@ -170,19 +180,6 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     passives.push({ spell, effects: scriptedEffects(t, resolveEffects(spell, t, config.talents[t.name])), source: t.name });
   }
 
-  // Racials: passive ones are always on, active ones are cast like abilities. Both Skyborne
-  // variants carry Wind Blessed, so racials are matched on the race name's start.
-  const racials = data.racials.filter((r) => r.race.startsWith(config.race));
-  const seen = new Set<number>();
-  const racialAbilities: [string, Spell][] = [];
-  for (const r of racials) {
-    if (seen.has(r.spellId)) continue;
-    seen.add(r.spellId);
-    const spell = data.spells[String(r.spellId)]!;
-    if (r.active) racialAbilities.push([snake(r.name), spell]);
-    else passives.push({ spell, effects: resolveEffects(spell), source: r.name });
-  }
-
   // Abilities a talent teaches are only known with the talent taken.
   const taughtByTalent = new Set(data.talents.filter((t) => !t.passive).map((t) => t.name));
   const abilities = new Map<string, Spell>();
@@ -192,7 +189,16 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     if (known) abilities.set(snake(a.name), known);
   }
 
-  for (const [name, spell] of racialAbilities) abilities.set(name, spell);
+  // Racials: passive ones are always on, active ones are cast like abilities. Both Skyborne
+  // variants carry Wind Blessed, so racials are matched on the race name's start.
+  const seen = new Set<number>();
+  for (const r of data.racials.filter((r) => r.race.startsWith(config.race))) {
+    if (seen.has(r.spellId)) continue;
+    seen.add(r.spellId);
+    const spell = data.spells[String(r.spellId)]!;
+    if (r.active) abilities.set(snake(r.name), spell);
+    else passives.push({ spell, effects: resolveEffects(spell), source: r.name });
+  }
 
   // Consumables act like spells with their item's cooldown, off the GCD. Item cooldown categories
   // are their own number space, so they are offset clear of spell categories.

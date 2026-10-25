@@ -37,3 +37,16 @@ export const bySpell = (rows: Row[]) =>
     rows.filter((r) => (r.DifficultyID ?? "0") === "0"),
     (r) => r.SpellID!,
   );
+
+// Forever joins items to effects through ItemXItemEffect; Classic Era keeps ParentItemID on the
+// effect. Returns Forever's effect rows by item, with ParentItemID filled in as Classic Era has it.
+export const effectsByItem = (links: Row[], effects: Row[]) => {
+  const effectById = byId(effects);
+  return groupBy(
+    links.flatMap((x): Row[] => {
+      const e = effectById.get(x.ItemEffectID!);
+      return e ? [{ ...e, ParentItemID: x.ItemID! }] : [];
+    }),
+    (r) => r.ParentItemID!,
+  );
+};

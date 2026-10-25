@@ -199,6 +199,15 @@ test("support presets add outside mana, and the raid's Judgement of Wisdom pays 
   expect(() => simulate(game, { ...spam, support: "nope" })).toThrow(/unknown preset/);
 });
 
+test("hunter talents do not modify other classes' support spells", () => {
+  // Bestial Swiftness's modifier shares a mask bit with Blessing of Wisdom in the paladin family.
+  const spam = { ...base, fight: { durationSec: 120, iterations: 50 }, support: "party", rotation: { actions: [{ action: "serpent_sting" }] } };
+  const talents = { "Deadly Aspects": 5, "Endurance Training": 1, "Focused Fire": 2, "Improved Aspect of the Monkey": 2 };
+  const without = simulate(game, { ...spam, talents });
+  const withIt = simulate(game, { ...spam, talents: { ...talents, "Bestial Swiftness": 1 } });
+  expect(withIt.manaSpentPerFight).toBe(without.manaSpentPerFight);
+});
+
 test("a mana potion is an off-GCD action on a 2 minute item cooldown", () => {
   const r = simulate(game, {
     ...base,
@@ -211,6 +220,17 @@ test("a mana potion is an off-GCD action on a 2 minute item cooldown", () => {
   expect(potion.castsPerFight).toBeLessThanOrEqual(3);
   expect(potion.dps).toBe(0);
   expect(arcane.castsPerFight).toBeGreaterThan(0);
+});
+
+test("conditions can name a consumable's cooldown by its action name", () => {
+  const r = simulate(game, {
+    ...base,
+    fight: { durationSec: 300, iterations: 5 },
+    rotation: {
+      actions: [{ action: "major_mana_potion", if: "cooldown.major_mana_potion.ready & casts.major_mana_potion < 1" }],
+    },
+  });
+  expect(r.abilities.find((a) => a.name === "Major Mana Potion")!.castsPerFight).toBe(1);
 });
 
 test("racials: Wind Blessed hastes Auto Shot, Berserking is cast, Savage adds crit", () => {

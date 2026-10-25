@@ -4,7 +4,7 @@
 import type { Row } from "./csv";
 import { ITEMS_PATH } from "./index";
 import type { Item, ItemStats } from "./schema";
-import { ERA_DIR, byId, bySpell, groupBy, num, tables } from "./tables";
+import { ERA_DIR, byId, bySpell, effectsByItem, groupBy, num, tables } from "./tables";
 
 const db = await tables([
   "ItemSparse",
@@ -131,15 +131,7 @@ function equipStats(spellId: string, stats: ItemStats): boolean {
   return all;
 }
 
-// Forever joins items to effects through ItemXItemEffect; Classic Era keeps ParentItemID on the effect.
-const effectById = byId(db.ItemEffect);
-const foreverEffects = groupBy(
-  db.ItemXItemEffect.flatMap((x): Row[] => {
-    const e = effectById.get(x.ItemEffectID!);
-    return e ? [{ ...e, ParentItemID: x.ItemID! }] : [];
-  }),
-  (r) => r.ParentItemID!,
-);
+const foreverEffects = effectsByItem(db.ItemXItemEffect, db.ItemEffect);
 const classicEffects = groupBy(era.ItemEffect, (r) => r.ParentItemID!);
 
 // Classic Era stores amounts and weapon damage outright.
