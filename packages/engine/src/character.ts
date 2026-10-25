@@ -24,6 +24,7 @@ export type Character = {
   rangedAttackPower: number;
   critPct: number;
   hitPct: number;
+  hastePct: number;
   mp5: number;
   rangedWeapon: { min: number; max: number; speed: number };
   // What the equipped items do that the sim does not model (procs, set bonuses, odd equip effects).
@@ -169,6 +170,19 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     passives.push({ spell, effects: scriptedEffects(t, resolveEffects(spell, t, config.talents[t.name])), source: t.name });
   }
 
+  // Racials: passive ones are always on, active ones are cast like abilities. Both Skyborne
+  // variants carry Wind Blessed, so racials are matched on the race name's start.
+  const racials = data.racials.filter((r) => r.race.startsWith(config.race));
+  const seen = new Set<number>();
+  const racialAbilities: [string, Spell][] = [];
+  for (const r of racials) {
+    if (seen.has(r.spellId)) continue;
+    seen.add(r.spellId);
+    const spell = data.spells[String(r.spellId)]!;
+    if (r.active) racialAbilities.push([snake(r.name), spell]);
+    else passives.push({ spell, effects: resolveEffects(spell), source: r.name });
+  }
+
   // Abilities a talent teaches are only known with the talent taken.
   const taughtByTalent = new Set(data.talents.filter((t) => !t.passive).map((t) => t.name));
   const abilities = new Map<string, Spell>();
@@ -177,6 +191,8 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     const known = knownRank(data, a, config.level);
     if (known) abilities.set(snake(a.name), known);
   }
+
+  for (const [name, spell] of racialAbilities) abilities.set(name, spell);
 
   // Consumables act like spells with their item's cooldown, off the GCD. Item cooldown categories
   // are their own number space, so they are offset clear of spell categories.
@@ -244,6 +260,7 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     rangedAttackPower,
     critPct,
     hitPct: sum("hitPct"),
+    hastePct: sum("hastePct"),
     mp5: sum("mp5"),
     rangedWeapon,
     gearNotes: worn.notes,

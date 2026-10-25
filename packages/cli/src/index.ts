@@ -173,6 +173,7 @@ async function main(argv: string[]): Promise<void> {
       rangedAttackPower: 40,
       critPct: 1,
       hitPct: 1,
+      hastePct: 1,
       intellect: 20,
       spirit: 20,
       mp5: 5,

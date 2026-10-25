@@ -23556,6 +23556,672 @@
     }
    ]
   },
+  "20550": {
+   "id": 20550,
+   "name": "Endurance",
+   "school": 1,
+   "attributes": [
+    80,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 133,
+     "basePoints": 5,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 6,
+     "aura": 163,
+     "basePoints": 2,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 2,
+     "effect": 6,
+     "aura": 50,
+     "basePoints": 2,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "20554": {
+   "id": 20554,
+   "name": "Berserking",
+   "school": 1,
+   "attributes": [
+    262160,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 10000,
+   "maxDurationMs": 10000,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 1,
+   "maxLevel": 0,
+   "cooldownMs": 180000,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 2,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 319,
+     "basePoints": 10,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 6,
+     "aura": 140,
+     "basePoints": 10,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 2,
+     "effect": 6,
+     "aura": 65,
+     "basePoints": 10,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "20572": {
+   "id": 20572,
+   "name": "Blood Fury",
+   "school": 1,
+   "attributes": [
+    16,
+    32,
+    16384,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 15000,
+   "maxDurationMs": 15000,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 180000,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 2,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 166,
+     "basePoints": 10,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 6,
+     "aura": 167,
+     "basePoints": 10,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 2,
+     "effect": 6,
+     "aura": 317,
+     "basePoints": 10,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "20574": {
+   "id": 20574,
+   "name": "Savage",
+   "school": 1,
+   "attributes": [
+    80,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 290,
+     "basePoints": 1,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "20597": {
+   "id": 20597,
+   "name": "Ruthless",
+   "school": 1,
+   "attributes": [
+    80,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 290,
+     "basePoints": 2,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "20598": {
+   "id": 20598,
+   "name": "The Human Spirit",
+   "school": 1,
+   "attributes": [
+    80,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 137,
+     "basePoints": 5,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      4,
+      16
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "20736": {
    "id": 20736,
    "name": "Distracting Shot",
@@ -34316,6 +34982,307 @@
      "pointsPerLevel": 0,
      "apCoefficient": 0,
      "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "1259710": {
+   "id": 1259710,
+   "name": "Wind Blessed",
+   "school": 1,
+   "attributes": [
+    80,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 342,
+     "basePoints": 3,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 6,
+     "aura": 65,
+     "basePoints": 3,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "1259719": {
+   "id": 1259719,
+   "name": "Earth Fury",
+   "school": 1,
+   "attributes": [
+    80,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 163,
+     "basePoints": 2,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 6,
+     "aura": 50,
+     "basePoints": 2,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "1259799": {
+   "id": 1259799,
+   "name": "Elune's Light",
+   "school": 1,
+   "attributes": [
+    16,
+    32,
+    16384,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 15000,
+   "maxDurationMs": 15000,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 180000,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 2,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 290,
+     "basePoints": 10,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
      "periodMs": 0,
      "triggerSpell": 0,
      "chainTargets": 0,
@@ -46990,6 +47957,68 @@
    "spellId": 27869,
    "categoryId": 1153,
    "cooldownMs": 120000
+  }
+ ],
+ "racials": [
+  {
+   "race": "Orc",
+   "name": "Blood Fury",
+   "spellId": 20572,
+   "active": true
+  },
+  {
+   "race": "Orc",
+   "name": "Savage",
+   "spellId": 20574,
+   "active": false
+  },
+  {
+   "race": "Tauren",
+   "name": "Endurance",
+   "spellId": 20550,
+   "active": false
+  },
+  {
+   "race": "Troll",
+   "name": "Berserking",
+   "spellId": 20554,
+   "active": true
+  },
+  {
+   "race": "Skyborne (Windshaper)",
+   "name": "Wind Blessed",
+   "spellId": 1259710,
+   "active": false
+  },
+  {
+   "race": "Human",
+   "name": "Ruthless",
+   "spellId": 20597,
+   "active": false
+  },
+  {
+   "race": "Human",
+   "name": "The Human Spirit",
+   "spellId": 20598,
+   "active": false
+  },
+  {
+   "race": "Dwarf",
+   "name": "Earth Fury",
+   "spellId": 1259719,
+   "active": false
+  },
+  {
+   "race": "Night Elf",
+   "name": "Elune's Light",
+   "spellId": 1259799,
+   "active": true
+  },
+  {
+   "race": "Skyborne (High Order)",
+   "name": "Wind Blessed",
+   "spellId": 1259710,
+   "active": false
   }
  ]
 }

@@ -18,7 +18,8 @@ test("auto shot alone matches the hand-calculated DPS", () => {
   const rap = 60 * f.rangedAttackPowerPerLevel.value + agility * f.rangedAttackPowerPerAgility.value + f.rangedAttackPowerBase.value;
   const perShot = (61 + 114) / 2 + (rap / f.attackPowerPerDps.value) * 2.8;
   const armor = 1 - t.armor / (t.armor + f.armorConstantBase.value + f.armorConstantPerLevel.value * 60);
-  const crit = (agility / f.agilityPerCrit.value - t.critSuppressionPct) / 100;
+  // Orcs get Savage, +1% crit.
+  const crit = (agility / f.agilityPerCrit.value + 1 - t.critSuppressionPct) / 100;
   // First shot after the 0.5 sec wind-up, then one every 2.8 sec.
   const shots = Math.floor((600 - 0.5) / 2.8) + 1;
   const expected = (perShot * armor * (1 + crit * (f.critDamageBonusPct.value / 100)) * shots) / 600;
@@ -210,4 +211,18 @@ test("a mana potion is an off-GCD action on a 2 minute item cooldown", () => {
   expect(potion.castsPerFight).toBeLessThanOrEqual(3);
   expect(potion.dps).toBe(0);
   expect(arcane.castsPerFight).toBeGreaterThan(0);
+});
+
+test("racials: Wind Blessed hastes Auto Shot, Berserking is cast, Savage adds crit", () => {
+  const fight = { durationSec: 300, iterations: 20 };
+  const autos = (race: string) =>
+    simulate(game, { ...base, race, fight }).abilities.find((a) => a.name === "Auto Shot")!.castsPerFight;
+  expect(autos("Skyborne")).toBeGreaterThan(autos("Tauren") * 1.025);
+
+  const troll = simulate(game, { ...base, race: "Troll", fight, rotation: { actions: [{ action: "berserking" }] } });
+  expect(troll.abilities.find((a) => a.name === "Berserking")!.castsPerFight).toBe(2);
+
+  const orc = buildCharacter(game.data, game.overrides, game.items, SimConfig.parse({ ...base, race: "Orc" }));
+  expect(orc.passives.map((p) => p.source)).toContain("Savage");
+  expect(orc.abilities.has("blood_fury")).toBe(true);
 });

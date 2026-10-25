@@ -25,6 +25,8 @@ export const Aura = {
   AddFlatModifier: 107,
   AddPctModifier: 108,
   ModRangedAttackPower: 124,
+  ModCritDamageBonus: 163,
+  ModRangedAttackPowerPct: 167,
   RangedAttackPowerAttackerBonus: 127,
   ModManaRegenInterrupt: 134,
   ModTotalStatPercentage: 137,
@@ -34,6 +36,8 @@ export const Aura = {
   ModCritPct: 290,
   // Melee haste: Rapid Fire's melee half, the pet's Frenzy and Trickster's Dance.
   ModMeleeHaste: 319,
+  // Melee and ranged haste together (Wind Blessed).
+  ModMeleeRangedHaste2: 342,
   // Careful Aim's two auras: attack power from a percentage of a stat. Which one is melee and
   // which is ranged is not documented; both carry the same value, so ranged reads 598.
   ModAttackPowerOfStatPercent: 580,
@@ -45,6 +49,11 @@ export const IGNORED_AURAS = new Set<number>([
   61, // Bestial Wrath: pet size
   68, // Hunter's Mark: makes the target visible
   77, // Bestial Wrath: pet immunities
+  50, // Endurance, Earth Fury: critical healing
+  65, // Berserking, Wind Blessed: spell haste
+  133, // Endurance: max health
+  166, // Blood Fury: melee attack power
+  317, // Blood Fury: spell power
 ]);
 export const IGNORED_EFFECTS = new Set<number>([
   179, // Volley: creates the ground area; damage comes from the linked tick spell

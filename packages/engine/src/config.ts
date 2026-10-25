@@ -12,6 +12,8 @@ const Stats = z
     rangedAttackPower: z.number().default(0),
     critPct: z.number().default(0),
     hitPct: z.number().default(0),
+    // Ranged haste in percent, multiplying with the quiver and every haste aura.
+    hastePct: z.number().default(0),
     mp5: z.number().default(0),
   })
   .default({});

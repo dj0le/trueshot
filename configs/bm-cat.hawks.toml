@@ -19,6 +19,15 @@ action = "bestial_wrath"
 action = "rapid_fire"
 
 [[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "berserking"
+
+[[rotation.actions]]
+action = "elunes_light"
+
+[[rotation.actions]]
 action = "serpent_sting"
 if = "!dot.serpent_sting.ticking"
 

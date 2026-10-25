@@ -67,6 +67,15 @@ if = "mana.pct > 20"
 action = "rapid_fire"
 
 [[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "berserking"
+
+[[rotation.actions]]
+action = "elunes_light"
+
+[[rotation.actions]]
 action = "sniper_shot"
 if = "mana.pct > 80"
 

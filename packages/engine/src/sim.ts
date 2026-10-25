@@ -100,6 +100,7 @@ export class Rotation {
     const knownNames = new Set([
       ...game.data.abilities.filter((a) => a.tab !== "Pets").map((a) => snake(a.name)),
       ...game.data.consumables.map((c) => snake(c.name)),
+      ...game.data.racials.filter((r) => r.active).map((r) => snake(r.name)),
     ]);
     this.actions = ch.config.rotation.actions.map((a) => {
       if (!knownNames.has(a.action)) throw new Error(`rotation: unknown action "${a.action}"`);
@@ -306,16 +307,17 @@ export class Fight implements PetHost {
 
   rangedAttackPower(): number {
     const fromInt = (this.selfAuras.sum(Aura.ModRangedAttackPowerOfStatPercent) / 100) * this.ch.primary.intellect;
-    return (
+    const flat =
       this.ch.rangedAttackPower +
       this.selfAuras.sum(Aura.ModRangedAttackPower) +
       this.targetAuras.sum(Aura.RangedAttackPowerAttackerBonus) +
-      fromInt
-    );
+      fromInt;
+    return flat * this.selfAuras.product([Aura.ModRangedAttackPowerPct]);
   }
 
   rangedHaste(): number {
-    return this.selfAuras.product([Aura.ModRangedHaste, Aura.ModRangedAmmoHaste], 1 + this.ch.config.gear.quiverHastePct / 100);
+    const base = (1 + this.ch.config.gear.quiverHastePct / 100) * (1 + this.ch.hastePct / 100);
+    return this.selfAuras.product([Aura.ModRangedHaste, Aura.ModRangedAmmoHaste, Aura.ModMeleeRangedHaste2], base);
   }
 
   // Sum of AddFlatModifier and AddPctModifier values for one spell and one modifier kind.
@@ -622,6 +624,9 @@ export class Fight implements PetHost {
       if (outcome === "crit") {
         const bonus = this.game.overrides.formula.critDamageBonusPct.value / 100;
         amount *= 1 + bonus * (1 + this.mods(spell, SpellModOp.CritDamageBonus).pct / 100);
+        // Endurance and Earth Fury: "critical strike bonus to damage increased by 2%", read as 2% more
+        // total critical damage, as the same aura worked on TBC's meta gems.
+        amount *= this.selfAuras.product([Aura.ModCritDamageBonus]);
         s.crits++;
       } else {
         s.hits++;

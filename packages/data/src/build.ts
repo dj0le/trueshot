@@ -4,7 +4,7 @@
 import { join } from "node:path";
 import type { Row } from "./csv";
 import { GENERATED_PATH } from "./index";
-import type { Ability, Consumable, HunterData, PetFamily, Spell, SpellEffect, Talent, TalentRankEffect } from "./schema";
+import type { Ability, Consumable, HunterData, PetFamily, Racial, Spell, SpellEffect, Talent, TalentRankEffect } from "./schema";
 import { HUNTER_TRAIT_TREE_ID, TALENTSFOREVER_HUNTER_URL, WOWF_BUILD } from "./sources";
 import { RAW_DIR, byId, bySpell, groupBy, num, tables } from "./tables";
 
@@ -27,6 +27,20 @@ const EXTRA_SPELLS: { id: number; why: string }[] = [
   { id: 25290, why: "Blessing of Wisdom, top rank" },
   { id: 10494, why: "Mana Spring Totem's aura, top rank" },
   { id: 20355, why: "Judgement of Wisdom, top rank" },
+];
+
+// Hunter racials that matter for damage, by client spell (names repeat across spells, so the id is
+// picked by hand and checked against the racial's tooltip). Active ones have a cooldown and are cast.
+const RACIALS: { name: string; spellId: number; tooltip: string }[] = [
+  { name: "Blood Fury", spellId: 20572, tooltip: "Increases Attack Power and Spell Power by 10% for 15 sec" },
+  { name: "Savage", spellId: 20574, tooltip: "critical strike chance with all spells and abilities by 1%" },
+  { name: "Berserking", spellId: 20554, tooltip: "spellcasting and attack speed by 10% for 10 sec" },
+  { name: "Wind Blessed", spellId: 1259710, tooltip: "melee, and ranged Haste by 3%" },
+  { name: "Ruthless", spellId: 20597, tooltip: "critical strike chance with all spells and attacks by 2%" },
+  { name: "The Human Spirit", spellId: 20598, tooltip: "Spirit increased by 5%" },
+  { name: "Endurance", spellId: 20550, tooltip: "critical strike bonus to damage and healing increased by 2%" },
+  { name: "Earth Fury", spellId: 1259719, tooltip: "critical strike bonus to damage and healing by 2%" },
+  { name: "Elune's Light", spellId: 1259799, tooltip: "critical strike chance with all spells and attacks by 10% for 15 sec" },
 ];
 
 // Consumables a hunter can use in a fight, by item id. Their spell and cooldown come from the
@@ -102,6 +116,7 @@ type TalentsForever = {
     }[];
   };
   spellbook: { tabs: { name: string; spells: [string, string][] }[]; levels: Record<string, number[]> };
+  racials: Record<string, { race: string; classes: string[]; abilities: [string, string, string][] }[]>;
   spell_desc: Record<string, { id?: number; d?: string }>;
 };
 
@@ -357,6 +372,19 @@ const consumables: Consumable[] = CONSUMABLE_ITEMS.flatMap((itemId) => {
   ];
 });
 
+// Racials ======================================================================
+
+const racials: Racial[] = [];
+for (const r of Object.values(tf.racials).flat()) {
+  if (!r.classes.includes("Hunter")) continue;
+  for (const [name, text] of r.abilities) {
+    const known = RACIALS.find((x) => x.name === name);
+    if (!known) continue;
+    if (!text.includes(known.tooltip)) problems.push(`racial ${name}: tooltip no longer says "${known.tooltip}"`);
+    racials.push({ race: r.race, name, spellId: known.spellId, active: /cooldown/.test(text) });
+  }
+}
+
 // Spell closure ==============================================================
 
 const wanted = new Set<string>([
@@ -365,6 +393,7 @@ const wanted = new Set<string>([
   ...LINKS.map((l) => String(l.to)),
   ...EXTRA_SPELLS.map((e) => String(e.id)),
   ...consumables.map((c) => String(c.spellId)),
+  ...RACIALS.map((r) => String(r.spellId)),
   ...(petPassives ?? []),
   ...petFamilies.map((p) => String(p.passiveSpellId)),
 ]);
@@ -415,6 +444,7 @@ const data: HunterData = {
   petFamilies,
   petPassives: (petPassives ?? []).map(num),
   consumables,
+  racials,
 };
 
 await Bun.write(GENERATED_PATH, JSON.stringify(data, null, 1) + "\n");

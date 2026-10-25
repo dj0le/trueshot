@@ -99,6 +99,10 @@ export type PetFamily = {
 // A usable item: its spell, and the item cooldown it shares with others of its category.
 export type Consumable = { itemId: number; name: string; spellId: number; categoryId: number; cooldownMs: number };
 
+// A racial ability of one race (as talentsforever names it, "Skyborne (Windshaper)"). Active ones are
+// cast from the rotation; passive ones are always on.
+export type Racial = { race: string; name: string; spellId: number; active: boolean };
+
 export type HunterData = {
   build: string;
   sources: { name: string; url: string; license?: string }[];
@@ -110,6 +114,7 @@ export type HunterData = {
   // (Unleashed Fury, Ferocity, Frenzy, Bestial Discipline).
   petPassives: number[];
   consumables: Consumable[];
+  racials: Racial[];
 };
 
 export type ItemStats = Partial<
