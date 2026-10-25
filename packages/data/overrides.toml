@@ -263,6 +263,18 @@ source = "Same stream, 24:07-24:18: one hawk's hits land 2.25, 1.75, 2.25 sec ap
 # Family damage modifiers come from the client (each family's Tamed Pet Passive), not from here.
 
 # Hotfixes ===================================================================
+# Support presets: what other players keep up all fight, as client spell ids (values come from the
+# client). A config picks one with `support = "party"`; "solo" is none.
+[support.party]
+spells = [25290]
+confidence = "guess"
+source = "A 5-man with a paladin: Blessing of Wisdom (40 mana per 5 sec)"
+
+[support.raid]
+spells = [25290, 10494, 20355]
+confidence = "guess"
+source = "A raid: Blessing of Wisdom, Mana Spring Totem (10 mana per 2 sec), Judgement of Wisdom on the target (59 mana per hit)"
+
 # Server-side changes the client tables do not have. Each one replaces one spell effect's base points.
 
 # Summon Hawk's dive: the tooltip adds 5% of ranged attack power; the client effect has no coefficient.

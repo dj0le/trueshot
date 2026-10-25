@@ -56,6 +56,8 @@ const Overrides = z.object({
     attackSpeedSec: Value,
     hawk: z.object({ durationSec: Value, maxActive: Value, hitPctOfPetMelee: Value, attackIntervalSec: Value }),
   }),
+  // Buffs and debuffs other players keep up, by preset name, as client spell ids.
+  support: z.record(z.object({ spells: z.array(z.number()), ...provenance })),
   hotfix: z.array(
     z
       .object({

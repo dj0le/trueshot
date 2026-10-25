@@ -30,6 +30,8 @@ export type Character = {
   gearNotes: string[];
 };
 
+const ITEM_CATEGORY_OFFSET = 1_000_000;
+
 // Inventory types each slot accepts.
 const SLOT_TYPES: Record<(typeof GEAR_SLOTS)[number], number[]> = {
   head: [1],
@@ -174,6 +176,20 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     if (a.tab === "Pets" || (taughtByTalent.has(a.name) && !config.talents[a.name])) continue;
     const known = knownRank(data, a, config.level);
     if (known) abilities.set(snake(a.name), known);
+  }
+
+  // Consumables act like spells with their item's cooldown, off the GCD. Item cooldown categories
+  // are their own number space, so they are offset clear of spell categories.
+  for (const c of data.consumables) {
+    const spell = data.spells[String(c.spellId)]!;
+    abilities.set(snake(c.name), {
+      ...spell,
+      name: c.name,
+      gcdMs: 0,
+      cooldownMs: 0,
+      category: ITEM_CATEGORY_OFFSET + c.categoryId,
+      categoryCooldownMs: c.cooldownMs,
+    });
   }
 
   const worn = gearStats(items, overrides, config);

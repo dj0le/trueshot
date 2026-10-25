@@ -4,23 +4,34 @@
 import { join } from "node:path";
 import type { Row } from "./csv";
 import { GENERATED_PATH } from "./index";
-import type { Ability, HunterData, PetFamily, Spell, SpellEffect, Talent, TalentRankEffect } from "./schema";
+import type { Ability, Consumable, HunterData, PetFamily, Spell, SpellEffect, Talent, TalentRankEffect } from "./schema";
 import { HUNTER_TRAIT_TREE_ID, TALENTSFOREVER_HUNTER_URL, WOWF_BUILD } from "./sources";
 import { RAW_DIR, byId, bySpell, groupBy, num, tables } from "./tables";
 
 // Spells the server triggers by script, so the client tables do not link them. Each link is
-// written onto the source effect's triggerSpell and checked against the source's tooltip.
-const LINKS: { from: number; effectIndex: number; to: number; tooltip: string }[] = [
+// written onto the source effect's triggerSpell and, for hunter spells, checked against the
+// source's tooltip; links on other classes' spells say why instead.
+const LINKS: ({ from: number; effectIndex: number; to: number } & ({ tooltip: string } | { why: string }))[] = [
   // Volley's periodic dummy fires a separate damage spell every second.
   { from: 1510, effectIndex: 2, to: 1279721, tooltip: "causing 70 Arcane damage" },
   { from: 14294, effectIndex: 2, to: 1279719, tooltip: "causing 91 Arcane damage" },
   { from: 14295, effectIndex: 2, to: 1279715, tooltip: "causing 112 Arcane damage" },
+  // Judgement of Wisdom's proc is a dummy; the server then restores 59 mana to the attacker (rank 3).
+  { from: 1826, effectIndex: 0, to: 20353, why: "Judgement of Wisdom rank 3 restores 59 mana per hit" },
 ];
 
 // Spells scripts in the engine apply directly, with why.
 const EXTRA_SPELLS: { id: number; why: string }[] = [
   { id: 1242512, why: "Rapid Recuperation's regen-while-casting buff, applied when Serpent Sting lands" },
+  // Support from other classes, for the support presets in overrides.toml.
+  { id: 25290, why: "Blessing of Wisdom, top rank" },
+  { id: 10494, why: "Mana Spring Totem's aura, top rank" },
+  { id: 20355, why: "Judgement of Wisdom, top rank" },
 ];
+
+// Consumables a hunter can use in a fight, by item id. Their spell and cooldown come from the
+// item's ItemEffect row.
+const CONSUMABLE_ITEMS = [13444, 12662, 20520]; // Major Mana Potion, Demonic Rune, Dark Rune
 
 // How far to follow EffectTriggerSpell chains from the spells we start with.
 const TRIGGER_DEPTH = 3;
@@ -54,6 +65,9 @@ const db = await tables([
   "CurvePoint",
   "CreatureFamily",
   "SkillLineAbility",
+  "ItemEffect",
+  "ItemXItemEffect",
+  "ItemSparse",
 ]);
 
 const names = new Map(db.SpellName.map((r) => [r.ID!, r.Name_lang!]));
@@ -321,6 +335,28 @@ for (const r of db.CreatureFamily.filter((r) => num(r.PetFoodMask) !== 0)) {
   });
 }
 
+// Consumables =================================================================
+
+const itemEffects = byId(db.ItemEffect);
+const effectsOfItem = groupBy(db.ItemXItemEffect, (r) => r.ItemID!);
+const itemNames = new Map(db.ItemSparse.map((r) => [r.ID!, r.Display_lang!]));
+const consumables: Consumable[] = CONSUMABLE_ITEMS.flatMap((itemId) => {
+  const use = (effectsOfItem.get(String(itemId)) ?? []).map((x) => itemEffects.get(x.ItemEffectID!)!).find((e) => e.TriggerType === "0");
+  if (!use) {
+    problems.push(`consumable ${itemId}: no on-use effect`);
+    return [];
+  }
+  return [
+    {
+      itemId,
+      name: itemNames.get(String(itemId)) ?? `item ${itemId}`,
+      spellId: num(use.SpellID),
+      categoryId: num(use.SpellCategoryID),
+      cooldownMs: Math.max(num(use.CoolDownMSec), num(use.CategoryCoolDownMSec)),
+    },
+  ];
+});
+
 // Spell closure ==============================================================
 
 const wanted = new Set<string>([
@@ -328,6 +364,7 @@ const wanted = new Set<string>([
   ...talents.map((t) => String(t.spellId)),
   ...LINKS.map((l) => String(l.to)),
   ...EXTRA_SPELLS.map((e) => String(e.id)),
+  ...consumables.map((c) => String(c.spellId)),
   ...(petPassives ?? []),
   ...petFamilies.map((p) => String(p.passiveSpellId)),
 ]);
@@ -357,8 +394,10 @@ for (const link of LINKS) {
     problems.push(`link ${link.from} -> ${link.to}: spell or effect missing`);
     continue;
   }
-  const text = Object.values(tf.spell_desc).find((d) => d.id === link.from)?.d ?? "";
-  if (!text.includes(link.tooltip)) problems.push(`link ${link.from} -> ${link.to}: tooltip no longer says "${link.tooltip}"`);
+  if ("tooltip" in link) {
+    const text = Object.values(tf.spell_desc).find((d) => d.id === link.from)?.d ?? "";
+    if (!text.includes(link.tooltip)) problems.push(`link ${link.from} -> ${link.to}: tooltip no longer says "${link.tooltip}"`);
+  }
   effect.triggerSpell = link.to;
 }
 
@@ -375,6 +414,7 @@ const data: HunterData = {
   talents,
   petFamilies,
   petPassives: (petPassives ?? []).map(num),
+  consumables,
 };
 
 await Bun.write(GENERATED_PATH, JSON.stringify(data, null, 1) + "\n");

@@ -96,6 +96,9 @@ export type PetFamily = {
   abilities: string[];
 };
 
+// A usable item: its spell, and the item cooldown it shares with others of its category.
+export type Consumable = { itemId: number; name: string; spellId: number; categoryId: number; cooldownMs: number };
+
 export type HunterData = {
   build: string;
   sources: { name: string; url: string; license?: string }[];
@@ -106,6 +109,7 @@ export type HunterData = {
   // Passives every hunter pet has. Hunter talents reach the pet by modifying these
   // (Unleashed Fury, Ferocity, Frenzy, Bestial Discipline).
   petPassives: number[];
+  consumables: Consumable[];
 };
 
 export type ItemStats = Partial<

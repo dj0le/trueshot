@@ -35,7 +35,7 @@ client build or to an override that records where it came from.
 | 25 | Forever Logs API client: list reports, pull hunter encounter events into a local gitignored cache | packages/data/src/foreverlogs | BLOCKED, key is in .env but needs events:read, granted by hand on request |
 | 26 | Set bonuses and enchants on gear | packages/data/src/build-items.ts | |
 | 27 | Item chance-on-hit procs | packages/engine | |
-| 28 | Support presets (solo, 5-man, raid) so rotations can be compared with and without outside mana: Blessing of Wisdom, Mana Spring, Judgement of Wisdom (chance per hit), mana potions and Dark/Demonic Runes as on-use cooldowns, plus the raid buffs MythicSim assumes | packages/engine | NEXT |
+| 28 | Support presets (solo, party, raid) so rotations can be compared with and without outside mana: Blessing of Wisdom, Mana Spring, Judgement of Wisdom from the Forever client; Major Mana Potion and Demonic/Dark Rune as off-GCD rotation actions on their item cooldowns | packages/engine | DONE, party and raid presets are guesses at who is in the group; MythicSim party buffs still to match |
 | 29 | Melee weaving: step in for Raptor Strike between Auto Shots, which MythicSim does for all three specs | packages/engine | |
 | 30 | Rotation comparison: variant configs that `extends` a base, `sim compare` with several variants and a per-ability diff, `sim value` for what each action is worth | packages/cli | DONE |
 | 31 | Fight-length presets: level 30 dungeon trash and bosses (mostly under 60 sec on Forever Logs), level 60 dungeon, raid boss | configs | |
@@ -75,6 +75,9 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
 - Mana decides Marksmanship. The naive priority list is out of mana 74% of the fight; the optimized one
   drops Arcane Shot and Multi-Shot, keeps Serpent Sting up, and only casts Aimed Shot when it fits before
   the next Auto Shot. That is +13.1% DPS (task 15). MythicSim also has Aimed Shot under 1% of damage.
+- Outside mana decides the "hold vs fire on cooldown" question. Solo, holding Arcane above 40% mana
+  wins by 3.7%; with a paladin's Blessing of Wisdom the gap is 0.3%; in a raid, Judgement of Wisdom
+  (100% per hit in the Forever client) makes mana effectively unlimited.
 - Intimidation costs bm-cat 1.3% DPS: 138 mana and a GCD a minute in a mana-bound build, for one
   guaranteed pet crit, while Frenzy 5/5 already procs off the pet's ~18% crit rate.
 - With Careful Aim 5/5, intellect is worth about as much as agility for MM (task 12).

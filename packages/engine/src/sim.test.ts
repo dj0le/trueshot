@@ -186,3 +186,28 @@ test("Intimidation's crit buff is used up by the pet's next successful attack", 
   expect(withIt.critPct - without.critPct).toBeGreaterThan(2);
   expect(withIt.critPct - without.critPct).toBeLessThan(25);
 });
+
+test("support presets add outside mana, and the raid's Judgement of Wisdom pays out per hit", () => {
+  // Serpent Sting on every GCD runs a solo hunter dry.
+  const spam = { ...base, fight: { durationSec: 120, iterations: 50 }, rotation: { actions: [{ action: "serpent_sting" }] } };
+  const solo = simulate(game, spam);
+  const party = simulate(game, { ...spam, support: "party" });
+  const raid = simulate(game, { ...spam, support: "raid" });
+  expect(party.manaSpentPerFight).toBeGreaterThan(solo.manaSpentPerFight);
+  expect(raid.manaSpentPerFight).toBeGreaterThan(party.manaSpentPerFight);
+  expect(() => simulate(game, { ...spam, support: "nope" })).toThrow(/unknown preset/);
+});
+
+test("a mana potion is an off-GCD action on a 2 minute item cooldown", () => {
+  const r = simulate(game, {
+    ...base,
+    fight: { durationSec: 300, iterations: 20 },
+    rotation: { actions: [{ action: "major_mana_potion", if: "mana.deficit > 2250" }, { action: "arcane_shot" }] },
+  });
+  const potion = r.abilities.find((a) => a.name === "Major Mana Potion")!;
+  const arcane = r.abilities.find((a) => a.name === "Arcane Shot")!;
+  expect(potion.castsPerFight).toBeGreaterThanOrEqual(2);
+  expect(potion.castsPerFight).toBeLessThanOrEqual(3);
+  expect(potion.dps).toBe(0);
+  expect(arcane.castsPerFight).toBeGreaterThan(0);
+});

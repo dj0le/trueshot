@@ -58,6 +58,8 @@ export const SimConfig = z.object({
   }),
   // Raid buffs and consumables, flattened to stats.
   buffs: Stats,
+  // What other players keep up: "solo", or a preset from overrides.toml [support].
+  support: z.string().default("solo"),
   pet: z
     .object({
       active: z.boolean().default(false),

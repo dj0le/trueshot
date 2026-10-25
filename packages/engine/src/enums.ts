@@ -5,6 +5,8 @@ export const Effect = {
   SchoolDamage: 2,
   Dummy: 3,
   ApplyAura: 6,
+  Energize: 30,
+  ApplyAreaAuraParty: 35,
   WeaponPercentDamage: 31,
   WeaponDamage: 58,
   ApplyAreaAuraRaid: 65,
@@ -13,6 +15,8 @@ export const Effect = {
 
 export const Aura = {
   PeriodicDamage: 3,
+  // Mana every few seconds: Blessing of Wisdom, Mana Spring.
+  PeriodicEnergize: 24,
   Dummy: 4,
   ProcTriggerSpell: 42,
   ModDamagePercentDone: 79,
@@ -50,6 +54,7 @@ export const IGNORED_EFFECTS = new Set<number>([
 // Implicit targets: the enemy (6, 25) and the hunter's pet (5). Anything else lands on the caster.
 export const TARGET_ENEMY = new Set([6, 25]);
 export const TARGET_PET = 5;
+export const TARGET_CASTER = 1;
 
 // Attributes_1 flags marking a channeled spell.
 export const CHANNELED_FLAGS = 0x4 | 0x40;
@@ -92,7 +97,9 @@ export const ProcFlag = {
   DoneMeleeAutoAttack: 0x4,
   DoneMeleeSpell: 0x10,
   DoneRangedAutoAttack: 0x40,
+  TakenRangedAutoAttack: 0x80,
   DoneRangedSpell: 0x100,
+  TakenRangedSpell: 0x200,
 } as const;
 
 export const Stat = { Strength: 0, Agility: 1, Stamina: 2, Intellect: 3, Spirit: 4 } as const;

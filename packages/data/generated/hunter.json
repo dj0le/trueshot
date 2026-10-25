@@ -2250,6 +2250,102 @@
     }
    ]
   },
+  "1826": {
+   "id": 1826,
+   "name": "Judgement of Wisdom Intermediate",
+   "school": 1,
+   "attributes": [
+    384,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 100,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 99,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [
+    {
+     "type": 3,
+     "cost": 0,
+     "costPct": 0,
+     "costPerLevel": 0
+    }
+   ],
+   "proc": {
+    "chance": 101,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     0,
+     0
+    ],
+    "cumulative": 0
+   },
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 3,
+     "aura": 0,
+     "basePoints": 0,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 20353,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      12,
+      0
+     ],
+     "implicitTarget": [
+      6,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "1978": {
    "id": 1978,
    "name": "Serpent Sting",
@@ -5711,6 +5807,93 @@
      "radiusIndex": [
       0,
       0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "10494": {
+   "id": 10494,
+   "name": "Mana Spring",
+   "school": 8,
+   "attributes": [
+    64,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 56,
+   "spellLevel": 56,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 11,
+    "mask": [
+     16384,
+     0,
+     0,
+     268435456
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 35,
+     "aura": 24,
+     "basePoints": 10,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 2000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      10,
+      10
      ],
      "implicitTarget": [
       1,
@@ -13331,6 +13514,127 @@
     }
    ]
   },
+  "16666": {
+   "id": 16666,
+   "name": "Demonic Rune",
+   "school": 32,
+   "attributes": [
+    536870912,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 58,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 60000,
+   "gcdMs": 0,
+   "category": 30,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": {
+    "chance": 101,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     0,
+     0
+    ],
+    "cumulative": 0
+   },
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 30,
+     "aura": 0,
+     "basePoints": 1200,
+     "variance": 0.5,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 2,
+     "aura": 0,
+     "basePoints": 800,
+     "variance": 0.5,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "16697": {
    "id": 16697,
    "name": "Cower",
@@ -17170,6 +17474,103 @@
      ],
      "implicitTarget": [
       6,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "17531": {
+   "id": 17531,
+   "name": "Restore Mana",
+   "school": 1,
+   "attributes": [
+    671088640,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 60000,
+   "gcdMs": 0,
+   "category": 4,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": {
+    "chance": 101,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     0,
+     0
+    ],
+    "cumulative": 0
+   },
+   "classOptions": {
+    "set": 13,
+    "mask": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 30,
+     "aura": 0,
+     "basePoints": 1800,
+     "variance": 0.5,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
       0
      ],
      "classMask": [
@@ -22968,6 +23369,182 @@
      ],
      "implicitTarget": [
       1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "20353": {
+   "id": 20353,
+   "name": "Judgement of Wisdom",
+   "school": 2,
+   "attributes": [
+    537133056,
+    0,
+    536870912,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 100,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 58,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 30,
+     "aura": 0,
+     "basePoints": 59,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "20355": {
+   "id": 20355,
+   "name": "Judgement of Wisdom",
+   "school": 2,
+   "attributes": [
+    2426880,
+    0,
+    0,
+    262144,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 40000,
+   "maxDurationMs": 40000,
+   "rangeMin": 0,
+   "rangeMax": 100,
+   "speed": 0,
+   "baseLevel": 58,
+   "spellLevel": 58,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 2,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [],
+   "proc": {
+    "chance": 100,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     139944,
+     0
+    ],
+    "cumulative": 0
+   },
+   "classOptions": {
+    "set": 10,
+    "mask": [
+     524288,
+     0,
+     0,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 42,
+     "basePoints": 0,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 1826,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      6,
       0
      ],
      "classMask": [
@@ -30452,6 +31029,100 @@
     }
    ]
   },
+  "25290": {
+   "id": 25290,
+   "name": "Blessing of Wisdom",
+   "school": 2,
+   "attributes": [
+    327680,
+    1024,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 3600000,
+   "maxDurationMs": 3600000,
+   "rangeMin": 0,
+   "rangeMax": 30,
+   "speed": 0,
+   "baseLevel": 60,
+   "spellLevel": 60,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 1500,
+   "category": 0,
+   "gcdCategory": 133,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [
+    {
+     "type": 0,
+     "cost": 125,
+     "costPct": 0,
+     "costPerLevel": 0
+    }
+   ],
+   "proc": null,
+   "classOptions": {
+    "set": 10,
+    "mask": [
+     268500992,
+     0,
+     65536,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 24,
+     "basePoints": 40,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 5000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      21,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "25295": {
    "id": 25295,
    "name": "Serpent Sting",
@@ -31965,6 +32636,127 @@
      ],
      "implicitTarget": [
       6,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "27869": {
+   "id": 27869,
+   "name": "Dark Rune",
+   "school": 32,
+   "attributes": [
+    536870912,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 58,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 60000,
+   "gcdMs": 0,
+   "category": 30,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "power": [],
+   "proc": {
+    "chance": 101,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     0,
+     0
+    ],
+    "cumulative": 0
+   },
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 30,
+     "aura": 0,
+     "basePoints": 1200,
+     "variance": 0.5,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 2,
+     "aura": 0,
+     "basePoints": 800,
+     "variance": 0.5,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
       0
      ],
      "classMask": [
@@ -46176,5 +46968,28 @@
   20784,
   409365,
   8875
+ ],
+ "consumables": [
+  {
+   "itemId": 13444,
+   "name": "Major Mana Potion",
+   "spellId": 17531,
+   "categoryId": 4,
+   "cooldownMs": 120000
+  },
+  {
+   "itemId": 12662,
+   "name": "Demonic Rune",
+   "spellId": 16666,
+   "categoryId": 1153,
+   "cooldownMs": 120000
+  },
+  {
+   "itemId": 20520,
+   "name": "Dark Rune",
+   "spellId": 27869,
+   "categoryId": 1153,
+   "cooldownMs": 120000
+  }
  ]
 }

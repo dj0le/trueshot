@@ -14,6 +14,7 @@ import {
   ProcFlag,
   School,
   SpellModOp,
+  TARGET_CASTER,
   TARGET_ENEMY,
   TARGET_PET,
 } from "./enums";
@@ -34,6 +35,8 @@ const KNOWN_EFFECTS = new Set<number>([
   ...DAMAGE_EFFECTS,
   Effect.ApplyAura,
   Effect.ApplyAreaAuraRaid,
+  Effect.ApplyAreaAuraParty,
+  Effect.Energize,
   Effect.Dummy,
   ...IGNORED_EFFECTS,
 ]);
@@ -94,7 +97,10 @@ export class Rotation {
       const key = snake(s.name);
       this.spellIds.set(key, [...(this.spellIds.get(key) ?? []), s.id]);
     }
-    const knownNames = new Set(game.data.abilities.filter((a) => a.tab !== "Pets").map((a) => snake(a.name)));
+    const knownNames = new Set([
+      ...game.data.abilities.filter((a) => a.tab !== "Pets").map((a) => snake(a.name)),
+      ...game.data.consumables.map((c) => snake(c.name)),
+    ]);
     this.actions = ch.config.rotation.actions.map((a) => {
       if (!knownNames.has(a.action)) throw new Error(`rotation: unknown action "${a.action}"`);
       let timed = false;
@@ -215,6 +221,7 @@ export class Fight implements PetHost {
   private readonly target: Target;
   private readonly autoShot: Spell;
   readonly attackPowerPerDps: number;
+  private readonly support: number[];
   private readonly scriptContext: ScriptContext;
   readonly pet: Pet | null = null;
 
@@ -233,6 +240,9 @@ export class Fight implements PetHost {
     this.target = game.overrides.targets[ch.config.target.preset]!;
     this.autoShot = game.data.spells["75"]!;
     this.attackPowerPerDps = game.overrides.formula.attackPowerPerDps.value;
+    const preset = ch.config.support;
+    if (preset !== "solo" && !game.overrides.support[preset]) throw new Error(`support: unknown preset "${preset}"`);
+    this.support = preset === "solo" ? [] : game.overrides.support[preset]!.spells;
     if (ch.config.pet.active) {
       const family = game.data.petFamilies.find((p) => p.name === ch.config.pet.family);
       if (!family) throw new Error(`pet: unknown family "${ch.config.pet.family}"`);
@@ -262,6 +272,8 @@ export class Fight implements PetHost {
       if (!spell) throw new Error(`precombat: "${name}" is not known at level ${this.ch.level} with these talents`);
       this.applyAuras(spell, null);
     }
+    // Other players keep these up all fight.
+    for (const id of this.support) this.applyAuras(this.game.data.spells[String(id)]!, null, Infinity);
     for (let t = 2000; t < this.durationMs; t += 2000) this.queue.push(t, () => this.manaTick());
     this.pet?.start();
     this.tryWindup();
@@ -592,7 +604,8 @@ export class Fight implements PetHost {
     for (const e of effects) {
       if (!KNOWN_EFFECTS.has(e.effect)) this.unimplemented.add(`${spell.name} (${spell.id}): effect ${e.effect}`);
     }
-    const damaging = effects.filter((e) => DAMAGE_EFFECTS.has(e.effect));
+    // Damage to the caster (Demonic Rune's health cost) is not damage done.
+    const damaging = effects.filter((e) => DAMAGE_EFFECTS.has(e.effect) && e.implicitTarget[0] !== TARGET_CASTER);
     // Spells that deal no damage and put nothing on the enemy (Intimidation, Bestial Wrath) cannot miss.
     const canMiss = damaging.length > 0 || effects.some((e) => TARGET_ENEMY.has(e.implicitTarget[0]));
     const outcome = isChanneled(spell) || !canMiss ? "hit" : this.roll(spell, isAuto);
@@ -618,22 +631,50 @@ export class Fight implements PetHost {
       s.hits++;
     }
 
+    this.energize(spell, effects);
+
     // Charges go after the damage they applied to and before this spell's own auras land, so a
     // shot that grants charged buffs does not spend one itself.
     const flag = isAuto ? ProcFlag.DoneRangedAutoAttack : ProcFlag.DoneRangedSpell;
     if (spell.defenseType === DefenseType.Ranged) this.selfAuras.consumeCharges(flag);
     this.applyAuras(spell, effects);
     ON_LAND[spell.name]?.(this.scriptContext);
-    if (spell.defenseType === DefenseType.Ranged) this.procs(flag);
+    if (spell.defenseType === DefenseType.Ranged) {
+      this.procs(flag);
+      this.targetProcs(isAuto ? ProcFlag.TakenRangedAutoAttack : ProcFlag.TakenRangedSpell);
+    }
+  }
+
+  private gainMana(amount: number): void {
+    this.mana = Math.min(this.ch.maxMana, this.mana + amount);
+  }
+
+  // Mana restored by a spell's energize effects (potions, runes, Judgement of Wisdom).
+  private energize(spell: Spell, effects: ResolvedEffect[]): void {
+    for (const e of effects) {
+      if (e.effect !== Effect.Energize || e.miscValue[0] !== 0) continue;
+      const spread = e.variance ? this.rng.stream("energize").range(-e.variance / 2, e.variance / 2) : 0;
+      this.gainMana(e.value * (1 + spread));
+    }
+  }
+
+  // A proc's triggered spell: its mana, its auras, and any server-side link it hands on to.
+  private trigger(spell: Spell): void {
+    const effects = resolveEffects(spell);
+    this.energize(spell, effects);
+    for (const e of effects) {
+      if (e.effect === Effect.Dummy && e.triggerSpell) this.trigger(this.game.data.spells[String(e.triggerSpell)]!);
+    }
+    this.applyAuras(spell, effects);
   }
 
   // Auras =====================================================================
 
-  private applyAuras(spell: Spell, effects: ResolvedEffect[] | null): void {
+  private applyAuras(spell: Spell, effects: ResolvedEffect[] | null, durationOverride?: number): void {
     const all = effects ?? resolveEffects(spell);
     const auraEffects = this.moddedEffects(
       spell,
-      all.filter((e) => e.effect === Effect.ApplyAura || e.effect === Effect.ApplyAreaAuraRaid),
+      all.filter((e) => e.effect === Effect.ApplyAura || e.effect === Effect.ApplyAreaAuraRaid || e.effect === Effect.ApplyAreaAuraParty),
     );
     if (auraEffects.length === 0) return;
     for (const e of auraEffects) {
@@ -643,18 +684,28 @@ export class Fight implements PetHost {
     const onTarget = auraEffects.filter((e) => TARGET_ENEMY.has(e.implicitTarget[0]));
     const onPet = auraEffects.filter((e) => e.implicitTarget[0] === TARGET_PET);
     const onSelf = auraEffects.filter((e) => !TARGET_ENEMY.has(e.implicitTarget[0]) && e.implicitTarget[0] !== TARGET_PET);
-    const duration = spell.durationMs < 0 ? Infinity : this.modded(spell.durationMs, spell, SpellModOp.Duration);
+    const duration =
+      durationOverride ?? (spell.durationMs < 0 ? Infinity : this.modded(spell.durationMs, spell, SpellModOp.Duration));
     if (onPet.length > 0) this.pet?.addAura(spell, onPet, duration);
     if (onSelf.length > 0) this.addAura(this.selfAuras, spell, onSelf, duration);
     if (onTarget.length > 0) this.addAura(this.targetAuras, spell, onTarget, duration);
   }
 
   private addAura(auras: AuraSet, spell: Spell, effects: ResolvedEffect[], duration: number): void {
+    // Ticks past the end of the fight never happen; this also bounds auras that last forever.
+    const tickUntil = Math.min(duration, this.durationMs - this.now);
     auras.add(spell, effects, this.now, duration, (isLive) => {
+      for (const e of effects.filter((x) => x.aura === Aura.PeriodicEnergize && x.miscValue[0] === 0)) {
+        for (let t = e.periodMs; t <= tickUntil; t += e.periodMs) {
+          this.queue.push(this.now + t, () => {
+            if (isLive()) this.gainMana(e.value);
+          });
+        }
+      }
       // Periodic dummies fire a linked spell each tick (Volley), rolling and scaling like a cast.
       for (const e of effects.filter((x) => x.aura === Aura.PeriodicDummy && x.triggerSpell)) {
         const triggered = this.game.data.spells[String(e.triggerSpell)]!;
-        for (let t = e.periodMs; t <= duration; t += e.periodMs) {
+        for (let t = e.periodMs; t <= tickUntil; t += e.periodMs) {
           this.queue.push(this.now + t, () => {
             if (isLive()) this.execute(triggered);
           });
@@ -665,7 +716,7 @@ export class Fight implements PetHost {
         const tick =
           this.modded(e.value + e.apCoefficient * this.rangedAttackPower(), spell, SpellModOp.PeriodicDamage) *
           this.selfAuras.damageMultiplier(spell.school);
-        for (let t = e.periodMs; t <= duration; t += e.periodMs) {
+        for (let t = e.periodMs; t <= tickUntil; t += e.periodMs) {
           this.queue.push(this.now + t, () => {
             if (!isLive()) return;
             const s = this.stat(spell.name);
@@ -690,7 +741,19 @@ export class Fight implements PetHost {
           this.unimplemented.add(`${src.spell.name}: proc spell ${e.triggerSpell} not in the data`);
           continue;
         }
-        this.applyAuras(triggered, null);
+        this.trigger(triggered);
+      }
+    }
+  }
+
+  // Debuffs on the target that answer the hunter's hits (Judgement of Wisdom).
+  private targetProcs(flag: number): void {
+    for (const src of this.targetAuras.sources()) {
+      const proc = src.spell.proc;
+      if (!proc || (proc.typeMask[0] & flag) === 0) continue;
+      for (const e of src.effects) {
+        if (e.aura !== Aura.ProcTriggerSpell || !e.triggerSpell) continue;
+        if (this.rng.stream(`target-proc:${src.spell.id}`).chance(proc.chance)) this.trigger(this.game.data.spells[String(e.triggerSpell)]!);
       }
     }
   }
