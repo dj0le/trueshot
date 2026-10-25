@@ -188,6 +188,24 @@ test("Intimidation's crit buff is used up by the pet's next successful attack", 
   expect(withIt.critPct - without.critPct).toBeLessThan(25);
 });
 
+test("a pet ability sent with Intimidation goes out at once and takes the guaranteed crit", () => {
+  const talents = { "Deadly Aspects": 5, "Endurance Training": 5, "Bestial Swiftness": 1, "Unleashed Fury": 5, Ferocity: 5, Intimidation: 1 };
+  const r = simulate(game, {
+    ...base,
+    talents,
+    pet: { active: true, family: "Cat", abilities: [] },
+    fight: { durationSec: 5, iterations: 50 },
+    rotation: { actions: [{ action: "intimidation", pet: "bite" }] },
+  });
+  const bite = r.abilities.find((a) => a.name === "Pet: Bite")!;
+  // Bite is not on autocast here, so the macro is its only cast; it crits whenever it lands.
+  expect(bite.castsPerFight).toBe(1);
+  expect(bite.critPct).toBe(100);
+  expect(() => simulate(game, { ...base, talents, pet: { active: true, family: "Cat" }, rotation: { actions: [{ action: "intimidation", pet: "rend" }] } })).toThrow(
+    /does not know "rend"/,
+  );
+});
+
 test("support presets add outside mana, and the raid's Judgement of Wisdom pays out per hit", () => {
   // Serpent Sting on every GCD runs a solo hunter dry.
   const spam = { ...base, fight: { durationSec: 120, iterations: 50 }, rotation: { actions: [{ action: "serpent_sting" }] } };

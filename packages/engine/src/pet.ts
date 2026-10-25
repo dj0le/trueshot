@@ -57,6 +57,7 @@ export class Pet {
   // The pet's DoTs on the target. Reapplying one replaces it.
   private readonly dots: AuraSet;
   private readonly abilities: Spell[];
+  private readonly known = new Map<string, Spell>();
   private wakeAt = -1;
 
   constructor(
@@ -75,7 +76,7 @@ export class Pet {
     this.auras = new AuraSet(host.queue, passives);
     this.dots = new AuraSet(host.queue);
 
-    const known = new Map<string, Spell>();
+    const known = this.known;
     for (const a of data.abilities) {
       if (a.tab !== "Pets" || !family.abilities.includes(a.name)) continue;
       const spell = knownRank(data, a, level);
@@ -213,32 +214,45 @@ export class Pet {
 
   // Abilities ==================================================================
 
+  knows(name: string): boolean {
+    return this.known.has(name);
+  }
+
+  // An ability sent from the hunter's macro. It goes out now if the pet can, or not at all.
+  command(name: string): void {
+    const spell = this.known.get(name)!;
+    if (this.host.now >= this.gcdReadyAt && this.tryUse(spell) === 0) this.wake(this.gcdReadyAt);
+  }
+
+  // Autocast: the first ability in priority order that is off cooldown and affordable.
   private act(): void {
     const now = this.host.now;
     if (now < this.gcdReadyAt) return this.wake(this.gcdReadyAt);
 
     let next = Infinity;
     for (const spell of this.abilities) {
-      const ready = this.cooldowns.get(spell.id) ?? 0;
-      if (ready > now) {
-        next = Math.min(next, ready);
-        continue;
-      }
-      const cost = spell.power.find((p) => p.type === 2)?.cost ?? 0;
-      const focus = this.focusNow();
-      if (focus < cost) {
-        next = Math.min(next, now + Math.ceil((cost - focus) / this.focusRate()));
-        continue;
-      }
-      this.focus = focus - cost;
-      this.focusAt = now;
-      this.use(spell);
-      this.gcdReadyAt = now + spell.gcdMs;
-      const cd = Math.max(spell.cooldownMs, spell.categoryCooldownMs);
-      if (cd > 0) this.cooldowns.set(spell.id, now + cd);
-      return this.wake(this.gcdReadyAt);
+      const at = this.tryUse(spell);
+      if (at === 0) return this.wake(this.gcdReadyAt);
+      next = Math.min(next, at);
     }
     if (next !== Infinity) this.wake(next);
+  }
+
+  // Uses the ability and returns 0, or returns when its cooldown or focus would allow it.
+  private tryUse(spell: Spell): number {
+    const now = this.host.now;
+    const ready = this.cooldowns.get(spell.id) ?? 0;
+    if (ready > now) return ready;
+    const cost = spell.power.find((p) => p.type === 2)?.cost ?? 0;
+    const focus = this.focusNow();
+    if (focus < cost) return now + Math.ceil((cost - focus) / this.focusRate());
+    this.focus = focus - cost;
+    this.focusAt = now;
+    this.use(spell);
+    this.gcdReadyAt = now + spell.gcdMs;
+    const cd = Math.max(spell.cooldownMs, spell.categoryCooldownMs);
+    if (cd > 0) this.cooldowns.set(spell.id, now + cd);
+    return 0;
   }
 
   private wake(at: number): void {

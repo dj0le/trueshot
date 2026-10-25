@@ -85,7 +85,7 @@ export class Rotation {
   fight: Fight | null = null;
   // timed: the condition reads something that changes with time alone, so the fight re-checks it
   // every REACTION_MS while it holds the action back.
-  readonly actions: { name: string; spell: Spell | null; cond: Getter | null; timed: boolean }[];
+  readonly actions: { name: string; spell: Spell | null; cond: Getter | null; timed: boolean; pet: string | null }[];
   // Spell ids by snake_case name, for conditions that look up auras.
   private readonly spellIds = new Map<string, number[]>();
   private readonly actionNames: Set<string>;
@@ -109,7 +109,7 @@ export class Rotation {
           })
         : null;
       // spell is null when the character does not know it (level or talents); the action is skipped.
-      return { name: a.action, spell: ch.abilities.get(a.action) ?? null, cond, timed };
+      return { name: a.action, spell: ch.abilities.get(a.action) ?? null, cond, timed, pet: a.pet ?? null };
     });
   }
 
@@ -250,6 +250,9 @@ export class Fight implements PetHost {
       const family = game.data.petFamilies.find((p) => p.name === ch.config.pet.family);
       if (!family) throw new Error(`pet: unknown family "${ch.config.pet.family}"`);
       this.pet = new Pet(this, game.data, game.overrides.pet, family, ch.level, ch.config.pet.abilities);
+      for (const a of ch.config.rotation.actions) {
+        if (a.pet && !this.pet.knows(a.pet)) throw new Error(`rotation: a ${family.name} does not know "${a.pet}" (${a.action})`);
+      }
     }
     this.scriptContext = {
       data: game.data,
@@ -278,9 +281,10 @@ export class Fight implements PetHost {
     // Other players keep these up all fight.
     for (const id of this.support) this.applyAuras(this.game.data.spells[String(id)]!, null, Infinity);
     for (let t = 2000; t < this.durationMs; t += 2000) this.queue.push(t, () => this.manaTick());
-    this.pet?.start();
     this.tryWindup();
     this.act();
+    // The pet goes in on the opening macro, after what it sends (Intimidation, Bestial Wrath) lands.
+    this.pet?.start();
 
     for (;;) {
       const time = this.queue.peekTime();
@@ -428,6 +432,7 @@ export class Fight implements PetHost {
       const pick = this.rotation.actions.find((a) => a.spell && this.canCast(a.spell) && (!a.cond || a.cond()));
       if (!pick) break;
       this.cast(pick.spell!);
+      if (pick.pet) this.pet?.command(pick.pet);
     }
     this.trackOom();
     this.scheduleWake();

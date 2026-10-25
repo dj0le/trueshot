@@ -1,4 +1,5 @@
-# bm-cat casting Intimidation on cooldown. Compare with:
+# bm-cat opening with Intimidation and Bite from one macro, so the guaranteed crit lands on Bite.
+# Compare with:
 #   bun run sim compare configs/bm-cat.toml configs/bm-cat.with-intimidation.toml
 extends = "bm-cat.toml"
 name = "BM cat, with Intimidation"
@@ -12,6 +13,8 @@ action = "bestial_wrath"
 
 [[rotation.actions]]
 action = "intimidation"
+if = "casts.intimidation < 1"
+pet = "bite"
 
 [[rotation.actions]]
 action = "rapid_fire"

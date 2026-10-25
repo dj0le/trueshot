@@ -39,7 +39,8 @@ export const GEAR_SLOTS = [
   "ranged",
 ] as const;
 
-const Action = z.object({ action: z.string(), if: z.string().optional() });
+// pet: a pet ability the same macro sends (Intimidation with Bite), used then if the pet can.
+const Action = z.object({ action: z.string(), if: z.string().optional(), pet: z.string().optional() });
 export type ActionConfig = z.infer<typeof Action>;
 
 export const SimConfig = z.object({

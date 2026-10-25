@@ -27,7 +27,7 @@ client build or to an override that records where it came from.
 | 17 | SvelteKit front end with the engine in a web worker | packages/web | |
 | 18 | Target presets: normal level 60, elite 62, boss 63 (armor, level-based miss and crit) | packages/engine/src/targets | DONE |
 | 19 | Marksmanship: talents, abilities, default priority list | packages/engine/src/specs/mm | DONE |
-| 20 | Beast Mastery: pet-heavy talents, Bestial Wrath, Kill Command | packages/engine/src/specs/bm | NEXT, needs a pet focus-pooling option. Summon Hawk works with guessed hawk attack values (overrides.toml pet.hawk). Intimidation is taken for Bestial Wrath but not cast: casting it loses DPS, see findings |
+| 20 | Beast Mastery: pet-heavy talents, Bestial Wrath, Kill Command | packages/engine/src/specs/bm | DONE. The pet autocasts greedily (the cheap ability starves the dear one: a cat uses Bite about twice a fight and Claw otherwise), which matches the game; no focus pooling, since the pet is not micromanaged. A rotation action can send a pet ability from the same macro (`pet = "bite"`). Summon Hawk works with guessed hawk attack values (overrides.toml pet.hawk) |
 | 21 | Survival: melee weapon, melee attack table, Raptor Strike and Mongoose Bite | packages/engine/src/specs/sv | |
 | 22 | Gear presets for all three specs at 60 from the GearQuestForever BiS lists | packages/data/presets | DONE, set bonuses and enchants are task 26 |
 | 23 | Level-aware sim: any level 10 to 60, spell ranks and target stats by level, so level 30 beta logs can check the mechanics | packages/engine | |
@@ -53,6 +53,8 @@ pets carry the weakest data. Task 21 comes last because it needs a whole melee m
 
 - Level 60 only. Three target presets instead of specific raid bosses.
 - Marksmanship first. It leans on the pet least, and pet numbers are the least known.
+- BM rotations do not cast Intimidation in boss fights. It is taken only to reach Bestial Wrath; even
+  as a one-off opener with Bite it loses DPS.
 - Beta is over, it was capped at level 30, and there are no local combat logs. So the mechanics
   (attack table, auto shot timing, coefficients, pet damage share) are checked against level 30 beta
   logs from other hunters (tasks 13 and 23), and level 60 results rest on the client data plus the
@@ -86,8 +88,9 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
   +2.1% for MM solo, up to +2.4% for MM in a raid, where mana no longer limits the extra shots.
 - Race matters by about 2.5% (3000 fights, both specs, solo): Skyborne 262, Night Elf and Human 261-262,
   Orc 260, Troll 259, Dwarf 257, Tauren 256-257. Skyborne's lead rests on base stats copied from Human.
-- Intimidation costs bm-cat 1.3% DPS: 138 mana and a GCD a minute in a mana-bound build, for one
-  guaranteed pet crit, while Frenzy 5/5 already procs off the pet's ~18% crit rate.
+- Intimidation on cooldown costs bm-cat 1.5% DPS: 138 mana and a GCD a minute in a mana-bound build,
+  for one guaranteed pet crit, while Frenzy 5/5 already procs off the pet's ~18% crit rate. As a
+  one-off opener macro with Bite it costs 0.2% (bm-cat.with-intimidation.toml).
 - With Careful Aim 5/5, intellect is worth about as much as agility for MM (task 12).
 - Serpent Sting matches the client tooltip (555 over 15 sec, no attack power scaling). MythicSim gets about
   twice our Serpent Sting DPS. Unresolved until logs exist.
