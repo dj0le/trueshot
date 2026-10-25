@@ -7,10 +7,11 @@ race = "Orc"
 "Deadly Aspects" = 5
 "Endurance Training" = 1
 "Focused Fire" = 2
-"Improved Aspect of the Monkey" = 3
+"Improved Aspect of the Monkey" = 2
 "Bestial Swiftness" = 1
 "Unleashed Fury" = 5
 "Ferocity" = 5
+"Summon Hawk" = 1
 "Bestial Discipline" = 2
 "Intimidation" = 1    # needed for Bestial Wrath; casting it costs DPS (see bm-cat.with-intimidation.toml)
 "Frenzy" = 5
@@ -72,7 +73,7 @@ if = "!dot.serpent_sting.ticking"
 
 [[rotation.actions]]
 action = "aimed_shot"
-if = "auto_shot.cooldown_remains >= cast.aimed_shot.time & mana.pct > 20"
+if = "mana.pct > 20"
 
 [[rotation.actions]]
 action = "multi_shot"

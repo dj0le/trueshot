@@ -44,6 +44,7 @@ export const IGNORED_AURAS = new Set<number>([
 ]);
 export const IGNORED_EFFECTS = new Set<number>([
   179, // Volley: creates the ground area; damage comes from the linked tick spell
+  32, // Summon Hawk: the dive's missile; its damage is the spell's own damage effect
 ]);
 
 // Implicit targets: the enemy (6, 25) and the hunter's pet (5). Anything else lands on the caster.

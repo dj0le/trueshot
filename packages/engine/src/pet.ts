@@ -120,30 +120,73 @@ export class Pet {
   // White swings ===============================================================
 
   private swing(): void {
-    const rng = this.host.rng.stream("pet-auto").next() * 100;
-    const miss = this.o.missPct.value;
-    const dodge = miss + this.o.dodgePct.value;
+    this.whiteHit("Pet: Melee", "pet", 1, true);
+    const speed = this.o.attackSpeedSec.value;
+    this.host.queue.push(this.host.now + (speed * 1000) / this.auras.product([Aura.ModMeleeHaste]), () => this.swing());
+  }
+
+  // One white melee hit on the one-roll table (miss, dodge, glance, crit, hit), at `scale` times
+  // the pet's own damage. Only the pet's own hits spend charges and set off its crit procs.
+  private whiteHit(name: string, streams: string, scale: number, own: boolean): void {
+    const rng = this.host.rng.stream(`${streams}-auto`).next() * 100;
+    const dodge = this.o.missPct.value + this.o.dodgePct.value;
     const glance = dodge + this.o.glancingPct.value;
     const crit = glance + this.critPct();
-    const speed = this.o.attackSpeedSec.value;
-
     if (rng < dodge) {
-      this.host.record("Pet: Melee", "miss");
-    } else {
-      this.auras.consumeCharges(ProcFlag.DoneMeleeAutoAttack);
-      const base = this.host.rng.stream("pet-damage").range(this.o.baseDamage.min, this.o.baseDamage.max);
-      let amount = (base + (this.attackPower() / this.host.attackPowerPerDps) * speed) * this.damageMultiplier(School.Physical) * this.host.armorMultiplier();
-      if (rng < glance) {
-        amount *= 1 - this.o.glancingPenaltyPct.value / 100;
-        this.host.record("Pet: Melee", "glance", amount);
-      } else if (rng < crit) {
-        this.host.record("Pet: Melee", "crit", amount * 2);
-        this.onCrit();
-      } else {
-        this.host.record("Pet: Melee", "hit", amount);
-      }
+      this.host.record(name, "miss");
+      return;
     }
-    this.host.queue.push(this.host.now + (speed * 1000) / this.auras.product([Aura.ModMeleeHaste]), () => this.swing());
+    if (own) this.auras.consumeCharges(ProcFlag.DoneMeleeAutoAttack);
+    const speed = this.o.attackSpeedSec.value;
+    const base = this.host.rng.stream(`${streams}-damage`).range(this.o.baseDamage.min, this.o.baseDamage.max);
+    let amount =
+      (base + (this.attackPower() / this.host.attackPowerPerDps) * speed) *
+      this.damageMultiplier(School.Physical) *
+      this.host.armorMultiplier() *
+      scale;
+    if (rng < glance) {
+      amount *= 1 - this.o.glancingPenaltyPct.value / 100;
+      this.host.record(name, "glance", amount);
+    } else if (rng < crit) {
+      this.host.record(name, "crit", amount * 2);
+      if (own) this.onCrit();
+    } else {
+      this.host.record(name, "hit", amount);
+    }
+  }
+
+  // Hawks =======================================================================
+  // Summon Hawk leaves a hawk attacking the target. Its attack is server-side, so its size and speed
+  // are overrides (pet.hawk), taken as a share of the pet's white hit so pet talents carry over.
+
+  private hawks: { expiresAt: number }[] = [];
+
+  summonHawk(): void {
+    const h = this.o.hawk;
+    // A new hawk past the limit replaces the oldest.
+    if (this.hawks.length >= h.maxActive.value) this.hawks.shift();
+    const hawk = { expiresAt: this.host.now + h.durationSec.value * 1000 };
+    this.hawks.push(hawk);
+    const live = () => this.hawks.includes(hawk);
+    const interval = h.attackIntervalSec.value * 1000;
+    for (let t = this.host.now + interval; t <= hawk.expiresAt; t += interval) {
+      this.host.queue.push(t, () => {
+        if (live()) this.whiteHit("Hawk: Attack", "hawk", h.hitPctOfPetMelee.value / 100, false);
+      });
+    }
+    // Scheduled after the attacks, so one landing exactly on expiry still happens.
+    this.host.queue.push(hawk.expiresAt, () => {
+      this.hawks = this.hawks.filter((x) => x !== hawk);
+    });
+  }
+
+  activeHawks(): number {
+    return this.hawks.length;
+  }
+
+  // Time until the next hawk leaves, 0 with none out.
+  hawkMinRemainsMs(): number {
+    return this.hawks.length ? Math.min(...this.hawks.map((x) => x.expiresAt)) - this.host.now : 0;
   }
 
   // Frenzy and anything like it: the client marks no "on crit" flag, the tooltips do.

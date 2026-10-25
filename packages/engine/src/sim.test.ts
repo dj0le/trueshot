@@ -38,7 +38,7 @@ test("the same seed gives the same result, a different seed a different one", ()
   expect(a.dps.mean).not.toBe(c.dps.mean);
 });
 
-test("an Aimed Shot cast delays the next Auto Shot instead of overlapping it", () => {
+test("Auto Shot keeps firing through Aimed Shot casts", () => {
   const r = simulate(game, {
     ...base,
     // Unlimited mana, so the cast count is set by the cooldown alone.
@@ -52,7 +52,7 @@ test("an Aimed Shot cast delays the next Auto Shot instead of overlapping it", (
   // The 6 sec cooldown starts when the 2 sec cast ends, so one cast every 8 sec at most.
   expect(aimed.castsPerFight).toBeGreaterThan(70);
   expect(aimed.castsPerFight).toBeLessThanOrEqual(600 / 8 + 1);
-  expect(auto.castsPerFight).toBeLessThan(uninterrupted);
+  expect(auto.castsPerFight).toBe(uninterrupted);
 });
 
 test("Bestial Discipline speeds up the pet's focus regen, so it uses Claw more", () => {

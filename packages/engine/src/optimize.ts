@@ -16,8 +16,6 @@ import type { GameData } from "./sim";
 export type Term =
   | { kind: "manaAbove"; pct: number }
   | { kind: "fightRemainsAbove"; sec: number }
-  // Only start a cast that ends before the next Auto Shot wind-up, so the shot is not delayed.
-  | { kind: "noClip" }
   // Only when the action's own debuff or DoT is not on the target.
   | { kind: "debuffDown" };
 
@@ -29,8 +27,6 @@ function termToExpr(action: string, t: Term): string {
       return `mana.pct > ${t.pct}`;
     case "fightRemainsAbove":
       return `fight.remains > ${t.sec}`;
-    case "noClip":
-      return `auto_shot.cooldown_remains >= cast.${action}.time`;
     case "debuffDown":
       return `!debuff.${action}.up`;
   }
@@ -57,7 +53,6 @@ export function actionsToGenes(actions: ActionConfig[]): { genes: Gene[]; droppe
       let m: RegExpExecArray | null;
       if ((m = /^mana\.pct > (\d+)$/.exec(part))) terms.push({ kind: "manaAbove", pct: Number(m[1]) });
       else if ((m = /^fight\.remains > (\d+)$/.exec(part))) terms.push({ kind: "fightRemainsAbove", sec: Number(m[1]) });
-      else if (part === `auto_shot.cooldown_remains >= cast.${a.action}.time`) terms.push({ kind: "noClip" });
       else if (part === `!dot.${a.action}.ticking` || part === `!debuff.${a.action}.up`) terms.push({ kind: "debuffDown" });
       else dropped.push(`${a.action}: ${part}`);
     }
@@ -91,7 +86,7 @@ export type OptimizeResult = {
   confirm: { before: SimResult; after: SimResult; delta: number; error95: number; pct: number };
 };
 
-function mutate(genes: Gene[], rng: Stream, castActions: Set<string>, debuffActions: Set<string>): Gene[] {
+function mutate(genes: Gene[], rng: Stream, debuffActions: Set<string>): Gene[] {
   const g: Gene[] = structuredClone(genes);
   const i = rng.int(g.length);
   const gene = g[i]!;
@@ -111,7 +106,6 @@ function mutate(genes: Gene[], rng: Stream, castActions: Set<string>, debuffActi
         { kind: "manaAbove", pct: rng.pick([10, 20, 30, 40, 50, 60, 70, 80]) },
         { kind: "fightRemainsAbove", sec: rng.pick([3, 6, 9, 12, 15]) },
       ];
-      if (castActions.has(gene.action)) options.push({ kind: "noClip" });
       if (debuffActions.has(gene.action)) options.push({ kind: "debuffDown" });
       const term = rng.pick(options);
       if (!gene.terms.some((t) => t.kind === term.kind)) gene.terms.push(term);
@@ -148,12 +142,10 @@ export function optimize(game: GameData, config: SimConfigInput, opts: OptimizeO
     ...opts.pool.filter((a) => !present.has(a) && known.has(a)).map((action) => ({ action, enabled: false, terms: [] })),
   ];
 
-  // Which actions have a cast time worth not clipping, or a debuff worth not reapplying.
-  const castActions = new Set<string>();
+  // Which actions have a debuff worth not reapplying.
   const debuffActions = new Set<string>();
   for (const a of game.data.abilities) {
     const top = game.data.spells[String(a.ranks.at(-1)!.spellId)]!;
-    if (top.castTimeMs > 0) castActions.add(snake(a.name));
     if (top.effects.some((e) => e.effect === Effect.ApplyAura && TARGET_ENEMY.has(e.implicitTarget[0]))) debuffActions.add(snake(a.name));
   }
 
@@ -171,8 +163,8 @@ export function optimize(game: GameData, config: SimConfigInput, opts: OptimizeO
     let roundBest: { genes: Gene[]; result: SimResult; delta: number } | null = null;
     for (let m = 0; m < opts.mutantsPerRound && evaluated < opts.budget; m++, attempts++) {
       // Sometimes stack two mutations to step over a dip.
-      let candidate = mutate(best, rng, castActions, debuffActions);
-      if (rng.next() < 0.3) candidate = mutate(candidate, rng, castActions, debuffActions);
+      let candidate = mutate(best, rng, debuffActions);
+      if (rng.next() < 0.3) candidate = mutate(candidate, rng, debuffActions);
       const actions = genesToActions(candidate);
       const key = JSON.stringify(actions);
       if (seen.has(key) || actions.length === 0) continue;

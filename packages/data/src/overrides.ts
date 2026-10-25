@@ -54,9 +54,18 @@ const Overrides = z.object({
     glancingPenaltyPct: Value,
     baseCritPct: Value,
     attackSpeedSec: Value,
+    hawk: z.object({ durationSec: Value, maxActive: Value, hitPctOfPetMelee: Value, attackIntervalSec: Value }),
   }),
   hotfix: z.array(
-    z.object({ spell: z.number(), effectIndex: z.number(), basePoints: z.number(), ...provenance }),
+    z
+      .object({
+        spell: z.number(),
+        effectIndex: z.number(),
+        basePoints: z.number().optional(),
+        apCoefficient: z.number().optional(),
+        ...provenance,
+      })
+      .refine((h) => h.basePoints !== undefined || h.apCoefficient !== undefined, "a hotfix needs basePoints or apCoefficient"),
   ),
 });
 export type Overrides = z.infer<typeof Overrides>;
@@ -75,10 +84,14 @@ export function applyHotfixes(data: HunterData, o: Overrides): HunterData {
   for (const h of o.hotfix) {
     const effect = spells[String(h.spell)]?.effects.find((e) => e.index === h.effectIndex);
     if (!effect) throw new Error(`hotfix: spell ${h.spell} effect ${h.effectIndex} is not in the client data`);
-    if (effect.basePoints === h.basePoints) {
-      throw new Error(`hotfix: spell ${h.spell} effect ${h.effectIndex} already has ${h.basePoints} in the client; remove the override`);
+    for (const key of ["basePoints", "apCoefficient"] as const) {
+      const value = h[key];
+      if (value === undefined) continue;
+      if (effect[key] === value) {
+        throw new Error(`hotfix: spell ${h.spell} effect ${h.effectIndex} already has ${value} (${key}) in the client; remove the override`);
+      }
+      effect[key] = value;
     }
-    effect.basePoints = h.basePoints;
   }
   return { ...data, spells };
 }

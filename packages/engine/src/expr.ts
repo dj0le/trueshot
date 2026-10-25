@@ -1,6 +1,6 @@
 // Condition language for rotation actions, SimulationCraft-style:
 //   cooldown.rapid_fire.ready & mana.pct > 20 | !debuff.serpent_sting.up
-// Numbers and dotted names, ! - unary, * / + -, < <= > >= = !=, & and |, parentheses.
+// Numbers and dotted names, ! - unary, * / % + -, < <= > >= = !=, & and |, parentheses.
 // Booleans are 1 and 0. Names are resolved once, at compile time, so a typo fails on load.
 
 export type Getter = () => number;
@@ -8,7 +8,7 @@ export type Resolver = (path: string[]) => Getter;
 
 type Token = { kind: "num"; value: number } | { kind: "name"; value: string } | { kind: "op"; value: string };
 
-const OPERATORS = ["<=", ">=", "!=", "<", ">", "=", "&", "|", "!", "+", "-", "*", "/", "(", ")"];
+const OPERATORS = ["<=", ">=", "!=", "<", ">", "=", "&", "|", "!", "+", "-", "*", "/", "%", "(", ")"];
 
 function tokenize(src: string): Token[] {
   const tokens: Token[] = [];
@@ -48,6 +48,7 @@ const BINARY: Record<string, { prec: number; fn: (a: number, b: number) => numbe
   "-": { prec: 5, fn: (a, b) => a - b },
   "*": { prec: 6, fn: (a, b) => a * b },
   "/": { prec: 6, fn: (a, b) => (b === 0 ? 0 : a / b) },
+  "%": { prec: 6, fn: (a, b) => (b ? a % b : 0) },
 };
 
 export function compile(src: string, resolve: Resolver): Getter {

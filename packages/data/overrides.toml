@@ -239,10 +239,39 @@ value = 2.0
 confidence = "classic"
 source = "Classic normalizes pet DPS to a 2.0 sec swing whatever the native speed"
 
+# Summon Hawk's hawk. Its attacks are server-side, so nothing about them is in the client.
+[pet.hawk.durationSec]
+value = 18
+confidence = "confirmed"
+source = "Summon Hawk tooltip: continuing its assault for 18 sec"
+
+[pet.hawk.maxActive]
+value = 2
+confidence = "confirmed"
+source = "Summon Hawk tooltip: only 2 hawks can be active at once. A new one is assumed to replace the oldest"
+
+[pet.hawk.hitPctOfPetMelee]
+value = 16
+confidence = "guess"
+source = "Beta stream youtu.be/keeiGM1B-LU (Oct 12, level 30) at 24:07-24:18: hawk hits 14 (crits 29) against wolf hits 41-61 per 1.2 sec swing, i.e. ~0.16 of a 2.0 sec normalized pet hit. Details at 1:05 and 2:37 agree (hawk attacks 0.33-0.37 of pet melee with ~2 hawks)"
+
+[pet.hawk.attackIntervalSec]
+value = 2.0
+confidence = "guess"
+source = "Same stream, 24:07-24:18: one hawk's hits land 2.25, 1.75, 2.25 sec apart"
+
 # Family damage modifiers come from the client (each family's Tamed Pet Passive), not from here.
 
 # Hotfixes ===================================================================
 # Server-side changes the client tables do not have. Each one replaces one spell effect's base points.
+
+# Summon Hawk's dive: the tooltip adds 5% of ranged attack power; the client effect has no coefficient.
+[[hotfix]]
+spell = 1293527
+effectIndex = 0
+apCoefficient = 0.05
+confidence = "confirmed"
+source = "Summon Hawk rank 4 tooltip: 108 plus 5% of your Ranged Attack Power"
 
 [[hotfix]]
 spell = 14325

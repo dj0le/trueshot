@@ -61,14 +61,14 @@ if = "!debuff.hunters_mark.up"
 
 [[rotation.actions]]
 action = "aimed_shot"
-if = "auto_shot.cooldown_remains >= cast.aimed_shot.time & mana.pct > 20"
+if = "mana.pct > 20"
 
 [[rotation.actions]]
 action = "rapid_fire"
 
 [[rotation.actions]]
 action = "sniper_shot"
-if = "mana.pct > 80 & auto_shot.cooldown_remains >= cast.sniper_shot.time"
+if = "mana.pct > 80"
 
 [[rotation.actions]]
 action = "serpent_sting"

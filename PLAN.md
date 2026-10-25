@@ -27,7 +27,7 @@ client build or to an override that records where it came from.
 | 17 | SvelteKit front end with the engine in a web worker | packages/web | |
 | 18 | Target presets: normal level 60, elite 62, boss 63 (armor, level-based miss and crit) | packages/engine/src/targets | DONE |
 | 19 | Marksmanship: talents, abilities, default priority list | packages/engine/src/specs/mm | DONE |
-| 20 | Beast Mastery: pet-heavy talents, Bestial Wrath, Kill Command | packages/engine/src/specs/bm | NEXT, needs Summon Hawk and a pet focus-pooling option. Intimidation is taken for Bestial Wrath but not cast: casting it loses DPS, see findings |
+| 20 | Beast Mastery: pet-heavy talents, Bestial Wrath, Kill Command | packages/engine/src/specs/bm | NEXT, needs a pet focus-pooling option. Summon Hawk works with guessed hawk attack values (overrides.toml pet.hawk). Intimidation is taken for Bestial Wrath but not cast: casting it loses DPS, see findings |
 | 21 | Survival: melee weapon, melee attack table, Raptor Strike and Mongoose Bite | packages/engine/src/specs/sv | |
 | 22 | Gear presets for all three specs at 60 from the GearQuestForever BiS lists | packages/data/presets | DONE, set bonuses and enchants are task 26 |
 | 23 | Level-aware sim: any level 10 to 60, spell ranks and target stats by level, so level 30 beta logs can check the mechanics | packages/engine | |
@@ -35,9 +35,11 @@ client build or to an override that records where it came from.
 | 25 | Forever Logs API client: list reports, pull hunter encounter events into a local gitignored cache | packages/data/src/foreverlogs | BLOCKED, key is in .env but needs events:read, granted by hand on request |
 | 26 | Set bonuses and enchants on gear | packages/data/src/build-items.ts | |
 | 27 | Item chance-on-hit procs | packages/engine | |
-| 28 | Raid buff and debuff presets, so results line up with MythicSim's party setup | packages/engine | |
+| 28 | Support presets (solo, 5-man, raid) so rotations can be compared with and without outside mana: Blessing of Wisdom, Mana Spring, Judgement of Wisdom (chance per hit), mana potions and Dark/Demonic Runes as on-use cooldowns, plus the raid buffs MythicSim assumes | packages/engine | NEXT |
 | 29 | Melee weaving: step in for Raptor Strike between Auto Shots, which MythicSim does for all three specs | packages/engine | |
 | 30 | Rotation comparison: variant configs that `extends` a base, `sim compare` with several variants and a per-ability diff, `sim value` for what each action is worth | packages/cli | DONE |
+| 31 | Fight-length presets: level 30 dungeon trash and bosses (mostly under 60 sec on Forever Logs), level 60 dungeon, raid boss | configs | |
+| 32 | Procs that need a crit (Resourcefulness): fire only on critical strikes | packages/engine | |
 
 Tasks 1 to 10, 18 and 19 give a working "run my setup" CLI for Marksmanship. Task 20 follows because
 pets carry the weakest data. Task 21 comes last because it needs a whole melee model.
@@ -58,6 +60,10 @@ pets carry the weakest data. Task 21 comes last because it needs a whole melee m
   100 ms reaction delay (REACTION_MS in sim.ts), not at the exact moment. The exact alternative is for
   each time-based getter to report when it next crosses its threshold and wake the fight then. We chose
   the simpler, human-like polling; revisit if a result ever depends on sub-100 ms timing.
+- Auto Shot fires through Aimed Shot and Sniper Shot casts (Forever's change, Blizzard-confirmed per the
+  forever-hunter wiki and a Blizzard forum thread; Robcat's Oct 16 video). Channels (Volley) still hold
+  it. A beta player remembers the cast bar "hiccuping" when an Auto Shot fired mid-cast; whether that
+  costs cast time is unknown, so the cast is left untouched until logs say otherwise.
 - All TypeScript on Bun. The engine is pure (no I/O), so it runs unchanged in the CLI now and in a
   SvelteKit web worker later. Rust/WASM only if the optimizer outgrows it, and then only the inner loop.
 

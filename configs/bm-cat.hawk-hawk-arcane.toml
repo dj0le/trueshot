@@ -1,0 +1,38 @@
+# bm-cat repeating hawk, hawk, Arcane Shot: both hawks live their full 18 sec, Arcane takes every third slot.
+# The shared Arcane Shot / Summon Hawk slot comes right after Serpent Sting, on every cooldown, so
+# the three variants differ only in that slot. Compare with:
+#   bun run sim compare configs/bm-cat.arcane.toml configs/bm-cat.hawks.toml configs/bm-cat.hawk-hawk-arcane.toml
+extends = "bm-cat.toml"
+name = "BM slot: hawk hawk arcane"
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "hunters_mark"]
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!dot.serpent_sting.ticking"
+
+[[rotation.actions]]
+action = "summon_hawk"
+if = "(casts.summon_hawk + casts.arcane_shot) % 3 < 2"
+
+[[rotation.actions]]
+action = "arcane_shot"
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "mana.pct > 20"
+
+[[rotation.actions]]
+action = "multi_shot"
+if = "mana.pct > 40"

@@ -1,0 +1,62 @@
+# Damage breakdowns read off Details in level 30 beta streams, for checking a level-aware sim
+# (task 23) against real fights. Only derived numbers live here; the footage is credited by link.
+#
+# Video: youtu.be/keeiGM1B-LU, "WoW Forever Beta! Troll BEAST MASTER Hunter Testing damage", 2026-10-12.
+# Build before the Oct 16 beta patch: no Auto Shot stand-still, and Aimed Shot may still clip.
+# Troll BM hunter, level 30, wolf pet "Drummer" (1.2 sec attack speed), Summon Hawk talented.
+# Talents (said at 0:08-0:10): Focused Fire 2, Endurance Training 3, Bestial Swiftness 1,
+# Unleashed Fury 5, Summon Hawk, Ferocity 5, Bestial Discipline, Intimidation 1, Frenzy 1.
+# Fights are in a 5-man group, so party buffs apply and Multi-Shot may have hit more than one target.
+
+[[fight]]
+name = "Death Speaker Jargba"
+at = "48:19"
+durationSec = 35
+totalDamage = 4585
+dps = 131
+rotation = "Summon Hawk, Serpent Sting and Multi-Shot first; occasional Arcane and Aimed Shot"
+# damage, as listed
+[fight.abilities]
+"Pet: Melee" = 1461
+"Auto Shot" = 1362
+"Multi-Shot" = 488
+"Serpent Sting" = 439
+"Hawk: Attack" = 258
+"Summon Hawk" = 184
+"Arcane Shot" = 176
+"Aimed Shot" = 148
+# Bite was about 2% of the total; the exact number was not read.
+
+[[fight]]
+name = "Razorfen boss"
+at = "1:05:00"
+durationSec = 40
+totalDamage = 4820
+dps = 120.5
+[fight.abilities]
+"Auto Shot" = 2044
+"Pet: Melee" = 1111
+"Aimed Shot" = 555
+"Hawk: Attack" = 369
+"Summon Hawk" = 298
+"Serpent Sting" = 240
+"Pet: Bite" = 203
+
+[[fight]]
+name = "Dalaran dungeon boss"
+at = "2:37:10"
+durationSec = 39
+totalDamage = 5867
+dps = 150.4
+[fight.abilities]
+"Auto Shot" = 1867
+"Pet: Melee" = 1535
+"Hawk: Attack" = 572
+"Multi-Shot" = 556
+"Pet: Flametongue" = 469
+"Serpent Sting" = 352
+"Summon Hawk" = 342
+"Pet: Bite" = 174
+
+# Single hits read off floating combat text (24:07-24:18, a level 23 mob): hawk 14 (crit 29),
+# hawk dive 61, wolf 41-61 (crit 114 likely the wolf), Auto Shot 106-107 (236 in an earlier pull).

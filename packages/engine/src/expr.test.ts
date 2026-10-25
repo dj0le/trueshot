@@ -27,3 +27,8 @@ test("unknown names and bad syntax fail at compile time", () => {
   expect(() => compile("mana.pct >", resolve)).toThrow();
   expect(() => compile("(mana.pct > 1", resolve)).toThrow(/expected "\)"/);
 });
+
+test("% is a remainder at the precedence of * and /", () => {
+  const f = compile("7 % 3 + 1 = 2 & 2 * 5 % 4 = 2", () => () => 0);
+  expect(f()).toBe(1);
+});

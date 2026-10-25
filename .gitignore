@@ -4,3 +4,5 @@ packages/data/raw/
 .env
 # Forever Logs events. Their terms forbid bulk redistribution, so they never go in the repo.
 packages/data/foreverlogs-cache/
+# YouTube captions, audio and clips used for research. Only derived numbers go in the repo.
+packages/data/youtube-cache/

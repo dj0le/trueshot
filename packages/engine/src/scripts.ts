@@ -9,9 +9,12 @@ export type ScriptContext = {
   config: SimConfig;
   // Applies a spell's auras, optionally replacing effect values by index.
   applySpell(id: number, values?: Record<number, number>): void;
+  summonHawk(): void;
 };
 
 export const ON_LAND: Record<string, (ctx: ScriptContext) => void> = {
+  // The dive is the spell's damage effect; the hawk it leaves behind is server-side.
+  "Summon Hawk": (ctx) => ctx.summonHawk(),
   // "Afflicting a target with Serpent Sting allows 50% of your Mana Regeneration to continue
   // while casting for 15 sec." The 100% upgrade needs Rapid Killing's kill reset, which a single
   // target fight never triggers.

@@ -137,12 +137,14 @@ export class Rotation {
       case "gcd":
         if (name === "remains") return () => sec(this.f().gcdReadyAt - this.f().now);
         break;
+      case "hawks":
+        if (name === "active") return () => this.f().pet?.activeHawks() ?? 0;
+        if (name === "min_remains") return () => sec(this.f().pet?.hawkMinRemainsMs() ?? 0);
+        break;
       case "haste":
         return () => this.f().rangedHaste();
       case "auto_shot":
         if (name === "remains") return () => sec(this.f().autoShotFiresAt() - this.f().now);
-        // Until the wind-up starts. A cast that ends by then does not delay the shot.
-        if (name === "cooldown_remains") return () => sec(this.f().autoShotWindupAt() - this.f().now);
         if (name === "windup") return () => (this.f().auto.windup ? 1 : 0);
         break;
       case "cooldown": {
@@ -151,6 +153,13 @@ export class Rotation {
         if (field === "ready") return () => (spell && this.f().cooldownReadyAt(spell) <= this.f().now ? 1 : 0);
         if (field === "remains") return () => (spell ? sec(this.f().cooldownReadyAt(spell) - this.f().now) : 1e9);
         break;
+      }
+      case "casts": {
+        // Times cast so far this fight, for fixed patterns: (casts.a + casts.b) % 3 < 2.
+        if (field !== undefined) break;
+        needSpellName();
+        const spell = this.ch.abilities.get(name!);
+        return () => (spell ? this.f().castCount(spell) : 0);
       }
       case "cast": {
         needSpellName();
@@ -236,6 +245,10 @@ export class Fight implements PetHost {
         const spell = game.data.spells[String(id)]!;
         const effects = resolveEffects(spell).map((e) => ({ ...e, value: values?.[e.index] ?? e.value }));
         this.applyAuras(spell, effects);
+      },
+      summonHawk: () => {
+        if (this.pet) this.pet.summonHawk();
+        else this.report("Summon Hawk without a pet out: the hawk's attacks are not simulated");
       },
     };
   }
@@ -328,6 +341,10 @@ export class Fight implements PetHost {
     else if (outcome === "tick") s.ticks++;
     else s.hits++;
     s.damage += amount;
+  }
+
+  castCount(spell: Spell): number {
+    return this.stats.get(spell.name)?.casts ?? 0;
   }
 
   report(what: string): void {
@@ -446,15 +463,13 @@ export class Fight implements PetHost {
       this.execute(spell);
       return;
     }
-    // A cast stops an Auto Shot wind-up; the shot waits until the cast ends.
-    this.cancelWindup();
+    // Auto Shot keeps firing through the cast (see the Auto Shot section).
     const endsAt = this.now + castMs;
     this.casting = { spell, endsAt };
     this.queue.push(endsAt, () => {
       this.casting = null;
       this.complete(spell);
       this.execute(spell);
-      this.tryWindup();
     });
   }
 
@@ -486,7 +501,14 @@ export class Fight implements PetHost {
   }
 
   // Auto Shot =================================================================
-  // The last 0.5 sec of each swing is a wind-up that must not overlap a cast.
+  // The last 0.5 sec of each swing is a wind-up the hunter must stand still for. In Forever, unlike
+  // Classic, Auto Shot fires while Aimed Shot or Sniper Shot is being cast (Blizzard: intentional,
+  // Class Highlights Part 2; https://github.com/classic-hunter/forever-hunter/wiki/Forever-Beta-Changes).
+  // Channels (Volley) still hold the shot until they end: no source covers them yet.
+
+  private channeling(): boolean {
+    return this.casting !== null && isChanneled(this.casting.spell);
+  }
 
   private windupMs(): number {
     return this.game.overrides.formula.autoShotStandStillMs.value;
@@ -494,17 +516,12 @@ export class Fight implements PetHost {
 
   autoShotFiresAt(): number {
     if (this.auto.windup) return this.auto.firesAt;
-    const start = Math.max(this.auto.cooldownEnd, this.casting?.endsAt ?? 0, this.now);
+    const start = Math.max(this.auto.cooldownEnd, this.channeling() ? this.casting!.endsAt : 0, this.now);
     return start + this.windupMs();
   }
 
-  // When the next wind-up starts (now, if it already has).
-  autoShotWindupAt(): number {
-    return this.auto.windup ? this.now : this.autoShotFiresAt() - this.windupMs();
-  }
-
   private tryWindup(): void {
-    if (this.casting || this.auto.windup || this.now < this.auto.cooldownEnd) return;
+    if (this.channeling() || this.auto.windup || this.now < this.auto.cooldownEnd) return;
     this.auto.windup = true;
     this.auto.firesAt = this.now + this.windupMs();
     const token = ++this.auto.token;
