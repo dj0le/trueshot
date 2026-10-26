@@ -122974,6 +122974,93 @@
     }
    ]
   },
+  "1310536": {
+   "id": 1310536,
+   "name": "Lacerating Strikes",
+   "school": 1,
+   "attributes": [
+    2424848,
+    512,
+    0,
+    1074003968,
+    256,
+    0,
+    536870912,
+    58720256,
+    4609,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 21000,
+   "maxDurationMs": 21000,
+   "rangeMin": 0,
+   "rangeMax": 100,
+   "speed": 0,
+   "baseLevel": 1,
+   "spellLevel": 1,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 2,
+   "preventionType": 2,
+   "mechanic": 15,
+   "dispelType": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     0,
+     4096,
+     0,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 3,
+     "basePoints": 1,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 3000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      6,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "1310612": {
    "id": 1310612,
    "name": "Trickster's Dance",

@@ -23,6 +23,7 @@ const LINKS: ({ from: number; effectIndex: number; to: number } & ({ tooltip: st
 // Spells scripts in the engine apply directly, with why.
 const EXTRA_SPELLS: { id: number; why: string }[] = [
   { id: 1242512, why: "Rapid Recuperation's regen-while-casting buff, applied when Serpent Sting lands" },
+  { id: 1310536, why: "Lacerating Strikes' bleed, applied when Mongoose Bite lands; the server sets its tick" },
   // Support from other classes, for the support presets in overrides.toml.
   { id: 25290, why: "Blessing of Wisdom, top rank" },
   { id: 10494, why: "Mana Spring Totem's aura, top rank" },

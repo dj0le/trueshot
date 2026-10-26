@@ -62,6 +62,10 @@ export const SimConfig = z.object({
     ammoDps: z.number().default(0),
     quiverHastePct: z.number().default(0),
   }),
+  // Where the hunter fights from: "ranged" (Auto Shot and shots) or "melee" (white swings with the
+  // melee weapons, Raptor Strike and the other melee abilities). Each side's abilities are out of
+  // range from the other.
+  position: z.enum(["ranged", "melee"]).default("ranged"),
   // Raid buffs and consumables, flattened to stats.
   buffs: Stats,
   // What other players keep up: "solo", or a preset from overrides.toml [support].

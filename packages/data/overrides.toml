@@ -28,6 +28,53 @@ value = 2
 confidence = "classic"
 source = "Classic: hunter ranged AP = level * 2 + agility * 2 - 10"
 
+[formula.meleeAttackPowerPerStrength]
+value = 1
+confidence = "classic"
+source = "Classic: hunter melee AP = level * 2 + strength + agility - 20"
+
+[formula.meleeAttackPowerPerAgility]
+value = 1
+confidence = "classic"
+source = "Classic: hunter melee AP = level * 2 + strength + agility - 20"
+
+[formula.meleeAttackPowerPerLevel]
+value = 2
+confidence = "classic"
+source = "Classic: hunter melee AP = level * 2 + strength + agility - 20"
+
+[formula.meleeAttackPowerBase]
+value = -20
+confidence = "classic"
+source = "Classic: hunter melee AP = level * 2 + strength + agility - 20"
+
+# Melee specials with normalized weapon damage (Mongoose Bite, Strider Kick, Counterattack: effect
+# 121) use a fixed speed per weapon type. Classic had no normalization; these are TBC's.
+[formula.normalizedOneHandSpeed]
+value = 2.4
+confidence = "guess"
+source = "TBC normalization: one-hand weapons 2.4 sec"
+
+[formula.normalizedDaggerSpeed]
+value = 1.7
+confidence = "guess"
+source = "TBC normalization: daggers 1.7 sec"
+
+[formula.normalizedTwoHandSpeed]
+value = 3.3
+confidence = "guess"
+source = "TBC normalization: two-hand weapons 3.3 sec"
+
+[formula.dualWieldMissPct]
+value = 19
+confidence = "classic"
+source = "Classic: white swings miss 19% more often while dual wielding (vmangos)"
+
+[formula.offHandDamagePct]
+value = 50
+confidence = "classic"
+source = "Classic: off-hand swings deal 50% damage; Predator's Edge raises that by up to 50% of itself"
+
 [formula.attackPowerPerDps]
 value = 14
 confidence = "classic"

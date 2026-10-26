@@ -108,6 +108,12 @@ const DEFAULT_POOL = [
   "multi_shot",
   "arcane_shot",
   "volley",
+  // Melee position; out of range from the other position, so harmless there.
+  "raptor_strike",
+  "mongoose_bite",
+  "strider_kick",
+  "lacerate",
+  "wing_clip",
 ];
 
 // Abilities talents teach, which a build search adds to the rotation when missing. Intimidation is

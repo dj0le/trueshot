@@ -459,3 +459,71 @@ test("a ranged weapon's chance-on-hit effect procs from ranged hits", () => {
   expect(shot.dps).toBeGreaterThan(0);
   expect(r.unimplemented.some((u) => u.includes("chance-on-hit"))).toBe(false);
 });
+
+test("in melee the hunter swings instead of shooting, and each side's abilities are out of range from the other", () => {
+  const items = { mainHand: 18520, ranged: 18680 }; // Barbarous Blade, 3.2 sec
+  const run = (position: "melee" | "ranged", actions: { action: string }[]) =>
+    simulate(game, {
+      ...base,
+      position,
+      gear: { items, stats: { hitPct: 9, mp5: 10000 } },
+      fight: { durationSec: 320, iterations: 20 },
+      rotation: { actions },
+    }).abilities;
+  const find = (r: ReturnType<typeof run>, name: string) => r.find((a) => a.name === name);
+  const melee = run("melee", [{ action: "arcane_shot" }, { action: "raptor_strike" }]);
+  expect(find(melee, "Auto Shot")).toBeUndefined();
+  expect(find(melee, "Arcane Shot")).toBeUndefined();
+  // 100 swings in 320 sec; Raptor Strike takes the place of a white swing whenever it is ready.
+  const swings = find(melee, "Melee")!.castsPerFight + find(melee, "Raptor Strike")!.castsPerFight;
+  expect(swings).toBe(100);
+  expect(find(melee, "Raptor Strike")!.castsPerFight).toBeGreaterThan(40);
+  const ranged = run("ranged", [{ action: "raptor_strike" }]);
+  expect(find(ranged, "Raptor Strike")).toBeUndefined();
+  expect(find(ranged, "Melee")).toBeUndefined();
+});
+
+test("Strider Kick multiplies its weapon damage by its percent instead of adding the two", () => {
+  const r = simulate(game, {
+    ...base,
+    position: "melee",
+    talents: { "Improved Tracking": 5, "Savage Strikes": 2, Survivalist: 5, Surefooted: 3, "Clever Traps": 2, "Survival Tactics": 2, "Predator's Edge": 1, "Strider Kick": 1 },
+    gear: { items: { mainHand: 18520, ranged: 18680 }, stats: { hitPct: 9, mp5: 10000 } },
+    fight: { durationSec: 300, iterations: 20 },
+    rotation: { actions: [{ action: "strider_kick" }, { action: "raptor_strike" }] },
+  }).abilities;
+  const kick = r.find((a) => a.name === "Strider Kick")!.avgHit;
+  const raptor = r.find((a) => a.name === "Raptor Strike")!.avgHit;
+  // 100% of a 3.3 sec normalized hit against a 3.2 sec hit plus 70: close, not double.
+  expect(kick / raptor).toBeGreaterThan(0.8);
+  expect(kick / raptor).toBeLessThan(1.1);
+});
+
+test("Expose Prey opens Mongoose Bite only against a Hunter's Marked target", () => {
+  const sv = { "Improved Tracking": 5, "Savage Strikes": 2, Survivalist: 5, Surefooted: 3, "Clever Traps": 2, "Survival Tactics": 2, "Predator's Edge": 3, "Expose Prey": 2 };
+  const run = (mark: boolean) =>
+    simulate(game, {
+      ...base,
+      position: "melee",
+      talents: sv,
+      gear: { items: { mainHand: 18520, ranged: 18680 }, stats: { hitPct: 9, mp5: 10000 } },
+      fight: { durationSec: 300, iterations: 20 },
+      rotation: { actions: [...(mark ? [{ action: "hunters_mark", if: "!debuff.hunters_mark.up" }] : []), { action: "mongoose_bite" }] },
+    }).abilities.find((a) => a.name === "Mongoose Bite")?.castsPerFight ?? 0;
+  expect(run(false)).toBe(0);
+  // About 88 landed white swings at 10%: some 9 activations.
+  expect(run(true)).toBeGreaterThan(6);
+  expect(run(true)).toBeLessThan(13);
+});
+
+test("dual wielding adds off-hand swings at half damage and misses more", () => {
+  const run = (items: Record<string, number>) =>
+    simulate(game, { ...base, position: "melee", gear: { items: { ...items, ranged: 18680 }, stats: { hitPct: 9 } }, fight: { durationSec: 300, iterations: 50 } }).abilities;
+  const longsword = 12584; // 2.9 sec, 138-207
+  const one = run({ mainHand: longsword });
+  const two = run({ mainHand: longsword, offHand: longsword });
+  const mh = (r: ReturnType<typeof run>) => r.find((a) => a.name === "Melee")!;
+  const oh = two.find((a) => a.name === "Melee (off hand)")!;
+  expect(mh(two).missPct - mh(one).missPct).toBeCloseTo(game.overrides.formula.dualWieldMissPct.value, 0);
+  expect(oh.avgHit / mh(two).avgHit).toBeCloseTo(0.5, 1);
+});

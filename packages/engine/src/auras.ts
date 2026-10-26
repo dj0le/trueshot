@@ -90,10 +90,15 @@ export class AuraSet {
     }
   }
 
-  // A successful attack of the given proc flag uses up one charge of each aura listening for it.
-  consumeCharges(flag: number): void {
+  remove(spellId: number): void {
+    if (this.active.delete(spellId)) this.changed();
+  }
+
+  // A successful attack of the given proc flag uses up one charge of each aura listening for it,
+  // except the ones in `keep` (a reactive ability's activation, which only that ability spends).
+  consumeCharges(flag: number, keep?: ReadonlySet<number>): void {
     for (const [id, a] of this.active) {
-      if (a.charges === 0 || (a.spell.proc!.typeMask[0] & flag) === 0) continue;
+      if (a.charges === 0 || (a.spell.proc!.typeMask[0] & flag) === 0 || keep?.has(id)) continue;
       if (--a.charges === 0) {
         this.active.delete(id);
         this.changed();

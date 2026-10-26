@@ -1,0 +1,79 @@
+# Deep Survival in melee with a cat against a raid boss, on the same gear as the BM and MM configs
+# (Barbarous Blade is the two-hander in the main hand).
+name = "SV melee, MythicSim gear"
+level = 60
+race = "Orc"
+position = "melee"
+
+[talents]
+"Deadly Aspects" = 5
+"Lethal Attacks" = 5
+"Efficiency" = 5
+"Careful Aim" = 5
+"Improved Tracking" = 5
+"Savage Strikes" = 2
+"Survivalist" = 3
+"Surefooted" = 3
+"Clever Traps" = 2
+"Predator's Edge" = 5
+"Expose Prey" = 2
+"Resourcefulness" = 2
+"Strider Kick" = 1
+"Lightning Reflexes" = 5
+"Lacerating Strikes" = 1
+
+[gear]
+ammoDps = 17.5
+quiverHastePct = 15
+
+# MythicSim's tier-list gear for its hunter sims (2026-10-21), so results can be compared.
+[gear.items]
+head = 252605      # Black Dragonscale Helm
+neck = 15411       # Mark of Fordring
+shoulder = 12927   # Truestrike Shoulders
+back = 13340       # Cape of the Black Baron
+chest = 252483     # Dawn Armor
+wrist = 16681      # Beaststalker's Bindings
+hands = 16676      # Beaststalker's Gloves
+waist = 272397     # Ranger's Belt
+legs = 16678       # Beaststalker's Pants
+feet = 13967       # Windreaver Greaves
+finger1 = 18500    # Tarnished Elven Ring
+finger2 = 18500    # Tarnished Elven Ring
+mainHand = 18520   # Barbarous Blade
+ranged = 18680     # Ancient Bone Bow
+
+[pet]
+active = true
+family = "Cat"
+
+[target]
+preset = "boss"
+
+[fight]
+durationSec = 180
+durationVariancePct = 10
+iterations = 2000
+
+[rotation]
+precombat = ["aspect_of_the_beast", "hunters_mark"]
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "strider_kick"
+
+[[rotation.actions]]
+action = "lacerate"
+if = "!dot.lacerate.ticking"

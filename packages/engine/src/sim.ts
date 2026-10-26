@@ -2,7 +2,7 @@
 // regen, ticks, aura expiry) runs off the event queue.
 import { atLevel, type GameData, type Overrides, type Spell } from "@hunter-sim/data";
 import { AuraSet } from "./auras";
-import { type ActiveSpell, actionNames, type Character, type ResolvedEffect, resolveEffects, snake } from "./character";
+import { type ActiveSpell, actionNames, type Character, type MeleeWeapon, type ResolvedEffect, resolveEffects, snake } from "./character";
 import {
   Aura,
   CHANNELED_FLAGS,
@@ -24,7 +24,7 @@ import { type AttackTable, attackTable } from "./levels";
 import { Pet, type PetHost } from "./pet";
 import { EventQueue } from "./queue";
 import { Rng } from "./rng";
-import { ON_LAND, type ScriptContext } from "./scripts";
+import { ON_LAND, PROC_CHANCE_IN_EFFECT, PROC_IF, type ScriptContext } from "./scripts";
 
 const DAMAGE_EFFECTS = new Set<number>([
   Effect.SchoolDamage,
@@ -62,6 +62,18 @@ const isChanneled = (spell: Spell) => (spell.attributes[1]! & CHANNELED_FLAGS) !
 
 // The hawk's dive is the hunter's spell, but the hawk deals it, so "pets and hawks" talents reach it.
 const HAWK_DIVE = "Summon Hawk";
+
+// Attributes_0 flags of an attack that replaces the next melee swing (Raptor Strike).
+const NEXT_SWING_FLAGS = 0x4 | 0x400;
+const isNextSwing = (spell: Spell) => (spell.attributes[0]! & NEXT_SWING_FLAGS) !== 0;
+// Melee abilities reach 5 yards; shots have an 8 yard minimum.
+const MELEE_RANGE = 5;
+
+// Abilities usable only while a reactive state is up, by the aura that grants it. Mongoose Bite
+// follows a dodge, or Expose Prey's activation; the hunter is not tanking, so only Expose Prey.
+// Counterattack follows a parry, which never happens without tanking: 0 is no aura at all.
+const REACTIVE: Record<string, number> = { "Mongoose Bite": 1310726, Counterattack: 0 };
+const REACTIVE_AURAS = new Set(Object.values(REACTIVE));
 
 export type AbilityStats = {
   name: string;
@@ -228,6 +240,9 @@ export class Fight implements PetHost {
   readonly selfAuras: AuraSet;
   readonly targetAuras: AuraSet;
   readonly auto = { cooldownEnd: 0, windup: false, firesAt: Infinity, token: 0 };
+  // Melee position: white swings instead of Auto Shot, and an attack queued on the next swing.
+  private readonly melee: boolean;
+  private queuedSwing: Spell | null = null;
   private wakeAt = -1;
   private oomSince: number | null = null;
   private oomMs = 0;
@@ -251,6 +266,7 @@ export class Fight implements PetHost {
     private unimplemented: Set<string>,
   ) {
     this.rng = new Rng(seed);
+    this.melee = ch.config.position === "melee";
     this.selfAuras = new AuraSet(this.queue, ch.passives, () => this.modsCache.clear());
     this.targetAuras = new AuraSet(this.queue);
     this.mana = ch.maxMana;
@@ -301,6 +317,8 @@ export class Fight implements PetHost {
           if (c?.by === spell.id) this.categoryCooldowns.delete(spell.category);
         }
       },
+      bleed: (id, total) => this.bleed(game.data.spells[String(id)]!, total),
+      targetHas: (name) => [...this.targetAuras.sources()].some((a) => snake(a.spell.name) === name),
       summonHawk: () => {
         if (this.pet) this.pet.summonHawk();
         else this.report("Summon Hawk without a pet out: the hawk's attacks are not simulated");
@@ -325,7 +343,11 @@ export class Fight implements PetHost {
     // Other players keep these up all fight.
     for (const id of this.support) this.applyAuras(this.game.data.spells[String(id)]!, null, Infinity);
     for (let t = 2000; t < this.durationMs; t += 2000) this.queue.push(t, () => this.manaTick());
-    this.tryWindup();
+    if (this.melee) {
+      if (!this.ch.mainHand) this.report("melee position without a melee weapon in the main hand");
+      else this.swing(this.ch.mainHand, false);
+      if (this.ch.offHand) this.swing(this.ch.offHand, true);
+    } else this.tryWindup();
     this.act();
     // The pet goes in on the opening macro, after what it sends (Intimidation, Bestial Wrath) lands.
     this.pet?.start();
@@ -372,6 +394,16 @@ export class Fight implements PetHost {
       if (e.aura === Aura.ModRangedAttackPowerVersus && (e.miscValue[0] & this.target.creatureMask) !== 0) versus += e.value;
     }
     return this.ownRangedAttackPower() + versus + this.targetAuras.sum(Aura.RangedAttackPowerAttackerBonus);
+  }
+
+  meleeAttackPower(): number {
+    const fromInt = (this.selfAuras.sum(Aura.ModAttackPowerOfStatPercent) / 100) * this.ch.primary.intellect;
+    const flat = this.ch.meleeAttackPower + this.selfAuras.sum(Aura.ModAttackPower) + fromInt;
+    return flat * this.selfAuras.product([Aura.ModAttackPowerPct]);
+  }
+
+  meleeHaste(): number {
+    return this.selfAuras.product([Aura.ModMeleeHaste, Aura.ModMeleeRangedHaste2]);
   }
 
   rangedHaste(): number {
@@ -480,8 +512,16 @@ export class Fight implements PetHost {
 
   // Acting =====================================================================
 
+  // Shots need distance and melee abilities need the target in reach; self buffs work anywhere.
+  private inRange(spell: Spell): boolean {
+    if (this.melee) return spell.rangeMin === 0;
+    return !(spell.rangeMax > 0 && spell.rangeMax <= MELEE_RANGE);
+  }
+
   private canCast(spell: Spell): boolean {
-    if (this.casting) return false;
+    if (this.casting || !this.inRange(spell) || this.queuedSwing === spell) return false;
+    const reactive = REACTIVE[spell.name];
+    if (reactive !== undefined && !this.selfAuras.get(reactive)) return false;
     if (spell.gcdMs > 0 && this.now < this.gcdReadyAt) return false;
     if (this.cooldownReadyAt(spell) > this.now) return false;
     return this.mana >= this.manaCost(spell);
@@ -524,6 +564,7 @@ export class Fight implements PetHost {
       this.rotation.actions.some(
         (a) =>
           a.spell &&
+          this.inRange(a.spell) &&
           this.cooldownReadyAt(a.spell) <= this.now &&
           this.mana < this.manaCost(a.spell) &&
           (!a.cond || a.cond()),
@@ -537,8 +578,15 @@ export class Fight implements PetHost {
 
   // The GCD starts with the cast; mana and the cooldown are taken when the cast completes.
   private cast(spell: Spell): void {
+    // Raptor Strike waits for the next main-hand swing, which it replaces.
+    if (isNextSwing(spell) && this.melee) {
+      this.queuedSwing = spell;
+      return;
+    }
     if (spell.gcdMs > 0) this.gcdReadyAt = this.now + spell.gcdMs;
     this.stat(spell.name).casts++;
+    const reactive = REACTIVE[spell.name];
+    if (reactive) this.selfAuras.remove(reactive);
 
     if (isChanneled(spell)) {
       this.complete(spell);
@@ -610,7 +658,7 @@ export class Fight implements PetHost {
   }
 
   private tryWindup(): void {
-    if (this.channeling() || this.auto.windup || this.now < this.auto.cooldownEnd) return;
+    if (this.melee || this.channeling() || this.auto.windup || this.now < this.auto.cooldownEnd) return;
     this.auto.windup = true;
     this.auto.firesAt = this.now + this.windupMs();
     const token = ++this.auto.token;
@@ -636,16 +684,76 @@ export class Fight implements PetHost {
     this.queue.push(this.auto.cooldownEnd, () => this.tryWindup());
   }
 
+  // Melee swings ==============================================================
+  // In melee position each weapon swings on its own timer. A queued next-swing attack replaces the
+  // main hand's white swing when its cooldown and mana allow.
+
+  private swing(weapon: MeleeWeapon, offHand: boolean): void {
+    const q = offHand ? null : this.queuedSwing;
+    if (!offHand) this.queuedSwing = null;
+    if (q && this.cooldownReadyAt(q) <= this.now && this.mana >= this.manaCost(q)) {
+      this.stat(q.name).casts++;
+      this.complete(q);
+      this.execute(q);
+    } else this.whiteSwing(weapon, offHand);
+    this.queue.push(this.now + (weapon.speed * 1000) / this.meleeHaste(), () => this.swing(weapon, offHand));
+  }
+
+  // One roll for the whole table: miss (more while dual wielding), dodge, glance, crit, hit. Attacks
+  // come from behind, so nothing is parried or blocked.
+  private whiteSwing(weapon: MeleeWeapon, offHand: boolean): void {
+    const f = this.game.overrides.formula;
+    const t = this.target.table;
+    const s = this.stat(offHand ? "Melee (off hand)" : "Melee");
+    s.casts++;
+    const dualWield = this.ch.offHand ? f.dualWieldMissPct.value : 0;
+    const miss = this.missPct() + dualWield;
+    const dodge = miss + t.dodgePct;
+    const glance = dodge + t.glancingPct;
+    const crit = glance + this.critPct(null);
+    const r = this.rng.stream("melee").next() * 100;
+    if (r < dodge) {
+      s.misses++;
+      return;
+    }
+    let amount = this.rng.stream("damage").range(weapon.min, weapon.max) + (this.meleeAttackPower() / this.attackPowerPerDps) * weapon.speed;
+    if (offHand) amount *= (f.offHandDamagePct.value / 100) * (1 + this.selfAuras.sum(Aura.ModOffhandDamagePct) / 100);
+    amount *= this.damageDone(School.Physical) * this.armorMultiplier();
+    if (r < glance) {
+      amount *= 1 - t.glancingPenaltyPct / 100;
+      s.hits++;
+    } else if (r < crit) {
+      amount *= (1 + f.critDamageBonusPct.value / 100) * this.selfAuras.product([Aura.ModCritDamageBonus]);
+      s.crits++;
+    } else s.hits++;
+    s.damage += amount;
+    this.selfAuras.consumeCharges(ProcFlag.DoneMeleeAutoAttack, REACTIVE_AURAS);
+    this.procs(this.selfAuras, ProcFlag.DoneMeleeAutoAttack, "proc");
+    this.weaponProcs(weapon.procs, weapon.speed);
+  }
+
   // Resolving a spell =========================================================
+
+  private missPct(): number {
+    const t = this.target.table;
+    const hit = this.ch.hitPct + this.selfAuras.sum(Aura.ModHitChance);
+    return Math.max(0, t.missPct - Math.max(0, hit - t.hitPenaltyPct));
+  }
+
+  // Crit chance after the target's suppression; a spell adds its own crit modifiers.
+  private critPct(spell: Spell | null, extraCritPct = 0): number {
+    const t = this.target.table;
+    const own = spell ? this.mods(spell, SpellModOp.CritChance).flat : 0;
+    const total = this.ch.critPct + this.selfAuras.sum(Aura.ModCritPct) + own + extraCritPct;
+    const auraCrit = total - this.ch.agilityCritPct;
+    return Math.max(0, total - t.critSuppressionPct - Math.min(Math.max(0, auraCrit), t.auraCritSuppressionPct));
+  }
 
   private roll(spell: Spell, isAuto: boolean, extraCritPct = 0): "miss" | "hit" | "crit" {
     if (spell.defenseType === DefenseType.None) return "hit";
-    const t = this.target.table;
-    const hit = this.ch.hitPct + this.selfAuras.sum(Aura.ModHitChance);
-    const miss = Math.max(0, t.missPct - Math.max(0, hit - t.hitPenaltyPct));
-    const total = this.ch.critPct + this.selfAuras.sum(Aura.ModCritPct) + this.mods(spell, SpellModOp.CritChance).flat + extraCritPct;
-    const auraCrit = total - this.ch.agilityCritPct;
-    const crit = Math.max(0, total - t.critSuppressionPct - Math.min(Math.max(0, auraCrit), t.auraCritSuppressionPct));
+    // Melee specials can also be dodged.
+    const miss = this.missPct() + (spell.defenseType === DefenseType.Melee ? this.target.table.dodgePct : 0);
+    const crit = this.critPct(spell, extraCritPct);
     const r = this.rng.stream(isAuto ? "auto" : "special").next() * 100;
     if (r < miss) return "miss";
     // Auto attacks use one roll for the whole table; special attacks roll crit separately.
@@ -653,25 +761,39 @@ export class Fight implements PetHost {
     return this.rng.stream("special-crit").chance(crit) ? "crit" : "hit";
   }
 
-  private weaponDamage(normalized: boolean): number {
+  // Melee abilities hit with the main hand and melee attack power, shots with the ranged weapon.
+  private weaponDamage(spell: Spell, normalized: boolean): number {
+    if (spell.defenseType === DefenseType.Melee) {
+      const w = this.ch.mainHand;
+      if (!w) return 0;
+      const speed = normalized ? w.normalizedSpeed : w.speed;
+      return this.rng.stream("damage").range(w.min, w.max) + (this.meleeAttackPower() / this.attackPowerPerDps) * speed;
+    }
     const g = this.ch.config.gear;
     const w = this.ch.rangedWeapon;
     const speed = normalized ? this.game.overrides.formula.normalizedRangedSpeed.value : w.speed;
     return this.rng.stream("damage").range(w.min, w.max) + g.ammoDps * speed + (this.rangedAttackPower() / this.attackPowerPerDps) * speed;
   }
 
-  private effectDamage(spell: Spell, e: ResolvedEffect): number {
-    switch (e.effect) {
-      case Effect.WeaponDamage:
-        return this.weaponDamage(false) + e.value;
-      case Effect.NormalizedWeaponDamage:
-        return this.weaponDamage(true) + e.value;
-      case Effect.WeaponPercentDamage:
-        return (this.weaponDamage(false) * e.value) / 100;
-      case Effect.SchoolDamage:
-        return this.rolled(e, "damage") + e.apCoefficient * this.rangedAttackPower();
+  private attackPowerFor(spell: Spell): number {
+    return spell.defenseType === DefenseType.Melee ? this.meleeAttackPower() : this.rangedAttackPower();
+  }
+
+  // A spell's damage before modifiers. A weapon percent effect scales the weapon damage effects
+  // (Counterattack: (weapon + 110) * 50% = 50% weapon damage plus 55), or the plain weapon hit when
+  // it stands alone (Scatter Shot).
+  private spellDamage(spell: Spell, damaging: ResolvedEffect[]): number {
+    const percent = damaging.filter((e) => e.effect === Effect.WeaponPercentDamage);
+    const weapon = damaging.filter((e) => e.effect === Effect.WeaponDamage || e.effect === Effect.NormalizedWeaponDamage);
+    let amount = weapon.reduce((sum, e) => sum + this.weaponDamage(spell, e.effect === Effect.NormalizedWeaponDamage) + e.value, 0);
+    if (percent.length > 0) {
+      if (weapon.length === 0) amount = this.weaponDamage(spell, false);
+      amount *= percent.reduce((m, e) => (m * e.value) / 100, 1);
     }
-    return 0;
+    for (const e of damaging) {
+      if (e.effect === Effect.SchoolDamage) amount += this.rolled(e, "damage") + e.apCoefficient * this.attackPowerFor(spell);
+    }
+    return amount;
   }
 
   // fromProc: a weapon proc's own spell, which cannot set off another.
@@ -691,9 +813,10 @@ export class Fight implements PetHost {
       s.misses++;
       return;
     }
+    let dealt = 0;
 
     if (damaging.length > 0) {
-      let amount = damaging.reduce((sum, e) => sum + this.effectDamage(spell, e), 0);
+      let amount = this.spellDamage(spell, damaging);
       amount = this.modded(amount, spell, SpellModOp.Damage) * this.damageDone(spell.school);
       if (hawk) amount *= this.hawkAuras.damageMultiplier(spell.school);
       if (spell.school === School.Physical) amount *= this.armorMultiplier();
@@ -708,6 +831,7 @@ export class Fight implements PetHost {
         s.hits++;
       }
       s.damage += amount;
+      dealt = amount;
     } else {
       s.hits++;
     }
@@ -717,15 +841,37 @@ export class Fight implements PetHost {
 
     // Charges go after the damage they applied to and before this spell's own auras land, so a
     // shot that grants charged buffs does not spend one itself.
-    const flag = isAuto ? ProcFlag.DoneRangedAutoAttack : ProcFlag.DoneRangedSpell;
-    if (spell.defenseType === DefenseType.Ranged) this.selfAuras.consumeCharges(flag);
+    const ranged = spell.defenseType === DefenseType.Ranged;
+    const melee = spell.defenseType === DefenseType.Melee;
+    const flag = melee ? ProcFlag.DoneMeleeSpell : isAuto ? ProcFlag.DoneRangedAutoAttack : ProcFlag.DoneRangedSpell;
+    if (ranged || melee) this.selfAuras.consumeCharges(flag, REACTIVE_AURAS);
     this.applyAuras(spell, effects);
-    ON_LAND[spell.name]?.(this.scriptContext);
-    if (spell.defenseType === DefenseType.Ranged) {
+    ON_LAND[spell.name]?.(this.scriptContext, { spell, damage: dealt });
+    if (ranged || melee) {
       this.procs(this.selfAuras, flag, "proc");
-      if (!fromProc) this.weaponProcs();
-      this.procs(this.targetAuras, isAuto ? ProcFlag.TakenRangedAutoAttack : ProcFlag.TakenRangedSpell, "target-proc");
+      if (!fromProc && ranged) this.weaponProcs(this.ch.weaponProcs, this.ch.rangedWeapon.speed);
+      if (!fromProc && melee && this.ch.mainHand) this.weaponProcs(this.ch.mainHand.procs, this.ch.mainHand.speed);
     }
+    if (ranged) this.procs(this.targetAuras, isAuto ? ProcFlag.TakenRangedAutoAttack : ProcFlag.TakenRangedSpell, "target-proc");
+  }
+
+  // A bleed carrying damage already done (Lacerating Strikes): ticks of an equal share over the
+  // spell's duration, with no further modifiers. A new one replaces the old.
+  private bleed(spell: Spell, total: number): void {
+    const e = spell.effects.find((x) => x.aura === Aura.PeriodicDamage)!;
+    const ticks = Math.max(1, Math.floor(spell.durationMs / e.periodMs));
+    const tick = total / ticks;
+    const tickUntil = Math.min(spell.durationMs, this.durationMs - this.now);
+    this.targetAuras.add(spell, [], this.now, spell.durationMs, (isLive) => {
+      for (let t = e.periodMs; t <= tickUntil; t += e.periodMs) {
+        this.queue.push(this.now + t, () => {
+          if (!isLive()) return;
+          const s = this.stat(spell.name);
+          s.ticks++;
+          s.damage += tick;
+        });
+      }
+    });
   }
 
   // An effect's value with its variance rolled; variance is the full width as a fraction of the value.
@@ -837,12 +983,12 @@ export class Fight implements PetHost {
     });
   }
 
-  // The ranged weapon's chance-on-hit effects (Dark Iron Rifle's Shadow Shot), at a rate per minute
-  // the client does not carry (overrides.toml formula.weaponProcPpm).
-  private weaponProcs(): void {
-    if (this.ch.weaponProcs.length === 0) return;
-    const chance = (this.game.overrides.formula.weaponProcPpm.value * this.ch.rangedWeapon.speed * 100) / 60;
-    for (const spell of this.ch.weaponProcs) {
+  // A weapon's chance-on-hit effects (Dark Iron Rifle's Shadow Shot), at a rate per minute the
+  // client does not carry (overrides.toml formula.weaponProcPpm).
+  private weaponProcs(procs: Spell[], speed: number): void {
+    if (procs.length === 0) return;
+    const chance = (this.game.overrides.formula.weaponProcPpm.value * speed * 100) / 60;
+    for (const spell of procs) {
       if (this.rng.stream(`weapon-proc:${spell.id}`).chance(chance)) this.execute(spell, false, true);
     }
   }
@@ -853,10 +999,15 @@ export class Fight implements PetHost {
     for (const src of auras.sources()) {
       const proc = src.spell.proc;
       if (!proc || (proc.typeMask[0] & flag) === 0) continue;
+      if (PROC_IF[src.spell.name] && !PROC_IF[src.spell.name]!(this.scriptContext)) continue;
       for (const e of src.effects) {
         if (e.aura !== Aura.ProcTriggerSpell || !e.triggerSpell) continue;
         // Procs per minute become a chance per hit at the ranged weapon's speed.
-        const base = proc.ppm > 0 ? (proc.ppm * this.ch.rangedWeapon.speed * 100) / 60 : proc.chance;
+        const base = PROC_CHANCE_IN_EFFECT.has(src.spell.name)
+          ? e.value
+          : proc.ppm > 0
+            ? (proc.ppm * this.ch.rangedWeapon.speed * 100) / 60
+            : proc.chance;
         if (base > 100 && proc.ppm === 0) this.report(`${src.spell.name}: proc chance is set by the server, simulated as every hit`);
         const chance = this.modded(base, src.spell, SpellModOp.ProcChance);
         if (!this.rng.stream(`${stream}:${src.spell.id}`).chance(chance)) continue;

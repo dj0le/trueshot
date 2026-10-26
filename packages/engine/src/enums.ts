@@ -33,6 +33,10 @@ export const Aura = {
   ModRangedAttackPowerVersus: 131,
   ModCritDamageBonus: 163,
   ModRangedAttackPowerPct: 167,
+  // Melee attack power in percent (Blood Fury's melee half).
+  ModAttackPowerPct: 166,
+  // Off-hand damage in percent of itself (Predator's Edge).
+  ModOffhandDamagePct: 122,
   RangedAttackPowerAttackerBonus: 127,
   ModManaRegenInterrupt: 134,
   ModTotalStatPercentage: 137,
@@ -72,7 +76,10 @@ export const IGNORED_AURAS = new Set<number>([
   50, // Endurance, Earth Fury: critical healing
   65, // Berserking, Wind Blessed: spell haste
   133, // Endurance: max health
-  166, // Blood Fury: melee attack power
+  120, // Aspect of the Beast: untrackable
+  31, // movement speed (Strider Kick)
+  55, // spell hit (Surefooted)
+  232, // movement impairing duration (Surefooted)
   317, // Blood Fury: spell power
 ]);
 export const IGNORED_EFFECTS = new Set<number>([

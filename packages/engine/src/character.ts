@@ -9,6 +9,10 @@ export type ResolvedEffect = SpellEffect & { value: number };
 
 export type ActiveSpell = { spell: Spell; effects: ResolvedEffect[]; source: string };
 
+// A melee weapon in hand: its damage, its speed and the fixed speed normalized attacks use, and its
+// chance-on-hit spells.
+export type MeleeWeapon = { name: string; min: number; max: number; speed: number; normalizedSpeed: number; procs: Spell[] };
+
 export type Character = {
   config: SimConfig;
   level: number;
@@ -29,6 +33,10 @@ export type Character = {
   hastePct: number;
   mp5: number;
   rangedWeapon: { min: number; max: number; speed: number };
+  // Melee attack power before auras, and the weapons for melee position (off hand: dual wielding).
+  meleeAttackPower: number;
+  mainHand: MeleeWeapon | null;
+  offHand: MeleeWeapon | null;
   // What the equipped items do that the sim does not model (procs, set bonuses, odd equip effects).
   gearNotes: string[];
   // The ranged weapon's chance-on-hit spells.
@@ -64,8 +72,10 @@ function gearStats(
   enchants: Map<number, Enchant>,
   overrides: Overrides,
   config: SimConfig,
-): { stats: StatBlock; rangedWeapon: Character["rangedWeapon"] | undefined; notes: string[] } {
+): { stats: StatBlock; rangedWeapon: Character["rangedWeapon"] | undefined; weaponDamage: Partial<Record<string, number>>; notes: string[] } {
   const stats = { ...config.gear.stats };
+  // Flat damage enchants by slot (a scope on the ranged weapon, +damage on a melee weapon).
+  const weaponDamage: Partial<Record<string, number>> = {};
   const notes: string[] = [];
   let rangedWeapon: Character["rangedWeapon"] | undefined;
   const add = (s: Item["stats"]) => {
@@ -89,7 +99,6 @@ function gearStats(
     add(item.stats);
     if (slot === "ranged" && item.weapon) rangedWeapon = { ...item.weapon };
     if (item.source === "classic") notes.push(`${item.name}: not in the Forever client, Classic Era stats used`);
-    if (item.procSpells.length && slot !== "ranged") notes.push(`${item.name}: chance-on-hit effect not simulated (melee)`);
     // Equip spells with effects run as passives (their unknown auras are reported then); the rest
     // have nothing to run.
     const unrun = item.unparsedEquip.length - item.passiveSpells.length;
@@ -100,15 +109,16 @@ function gearStats(
     if (!enchant) throw new Error(`gear: enchant ${id} on ${slot} is not in enchants.json (stat and scope enchants)`);
     add(enchant.stats);
     if (enchant.weaponDamage) {
-      // A scope adds its damage to every shot of the weapon it is on; melee weapons are not simulated.
+      // A scope adds its damage to every shot of the weapon it is on.
+      weaponDamage[slot] = (weaponDamage[slot] ?? 0) + enchant.weaponDamage;
       if (slot === "ranged" && rangedWeapon) {
         rangedWeapon.min += enchant.weaponDamage;
         rangedWeapon.max += enchant.weaponDamage;
-      } else notes.push(`${enchant.name} on ${slot}: weapon damage outside the ranged slot not simulated`);
+      }
     }
     for (const u of enchant.unparsed) notes.push(`${enchant.name} on ${slot}: "${u}" not simulated`);
   }
-  return { stats, rangedWeapon, notes };
+  return { stats, rangedWeapon, weaponDamage, notes };
 }
 
 export const snake = (name: string) =>
@@ -338,6 +348,30 @@ export function buildCharacter(
     f.rangedAttackPowerBase.value +
     sum("rangedAttackPower");
 
+  const meleeAttackPower =
+    config.level * f.meleeAttackPowerPerLevel.value +
+    primary.strength * f.meleeAttackPowerPerStrength.value +
+    primary.agility * f.meleeAttackPowerPerAgility.value +
+    f.meleeAttackPowerBase.value +
+    sum("attackPower");
+
+  const meleeWeapon = (slot: "mainHand" | "offHand"): MeleeWeapon | null => {
+    const item = items.get(config.gear.items[slot] ?? 0);
+    const w = item?.weapon;
+    if (!item || !w || (w.kind !== "oneHand" && w.kind !== "twoHand")) return null;
+    const dagger = item.classId === 2 && item.subclassId === 15;
+    const normalized = w.kind === "twoHand" ? f.normalizedTwoHandSpeed : dagger ? f.normalizedDaggerSpeed : f.normalizedOneHandSpeed;
+    const bonus = worn.weaponDamage[slot] ?? 0;
+    return {
+      name: item.name,
+      min: w.min + bonus,
+      max: w.max + bonus,
+      speed: w.speed,
+      normalizedSpeed: normalized.value,
+      procs: item.procSpells.flatMap((id) => data.spells[String(id)] ?? []),
+    };
+  };
+
   const agilityCritPct = primary.agility / atLevel(lv, lv.hunter.agilityPerCrit.values, config.level);
   const critPct = f.baseCritPct.value + agilityCritPct + sum("critPct");
 
@@ -356,6 +390,9 @@ export function buildCharacter(
     hastePct: sum("hastePct"),
     mp5: sum("mp5") + passiveMp5,
     rangedWeapon,
+    meleeAttackPower,
+    mainHand: meleeWeapon("mainHand"),
+    offHand: meleeWeapon("offHand"),
     gearNotes: worn.notes,
     weaponProcs: (items.get(config.gear.items.ranged ?? 0)?.procSpells ?? []).flatMap((id) => data.spells[String(id)] ?? []),
   };
