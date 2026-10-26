@@ -45,6 +45,8 @@ export const Aura = {
   PeriodicDummy: 226,
   ModCritPct: 290,
   ModHitChance: 54,
+  // Run speed in percent (Strider Kick); the highest one counts.
+  ModIncreaseSpeed: 31,
   // Fires a linked spell every period (Jom Gabbar).
   PeriodicTriggerSpell: 23,
   // Lowers the target's resistance (armor, miscValue 1) to the hunter's own attacks (Badge of the
@@ -77,7 +79,6 @@ export const IGNORED_AURAS = new Set<number>([
   65, // Berserking, Wind Blessed: spell haste
   133, // Endurance: max health
   120, // Aspect of the Beast: untrackable
-  31, // movement speed (Strider Kick)
   55, // spell hit (Surefooted)
   232, // movement impairing duration (Surefooted)
   317, // Blood Fury: spell power

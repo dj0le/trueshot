@@ -527,3 +527,34 @@ test("dual wielding adds off-hand swings at half damage and misses more", () => 
   expect(mh(two).missPct - mh(one).missPct).toBeCloseTo(game.overrides.formula.dualWieldMissPct.value, 0);
   expect(oh.avgHit / mh(two).avgHit).toBeCloseTo(0.5, 1);
 });
+
+test("weaving walks in for one swing between Auto Shots, only when the Auto Shot delay allows", () => {
+  const run = (maxAutoShotDelayMs: number, enchants: Record<string, number> = {}) =>
+    simulate(game, {
+      ...base,
+      position: "weave",
+      weave: { maxAutoShotDelayMs },
+      gear: { items: { mainHand: 18520, ranged: 18680 }, enchants, quiverHastePct: 15, stats: { hitPct: 9, mp5: 10000 } },
+      fight: { durationSec: 300, iterations: 20 },
+      rotation: { actions: [{ action: "raptor_strike" }] },
+    }).abilities;
+  const casts = (r: ReturnType<typeof run>, name: string) => r.find((a) => a.name === name)?.castsPerFight ?? 0;
+  const ranged = simulate(game, { ...base, gear: { items: { mainHand: 18520, ranged: 18680 }, quiverHastePct: 15, stats: { hitPct: 9 } }, fight: { durationSec: 300, iterations: 20 } });
+  const rangedAutos = ranged.abilities.find((a) => a.name === "Auto Shot")!.castsPerFight;
+
+  // Walking 7 yards each way takes 2 sec, plus reactions: more than the 1.9 sec between an Auto Shot
+  // and the next wind-up of a 2.8 sec bow with a 15% quiver, so a zero delay never weaves.
+  const none = run(0);
+  expect(casts(none, "Melee weave")).toBe(0);
+  expect(casts(none, "Auto Shot")).toBe(rangedAutos);
+
+  const weaving = run(1200);
+  const weaves = casts(weaving, "Melee weave");
+  expect(weaves).toBeGreaterThan(30);
+  // One main-hand swing per weave, Raptor Strike whenever it is ready.
+  expect(casts(weaving, "Melee") + casts(weaving, "Raptor Strike")).toBe(weaves);
+  expect(casts(weaving, "Auto Shot")).toBeLessThan(rangedAutos);
+
+  // Minor Speed boots: 8% faster legs, so more weaves fit.
+  expect(casts(run(1200, { feet: 911 }), "Melee weave")).toBeGreaterThanOrEqual(weaves);
+});

@@ -40,6 +40,7 @@ const Overrides = z.object({
     normalizedDaggerSpeed: Value,
     normalizedTwoHandSpeed: Value,
     dualWieldMissPct: Value,
+    runSpeedYdPerSec: Value,
     offHandDamagePct: Value,
     attackPowerPerDps: Value,
     baseCritPct: Value,

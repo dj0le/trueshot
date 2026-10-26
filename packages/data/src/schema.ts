@@ -135,7 +135,8 @@ export type ItemStats = Partial<
     | "mp5"
     | "spellDamage"
     | "healing"
-    | "hastePct",
+    | "hastePct"
+    | "runSpeedPct",
     number
   >
 >;

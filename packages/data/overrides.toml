@@ -70,6 +70,11 @@ value = 19
 confidence = "classic"
 source = "Classic: white swings miss 19% more often while dual wielding (vmangos)"
 
+[formula.runSpeedYdPerSec]
+value = 7
+confidence = "classic"
+source = "Base run speed 7 yd/sec; speed auras (Strider Kick, Minor Speed boots) do not stack, the highest counts (wowsims/forever PR 575)"
+
 [formula.offHandDamagePct]
 value = 50
 confidence = "classic"

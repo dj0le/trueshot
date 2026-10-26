@@ -125,6 +125,7 @@ function equipStats(spellId: string, stats: ItemStats): boolean {
         else all = false;
       }
     } else if (aura === 140) add("hastePct", bp);
+    else if (aura === 31) add("runSpeedPct", bp);
     else if (aura === 99) add("attackPower", bp);
     else if (aura === 124) add("rangedAttackPower", bp);
     else if (aura === 52 || aura === 290) add("critPct", bp);

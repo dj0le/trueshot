@@ -14,6 +14,8 @@ const Stats = z
     hitPct: z.number().default(0),
     // Ranged haste in percent, multiplying with the quiver and every haste aura.
     hastePct: z.number().default(0),
+    // Run speed in percent (Minor Speed boots); the highest of this and speed auras counts.
+    runSpeedPct: z.number().default(0),
     mp5: z.number().default(0),
   })
   .default({});
@@ -62,10 +64,21 @@ export const SimConfig = z.object({
     ammoDps: z.number().default(0),
     quiverHastePct: z.number().default(0),
   }),
-  // Where the hunter fights from: "ranged" (Auto Shot and shots) or "melee" (white swings with the
-  // melee weapons, Raptor Strike and the other melee abilities). Each side's abilities are out of
-  // range from the other.
-  position: z.enum(["ranged", "melee"]).default("ranged"),
+  // Where the hunter fights from: "ranged" (Auto Shot and shots), "melee" (white swings with the
+  // melee weapons, Raptor Strike and the other melee abilities), or "weave": shooting, and walking
+  // in for a melee swing between Auto Shots when the swing is ready. Each side's abilities are out
+  // of range from the other.
+  position: z.enum(["ranged", "melee", "weave"]).default("ranged"),
+  // Melee weaving: where the hunter shoots from and walks in to, in yards, and the most a weave may
+  // push the next Auto Shot back. Defaults follow wowsims/forever's hunter weave (PR 575): shoot
+  // from just past the 11.67 yd minimum, walk in just inside melee range, 1.2 sec measured best.
+  weave: z
+    .object({
+      shootRangeYd: z.number().default(12),
+      meleeRangeYd: z.number().default(4.99),
+      maxAutoShotDelayMs: z.number().min(0).default(1200),
+    })
+    .default({}),
   // Raid buffs and consumables, flattened to stats.
   buffs: Stats,
   // What other players keep up: "solo", or a preset from overrides.toml [support].

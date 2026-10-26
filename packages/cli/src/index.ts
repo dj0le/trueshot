@@ -91,8 +91,8 @@ const USAGE = [
   "  bun run sim optimize <config.toml> [--budget N] [--iterations N] [--pool a,b] [--out file.toml]",
   "  bun run sim pets <config.toml> [--iterations N]       every pet family, and none, with these talents",
   "  bun run sim enchants <text>                           enchant ids for gear.enchants, by name",
-  "  bun run sim build <config.toml> [--budget N] [--rotation-budget N] [--rounds N] [--iterations N] [--keep-pet] [--out file.toml]",
-  "                                                        talents, pet and rotation searched together",
+  "  bun run sim build <config.toml> [--budget N] [--rotation-budget N] [--rounds N] [--iterations N] [--keep-pet] [--keep-style] [--out file.toml]",
+  "                                                        talents, pet, play style and rotation searched together",
 ].join("\n");
 
 // Damage and cooldown actions the optimizer may add even when the starting rotation leaves them
@@ -116,9 +116,13 @@ const DEFAULT_POOL = [
   "wing_clip",
 ];
 
-// Abilities talents teach, which a build search adds to the rotation when missing. Intimidation is
-// left out: casting it costs DPS (PLAN.md findings).
-const TAUGHT = { precombat: ["trueshot_aura"], actions: ["bestial_wrath", "sniper_shot", "summon_hawk"] };
+// Abilities only some builds can use, which a build search adds to the rotation when missing: ones
+// talents teach, and the melee core for melee and weaving (out of range, so free, when shooting).
+// Intimidation is left out: casting it costs DPS (PLAN.md findings).
+const TAUGHT = {
+  precombat: ["trueshot_aura"],
+  actions: ["bestial_wrath", "sniper_shot", "summon_hawk", "mongoose_bite", "raptor_strike"],
+};
 
 // The default pool plus the on-use items the config wears (trinkets).
 function poolFor(game: Awaited<ReturnType<typeof loadGameData>>, config: SimConfigInput): string[] {
@@ -158,6 +162,10 @@ function buildToml(parent: SimConfigInput, parentPath: string, out: string, best
     `# ${note}`,
     `extends = ${tomlString(relative(dirname(resolve(out)), resolve(parentPath)))}`,
     `name = ${tomlString(`${parent.name ?? "unnamed"}, build search`)}`,
+    `position = ${tomlString(best.position ?? "ranged")}`,
+    "",
+    "[weave]",
+    `maxAutoShotDelayMs = ${best.weave?.maxAutoShotDelayMs ?? 1200}`,
     "",
     "[talents]",
     ...Object.entries(talents).map(([t, r]) => `${tomlString(t)} = ${r}`),
@@ -191,6 +199,7 @@ async function main(argv: string[]): Promise<void> {
       "rotation-budget": { type: "string" },
       rounds: { type: "string" },
       "keep-pet": { type: "boolean" },
+      "keep-style": { type: "boolean" },
       pool: { type: "string" },
       out: { type: "string" },
     },
@@ -299,7 +308,7 @@ async function main(argv: string[]): Promise<void> {
     const config = await loadConfig(paths[0]!);
     const iterations = Number(flags.iterations ?? 300);
     const result = optimizeBuild(game, config, {
-      build: { iterations, budget: Number(flags.budget ?? 400), mutantsPerRound: 8, climbs: 3, pets: !flags["keep-pet"] },
+      build: { iterations, budget: Number(flags.budget ?? 400), mutantsPerRound: 8, climbs: 3, pets: !flags["keep-pet"], styles: !flags["keep-style"] },
       rotation: { pool: poolFor(game, config), iterations, budget: Number(flags["rotation-budget"] ?? 150), mutantsPerRound: 8, confirmIterations: 3000 },
       rounds: Number(flags.rounds ?? 2),
       taught: TAUGHT,

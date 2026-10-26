@@ -17,8 +17,20 @@ import { Stream } from "./rng";
 import { compareResults, simulate, type SimResult } from "./run";
 import type { GameData } from "./sim";
 
+// How the hunter plays: where from, and when weaving, how far a weave may push Auto Shot back.
+export type Style = { position: SimConfig["position"]; weaveDelayMs: number };
+
 // pet: a family name, or null for no pet.
-export type Build = { talents: Record<string, number>; pet: string | null };
+export type Build = { talents: Record<string, number>; pet: string | null; style: Style };
+
+// Play styles a search tries: shooting, melee, and weaving with a range of Auto Shot delays (the
+// best delay depends on the build: about 0.5 sec for ranged builds, 1.2 sec or more for Survival).
+const STYLES: Style[] = [
+  { position: "ranged", weaveDelayMs: 0 },
+  { position: "melee", weaveDelayMs: 0 },
+  ...[300, 600, 900, 1200, 1500, 2000].map((weaveDelayMs) => ({ position: "weave" as const, weaveDelayMs })),
+];
+const sameStyle = (a: Style, b: Style) => a.position === b.position && (a.position !== "weave" || a.weaveDelayMs === b.weaveDelayMs);
 
 export type BuildSearchOptions = {
   // Fights per candidate.
@@ -32,6 +44,8 @@ export type BuildSearchOptions = {
   configOnly: boolean;
   // Whether the pet (any family, or none) is searched too.
   pets: boolean;
+  // Whether the play style (ranged, melee, weaving) is searched too; it needs a melee weapon.
+  styles: boolean;
   seed: string;
   onProgress?: (msg: string) => void;
 };
@@ -43,6 +57,7 @@ export function configBuild(config: SimConfigInput): Build {
   return {
     talents: Object.fromEntries(Object.entries(c.talents).filter(([, rank]) => rank > 0)),
     pet: c.pet.active ? c.pet.family : null,
+    style: { position: c.position, weaveDelayMs: c.weave.maxAutoShotDelayMs },
   };
 }
 
@@ -50,17 +65,27 @@ export function configBuild(config: SimConfigInput): Build {
 // names the old family's abilities.
 export function withBuild(config: SimConfigInput, b: Build): SimConfigInput {
   const pet = SimConfig.parse(config).pet;
-  if (!b.pet) return { ...config, talents: b.talents, pet: { ...config.pet, active: false } };
+  const styled = {
+    ...config,
+    talents: b.talents,
+    position: b.style.position,
+    weave: { ...config.weave, maxAutoShotDelayMs: b.style.weaveDelayMs },
+  };
+  if (!b.pet) return { ...styled, pet: { ...config.pet, active: false } };
   const abilities = b.pet === pet.family ? config.pet?.abilities : undefined;
-  return { ...config, talents: b.talents, pet: { ...config.pet, active: true, family: b.pet, abilities } };
+  return { ...styled, pet: { ...config.pet, active: true, family: b.pet, abilities } };
 }
 
-// "Beast Mastery 31 / Marksmanship 20, Cat"
+export function describeStyle(s: Style): string {
+  return s.position === "weave" ? `weaving (Auto Shot pushed back up to ${(s.weaveDelayMs / 1000).toFixed(1)} sec)` : s.position;
+}
+
+// "Beast Mastery 31 / Marksmanship 20, Cat, ranged"
 export function describeBuild(data: HunterData, b: Build): string {
   const trees = new Map<string, number>();
   for (const t of data.talents) trees.set(t.tree, (trees.get(t.tree) ?? 0) + (b.talents[t.name] ?? 0));
   const split = [...trees].map(([tree, n]) => `${tree} ${n}`).join(" / ");
-  return `${split}, ${b.pet ?? "no pet"}`;
+  return `${split}, ${b.pet ?? "no pet"}, ${describeStyle(b.style)}`;
 }
 
 // Spends points down a talent order, each talent to its max before the next, and comes back to
@@ -88,26 +113,28 @@ export function fillBuild(data: HunterData, level: number, order: Talent[]): Rec
 }
 
 // Deep in one tree, the rest in another, for every ordered pair of trees.
-function seedBuilds(data: HunterData, level: number, pet: string | null): { name: string; build: Build }[] {
+function seedBuilds(data: HunterData, level: number, pet: string | null, style: Style): { name: string; build: Build }[] {
   const trees = [...new Set(data.talents.map((t) => t.tree))];
   const inTree = (tree: string) => data.talents.filter((t) => t.tree === tree).sort((a, b) => a.row - b.row || a.col - b.col);
   return trees.flatMap((a) =>
     trees
       .filter((b) => b !== a)
-      .map((b) => ({ name: `deep ${a}, then ${b}`, build: { talents: fillBuild(data, level, [...inTree(a), ...inTree(b)]), pet } })),
+      .map((b) => ({ name: `deep ${a}, then ${b}`, build: { talents: fillBuild(data, level, [...inTree(a), ...inTree(b)]), pet, style } })),
   );
 }
 
-const keyOf = (b: Build) =>
-  JSON.stringify([
+const talentKey = (b: Build) =>
+  JSON.stringify(
     Object.entries(b.talents)
       .filter(([, r]) => r > 0)
       .sort(),
-    b.pet,
-  ]);
+  );
+const keyOf = (b: Build) =>
+  JSON.stringify([talentKey(b), b.pet, b.style.position, b.style.position === "weave" ? b.style.weaveDelayMs : 0]);
 
-function mutate(b: Build, rng: Stream, data: HunterData, level: number, families: string[] | null): Build {
+function mutate(b: Build, rng: Stream, data: HunterData, level: number, families: string[] | null, styles: Style[] | null): Build {
   if (families && rng.next() < 0.15) return { ...b, pet: rng.pick([null, ...families.filter((f) => f !== b.pet)]) };
+  if (styles && rng.next() < 0.1) return { ...b, style: rng.pick(styles.filter((s) => !sameStyle(s, b.style))) };
   const talents = { ...b.talents };
   const rank = (name: string) => talents[name] ?? 0;
   const spare = talentPoints(level) - Object.values(talents).reduce((s, r) => s + r, 0);
@@ -134,6 +161,7 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
   const data = game.data;
   const level = SimConfig.parse(config).level;
   const families = opts.pets ? data.petFamilies.map((f) => f.name) : null;
+  const styles = opts.styles && SimConfig.parse(config).gear.items.mainHand ? STYLES : null;
   const searchSeed = `${opts.seed}/search`;
   const seen = new Map<string, SimResult | null>();
   let evaluated = 0;
@@ -169,19 +197,25 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
     return out;
   };
 
-  // The pet mostly stands apart from the talents, so it is chosen once on the config's talents.
+  // The play style and the pet mostly stand apart from the talents, so each is chosen once on the
+  // config's talents: the style first, then the pet with it.
   const start = configBuild(config);
+  const byDps = (a: Seed, b: Seed) => b.result.dps.mean - a.result.dps.mean;
+  const withStyles = tryAll((styles ?? [start.style]).map((style) => ({ name: `config, ${describeStyle(style)}`, build: { ...start, style } })));
+  const bestStyle = withStyles.sort(byDps)[0]?.build.style ?? start.style;
   const pets = families ? [start.pet, ...families, null] : [start.pet];
-  const withPets = tryAll(pets.map((pet) => ({ name: `config, ${pet ?? "no pet"}`, build: { ...start, pet } })));
-  const bestPet = withPets.filter((s) => s.build.pet).sort((a, b) => b.result.dps.mean - a.result.dps.mean)[0]?.build.pet ?? start.pet;
-  const generated = opts.configOnly ? [] : [...new Set([bestPet, ...(families ? [null] : [])])].flatMap((pet) => seedBuilds(data, level, pet));
-  const seeds = [...withPets, ...tryAll(generated)].sort((a, b) => b.result.dps.mean - a.result.dps.mean);
+  const withPets = tryAll(pets.map((pet) => ({ name: `config, ${pet ?? "no pet"}`, build: { ...start, pet, style: bestStyle } })));
+  const bestPet = withPets.filter((s) => s.build.pet).sort(byDps)[0]?.build.pet ?? start.pet;
+  const generated = opts.configOnly
+    ? []
+    : [...new Set([bestPet, ...(families ? [null] : [])])].flatMap((pet) => seedBuilds(data, level, pet, bestStyle));
+  const seeds = [...withStyles, ...withPets, ...tryAll(generated)].sort(byDps);
   if (seeds.length === 0) throw new Error("build search: no seed build can run; check the config's talents");
   for (const s of seeds.slice(0, 8)) log(`seed ${s.result.dps.mean.toFixed(1)} DPS: ${s.name} (${describeBuild(data, s.build)})`);
 
   const rng = new Stream(`${opts.seed}/mutations`);
-  // One climb per talent build: the same talents with another pet are the same climb.
-  const climbs = seeds.filter((s, i) => seeds.findIndex((x) => keyOf({ ...x.build, pet: null }) === keyOf({ ...s.build, pet: null })) === i).slice(0, opts.climbs);
+  // One climb per talent build: the same talents with another pet or style are the same climb.
+  const climbs = seeds.filter((s, i) => seeds.findIndex((x) => talentKey(x.build) === talentKey(s.build)) === i).slice(0, opts.climbs);
   const perClimb = Math.max(0, Math.floor((opts.budget - evaluated) / climbs.length));
   let best = { build: climbs[0]!.build, result: climbs[0]!.result };
   for (const seed of climbs) {
@@ -192,9 +226,9 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
     for (let attempts = 0; evaluated < stopAt && attempts < perClimb * 50; ) {
       let roundBest: { build: Build; result: SimResult; delta: number } | null = null;
       for (let m = 0; m < opts.mutantsPerRound && evaluated < stopAt; m++, attempts++) {
-        let candidate = mutate(current.build, rng, data, level, families);
+        let candidate = mutate(current.build, rng, data, level, families, styles);
         // Sometimes two moves at once, to step over a dip (a row requirement, a prerequisite).
-        if (rng.next() < 0.3) candidate = mutate(candidate, rng, data, level, families);
+        if (rng.next() < 0.3) candidate = mutate(candidate, rng, data, level, families, styles);
         if (seen.has(keyOf(candidate))) continue;
         const result = run(candidate);
         if (!result) continue;
@@ -217,12 +251,12 @@ export type PetRow = { pet: string | null; dps: number; delta: number; error95: 
 // Families that cannot run the rotation (it sends an ability they lack) are left out.
 export function petSweep(game: GameData, config: SimConfigInput): PetRow[] {
   const base = simulate(game, config);
-  const talents = configBuild(config).talents;
+  const own = configBuild(config);
   const rows: PetRow[] = [];
   for (const pet of [null, ...game.data.petFamilies.map((f) => f.name)]) {
     let r: SimResult;
     try {
-      r = simulate(game, withBuild(config, { talents, pet }));
+      r = simulate(game, withBuild(config, { ...own, pet }));
     } catch {
       continue;
     }

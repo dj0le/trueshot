@@ -31,6 +31,7 @@ export type Character = {
   agilityCritPct: number;
   hitPct: number;
   hastePct: number;
+  runSpeedPct: number;
   mp5: number;
   rangedWeapon: { min: number; max: number; speed: number };
   // Melee attack power before auras, and the weapons for melee position (off hand: dual wielding).
@@ -89,6 +90,7 @@ function gearStats(
     stats.critPct += (s.critPct ?? 0) + (s.critRating ?? 0) / overrides.formula.critRatingPerPct.value;
     stats.hitPct += (s.hitPct ?? 0) + (s.hitRating ?? 0) / overrides.formula.hitRatingPerPct.value;
     stats.hastePct += s.hastePct ?? 0;
+    stats.runSpeedPct = Math.max(stats.runSpeedPct, s.runSpeedPct ?? 0);
     stats.mp5 += s.mp5 ?? 0;
   };
   for (const [slot, id] of Object.entries(config.gear.items) as [keyof typeof SLOT_TYPES, number][]) {
@@ -388,6 +390,7 @@ export function buildCharacter(
     agilityCritPct,
     hitPct: sum("hitPct"),
     hastePct: sum("hastePct"),
+    runSpeedPct: Math.max(gear.runSpeedPct, buffs.runSpeedPct),
     mp5: sum("mp5") + passiveMp5,
     rangedWeapon,
     meleeAttackPower,

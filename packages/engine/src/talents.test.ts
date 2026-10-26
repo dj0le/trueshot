@@ -27,16 +27,21 @@ test("a greedy fill spends every point and keeps to the talent rules", () => {
 
 test("a build drops into a config: a new family loses the old family's ability list", () => {
   const config = { ...base, pet: { active: true, family: "Cat", abilities: ["claw"] } };
-  expect(configBuild(config)).toEqual({ talents: {}, pet: "Cat" });
-  expect(withBuild(config, { talents: { "Lethal Attacks": 5 }, pet: "Cat" }).pet).toMatchObject({ family: "Cat", abilities: ["claw"] });
-  expect(withBuild(config, { talents: {}, pet: "Wolf" }).pet).toMatchObject({ active: true, family: "Wolf", abilities: undefined });
-  expect(withBuild(config, { talents: {}, pet: null }).pet).toMatchObject({ active: false });
+  const style = { position: "ranged" as const, weaveDelayMs: 1200 };
+  expect(configBuild(config)).toEqual({ talents: {}, pet: "Cat", style });
+  expect(withBuild(config, { talents: { "Lethal Attacks": 5 }, pet: "Cat", style }).pet).toMatchObject({ family: "Cat", abilities: ["claw"] });
+  expect(withBuild(config, { talents: {}, pet: "Wolf", style }).pet).toMatchObject({ active: true, family: "Wolf", abilities: undefined });
+  expect(withBuild(config, { talents: {}, pet: null, style }).pet).toMatchObject({ active: false });
+  expect(withBuild(config, { talents: {}, pet: null, style: { position: "weave", weaveDelayMs: 600 } })).toMatchObject({
+    position: "weave",
+    weave: { maxAutoShotDelayMs: 600 },
+  });
 });
 
 test("the search moves points out of talents that do nothing into ones that do", () => {
   // All five points in Endurance Training, pet health and armor, with no pet out.
   const config = { ...base, level: 14, talents: { "Endurance Training": 5 } };
-  const r = searchBuilds(game, config, { iterations: 50, budget: 40, mutantsPerRound: 6, climbs: 1, configOnly: true, pets: false, seed: "t" });
+  const r = searchBuilds(game, config, { iterations: 50, budget: 40, mutantsPerRound: 6, climbs: 1, configOnly: true, pets: false, styles: false, seed: "t" });
   expect(r.best.talents["Endurance Training"] ?? 0).toBeLessThan(5);
   expect(talentErrors(data, 14, r.best.talents).errors).toEqual([]);
 });

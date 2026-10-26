@@ -240,8 +240,12 @@ export class Fight implements PetHost {
   readonly selfAuras: AuraSet;
   readonly targetAuras: AuraSet;
   readonly auto = { cooldownEnd: 0, windup: false, firesAt: Infinity, token: 0 };
-  // Melee position: white swings instead of Auto Shot, and an attack queued on the next swing.
-  private readonly melee: boolean;
+  // Where the hunter is: shooting, in melee, or walking between the two while weaving. Melee
+  // position stays in melee and swings on its own timers; weaving swings only on arrival.
+  private at: "ranged" | "toMelee" | "melee" | "toRanged";
+  private readonly weaving: boolean;
+  private readonly swingReadyAt = { mainHand: 0, offHand: 0 };
+  // An attack queued on the next main-hand swing (Raptor Strike).
   private queuedSwing: Spell | null = null;
   private wakeAt = -1;
   private oomSince: number | null = null;
@@ -266,7 +270,8 @@ export class Fight implements PetHost {
     private unimplemented: Set<string>,
   ) {
     this.rng = new Rng(seed);
-    this.melee = ch.config.position === "melee";
+    this.at = ch.config.position === "melee" ? "melee" : "ranged";
+    this.weaving = ch.config.position === "weave";
     this.selfAuras = new AuraSet(this.queue, ch.passives, () => this.modsCache.clear());
     this.targetAuras = new AuraSet(this.queue);
     this.mana = ch.maxMana;
@@ -343,9 +348,9 @@ export class Fight implements PetHost {
     // Other players keep these up all fight.
     for (const id of this.support) this.applyAuras(this.game.data.spells[String(id)]!, null, Infinity);
     for (let t = 2000; t < this.durationMs; t += 2000) this.queue.push(t, () => this.manaTick());
-    if (this.melee) {
-      if (!this.ch.mainHand) this.report("melee position without a melee weapon in the main hand");
-      else this.swing(this.ch.mainHand, false);
+    if (this.ch.config.position !== "ranged" && !this.ch.mainHand) this.report(`${this.ch.config.position} position without a melee weapon in the main hand`);
+    if (this.at === "melee") {
+      if (this.ch.mainHand) this.swing(this.ch.mainHand, false);
       if (this.ch.offHand) this.swing(this.ch.offHand, true);
     } else this.tryWindup();
     this.act();
@@ -514,12 +519,19 @@ export class Fight implements PetHost {
 
   // Shots need distance and melee abilities need the target in reach; self buffs work anywhere.
   private inRange(spell: Spell): boolean {
-    if (this.melee) return spell.rangeMin === 0;
-    return !(spell.rangeMax > 0 && spell.rangeMax <= MELEE_RANGE);
+    if (spell.rangeMin > 0) return this.at === "ranged";
+    if (spell.rangeMax > 0 && spell.rangeMax <= MELEE_RANGE) return this.at === "melee";
+    return true;
+  }
+
+  private moving(): boolean {
+    return this.at === "toMelee" || this.at === "toRanged";
   }
 
   private canCast(spell: Spell): boolean {
     if (this.casting || !this.inRange(spell) || this.queuedSwing === spell) return false;
+    // Casts and channels need the hunter standing still.
+    if (this.moving() && (spell.castTimeMs > 0 || isChanneled(spell))) return false;
     const reactive = REACTIVE[spell.name];
     if (reactive !== undefined && !this.selfAuras.get(reactive)) return false;
     if (spell.gcdMs > 0 && this.now < this.gcdReadyAt) return false;
@@ -579,7 +591,7 @@ export class Fight implements PetHost {
   // The GCD starts with the cast; mana and the cooldown are taken when the cast completes.
   private cast(spell: Spell): void {
     // Raptor Strike waits for the next main-hand swing, which it replaces.
-    if (isNextSwing(spell) && this.melee) {
+    if (isNextSwing(spell)) {
       this.queuedSwing = spell;
       return;
     }
@@ -606,6 +618,7 @@ export class Fight implements PetHost {
       this.casting = null;
       this.complete(spell);
       this.execute(spell);
+      this.considerWeave();
     });
   }
 
@@ -634,6 +647,7 @@ export class Fight implements PetHost {
     this.queue.push(endsAt, () => {
       this.casting = null;
       this.tryWindup();
+      this.considerWeave();
     });
   }
 
@@ -658,7 +672,7 @@ export class Fight implements PetHost {
   }
 
   private tryWindup(): void {
-    if (this.melee || this.channeling() || this.auto.windup || this.now < this.auto.cooldownEnd) return;
+    if (this.at !== "ranged" || this.channeling() || this.auto.windup || this.now < this.auto.cooldownEnd) return;
     this.auto.windup = true;
     this.auto.firesAt = this.now + this.windupMs();
     const token = ++this.auto.token;
@@ -682,6 +696,53 @@ export class Fight implements PetHost {
     const speed = this.ch.rangedWeapon.speed * 1000;
     this.auto.cooldownEnd = this.now + Math.max(0, speed / this.rangedHaste() - this.windupMs());
     this.queue.push(this.auto.cooldownEnd, () => this.tryWindup());
+    // Weaving: the hunter sees the shot go and decides whether to walk in.
+    if (this.weaving) this.queue.push(this.now + REACTION_MS, () => this.considerWeave());
+  }
+
+  // Melee weaving =============================================================
+  // After an Auto Shot (or a cast) the hunter walks in when the main-hand swing will be ready by
+  // arrival and the walk back pushes the next Auto Shot back by no more than weave.maxAutoShotDelayMs.
+  // In melee: whatever the rotation can use there, the swing (Raptor Strike if queued), and straight
+  // back out; Auto Shot restarts a reaction after arriving. Ready shots go first: a cast started
+  // here holds the hunter in place. Modelled on wowsims/forever's hunter weave (PR 575).
+
+  runSpeed(): number {
+    let pct = this.ch.runSpeedPct;
+    for (const e of this.selfAuras.effects()) if (e.aura === Aura.ModIncreaseSpeed) pct = Math.max(pct, e.value);
+    return this.game.overrides.formula.runSpeedYdPerSec.value * (1 + pct / 100);
+  }
+
+  private legMs(): number {
+    const w = this.ch.config.weave;
+    return (1000 * Math.max(0, w.shootRangeYd - w.meleeRangeYd)) / this.runSpeed();
+  }
+
+  private considerWeave(): void {
+    if (!this.weaving || this.at !== "ranged" || !this.ch.mainHand) return;
+    this.act();
+    if (this.casting || this.auto.windup) return;
+    const leg = this.legMs();
+    const arrive = this.now + leg;
+    if (this.swingReadyAt.mainHand > arrive) return;
+    const autoShotBack = arrive + leg + REACTION_MS;
+    if (autoShotBack - Math.max(this.now, this.auto.cooldownEnd) > this.ch.config.weave.maxAutoShotDelayMs) return;
+    this.at = "toMelee";
+    this.stat("Melee weave").casts++;
+    this.queue.push(arrive, () => this.arriveInMelee());
+  }
+
+  private arriveInMelee(): void {
+    this.at = "melee";
+    this.act();
+    this.strike(this.ch.mainHand!, false);
+    if (this.ch.offHand && this.swingReadyAt.offHand <= this.now) this.strike(this.ch.offHand, true);
+    this.act();
+    this.at = "toRanged";
+    this.queue.push(this.now + this.legMs(), () => {
+      this.at = "ranged";
+      this.queue.push(Math.max(this.now + REACTION_MS, this.auto.cooldownEnd), () => this.tryWindup());
+    });
   }
 
   // Melee swings ==============================================================
@@ -689,6 +750,12 @@ export class Fight implements PetHost {
   // main hand's white swing when its cooldown and mana allow.
 
   private swing(weapon: MeleeWeapon, offHand: boolean): void {
+    this.strike(weapon, offHand);
+    this.queue.push(this.swingReadyAt[offHand ? "offHand" : "mainHand"], () => this.swing(weapon, offHand));
+  }
+
+  // One swing of a weapon, and when that weapon can swing again.
+  private strike(weapon: MeleeWeapon, offHand: boolean): void {
     const q = offHand ? null : this.queuedSwing;
     if (!offHand) this.queuedSwing = null;
     if (q && this.cooldownReadyAt(q) <= this.now && this.mana >= this.manaCost(q)) {
@@ -696,7 +763,7 @@ export class Fight implements PetHost {
       this.complete(q);
       this.execute(q);
     } else this.whiteSwing(weapon, offHand);
-    this.queue.push(this.now + (weapon.speed * 1000) / this.meleeHaste(), () => this.swing(weapon, offHand));
+    this.swingReadyAt[offHand ? "offHand" : "mainHand"] = this.now + (weapon.speed * 1000) / this.meleeHaste();
   }
 
   // One roll for the whole table: miss (more while dual wielding), dodge, glance, crit, hit. Attacks
