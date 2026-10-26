@@ -28,7 +28,7 @@ client build or to an override that records where it came from.
 | 18 | Target presets: normal level 60, elite 62, boss 63 (armor, level-based miss and crit) | packages/engine/src/targets | DONE |
 | 19 | Marksmanship: talents, abilities, default priority list | packages/engine/src/specs/mm | DONE |
 | 20 | Beast Mastery: pet-heavy talents, Bestial Wrath, Kill Command | packages/engine/src/specs/bm | DONE. The pet autocasts greedily (the cheap ability starves the dear one: a cat uses Bite about twice a fight and Claw otherwise), which matches the game; no focus pooling, since the pet is not micromanaged. A rotation action can send a pet ability from the same macro (`pet = "bite"`). Summon Hawk works with guessed hawk attack values (overrides.toml pet.hawk) |
-| 21 | Survival: melee weapon, melee attack table, Raptor Strike and Mongoose Bite | packages/engine/src/specs/sv | |
+| 21 | Survival: melee weapon, melee attack table, Raptor Strike and Mongoose Bite | packages/engine/src/sim.ts | DONE. `position = "melee"`: main and off-hand white swings (dual-wield miss, dodge, glancing), Raptor Strike on the next swing, melee abilities on melee attack power and normalized weapon damage, shots out of range. Mongoose Bite comes from Expose Prey (Hunter's Marked target only; the hunter is not tanking, so no dodges); Counterattack needs a parry and never comes up. Weapon percent effects multiply. Lacerating Strikes bleeds 40% of each bite; Predator's Edge raises crit damage and the off hand. Normalized melee speeds are TBC's (guesses) |
 | 22 | Gear presets for all three specs at 60 from the GearQuestForever BiS lists | packages/data/presets | DONE, set bonuses and enchants are task 26 |
 | 23 | Level-aware sim: any level 10 to 60, spell ranks and target stats by level, so level 30 beta logs can check the mechanics | packages/engine | DONE, levels.toml holds base stats, base mana, agility per crit, pet attack power and creature armor by level (vmangos and cmangos databases); targets are a level offset and the attack table follows from the gap; items go down to level 10. Comparing with the beta fights in calibration/beta-level30.toml is still to do: Troll BM, level 30, wolf, gear unknown, so compare damage shares (pet melee vs Auto Shot, hawk) rather than DPS; Jargba is level 30 with 1004 armor |
 | 24 | Recalibrate against real level 60 logs after launch | tests/golden | BLOCKED, needs level 60 logs, launch is 2026-11-04 |
@@ -99,6 +99,11 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
   (+7.6% over bm-cat.optimized) and MM 8/38/5 with a Wind Serpent at 269.3 (+10.1% over
   mm-lone-wolf.optimized), configs/bm.build.toml and configs/mm.build.toml. Both take Improved
   Tracking and Trueshot Aura; MM drops Lone Wolf for a pet. These assume the pet attacks all fight.
+- Survival in melee does 239.0 DPS after the build search (SV 31 / MM 13 / BM 7, Wind Serpent,
+  configs/sv.build.toml), against 276.7 for BM and 271.8 for MM on the same gear. That gear is
+  MythicSim's ranged set with Barbarous Blade as the only melee weapon, so melee gear could close
+  some of the gap. The search spams Wing Clip as filler: 75 casts a fight for 15 DPS, and each hit
+  is another 10% roll for Expose Prey's Mongoose Bite.
 - Wind Serpent leads every pet sweep by about 2% (Lightning Breath is nature damage, so armor does
   not touch it), then Raptor, Cat and Bird of Prey within 1%. It rests on pet abilities not scaling
   with attack power and on no partial resists, both unverified.

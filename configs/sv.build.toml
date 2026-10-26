@@ -1,0 +1,63 @@
+# Found by `sim build configs/sv-melee.toml` (2026-10-26): +16.08% DPS on 5000 fresh fights.
+extends = "sv-melee.toml"
+name = "SV melee, MythicSim gear, build search"
+
+[talents]
+"Deadly Aspects" = 5
+"Lethal Attacks" = 5
+"Efficiency" = 3
+"Careful Aim" = 5
+"Improved Tracking" = 5
+"Savage Strikes" = 2
+"Survivalist" = 3
+"Surefooted" = 3
+"Clever Traps" = 2
+"Predator's Edge" = 5
+"Expose Prey" = 2
+"Resourcefulness" = 2
+"Strider Kick" = 1
+"Lightning Reflexes" = 5
+"Lacerating Strikes" = 1
+"Focused Fire" = 2
+
+[pet]
+active = true
+family = "Wind Serpent"
+
+[rotation]
+precombat = ["aspect_of_the_beast", "hunters_mark", "trueshot_aura"]
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "strider_kick"
+
+[[rotation.actions]]
+action = "lacerate"
+if = "!debuff.lacerate.up & fight.remains > 3"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "wing_clip"
+
+[[rotation.actions]]
+action = "rapid_fire"
