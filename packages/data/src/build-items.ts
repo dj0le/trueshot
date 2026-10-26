@@ -2,8 +2,8 @@
 // way the Forever client stores them. Cross-checks the formulas against Classic Era's explicit
 // values for items both clients share, and fails if they drift.
 import type { Row } from "./csv";
-import { ENCHANTS_PATH, ITEMS_PATH } from "./index";
-import type { Enchant, Item, ItemStats } from "./schema";
+import { ENCHANTS_PATH, ITEMS_PATH, SUFFIXES_PATH } from "./index";
+import type { Enchant, Item, ItemStats, Suffix } from "./schema";
 import { ERA_DIR, byId, bySpell, effectsByItem, groupBy, hunterCanUse, num, tables } from "./tables";
 
 const db = await tables([
@@ -20,7 +20,7 @@ const db = await tables([
   "SpellName",
   "SpellItemEnchantment",
 ]);
-const era = await tables(["ItemSparse", "ItemEffect"], ERA_DIR);
+const era = await tables(["ItemSparse", "ItemEffect", "ItemRandomProperties"], ERA_DIR);
 
 const items = byId(db.Item);
 const rpp = byId(db.RandPropPoints);
@@ -110,9 +110,13 @@ function allocatedStats(r: Row): { stats: ItemStats; unparsed: number[] } {
 const PRIMARY_BY_INDEX: (keyof ItemStats)[] = ["strength", "agility", "stamina", "intellect", "spirit"];
 
 // Simple equip spells become plain stats; anything else is listed on the item.
-function equipStats(spellId: string, stats: ItemStats): boolean {
+// allOrNothing: keep the stats only when every effect is one. An item's equip spell that is not all
+// stats runs whole as a passive in the engine, which would count its stats a second time; an
+// enchant's never runs, so it keeps what it can.
+function equipStats(spellId: string, into: ItemStats, allOrNothing: boolean): boolean {
   const effects = effectsBySpell.get(spellId) ?? [];
   if (effects.length === 0) return false;
+  const stats: ItemStats = {};
   let all = true;
   for (const e of effects) {
     const bp = num(e.EffectBasePointsF);
@@ -137,6 +141,7 @@ function equipStats(spellId: string, stats: ItemStats): boolean {
     else if (aura === 55 || aura === 593 || aura === 319) continue; // spell hit, expertise, melee haste: not ranged
     else all = false;
   }
+  if (all || !allOrNothing) for (const [k, v] of Object.entries(stats)) addStat(into, k as keyof ItemStats, v);
   return all;
 }
 
@@ -168,7 +173,6 @@ function buildItem(r: Row, source: "forever" | "classic"): Item | null {
   if (!hunterCanUse(base)) return null;
 
   const { stats, unparsed } = source === "forever" ? allocatedStats(r) : explicitStats(r);
-  const equipSpells: number[] = [];
   const procSpells: number[] = [];
   const passiveSpells: number[] = [];
   const useSpells: Item["useSpells"] = [];
@@ -176,8 +180,7 @@ function buildItem(r: Row, source: "forever" | "classic"): Item | null {
   for (const e of (source === "forever" ? foreverEffects : classicEffects).get(r.ID!) ?? []) {
     const spell = e.SpellID!;
     if (e.TriggerType === "1") {
-      equipSpells.push(num(spell));
-      if (!equipStats(spell, stats)) {
+      if (!equipStats(spell, stats, true)) {
         unparsedEquip.push(names.get(spell) ?? spell);
         if (effectsBySpell.has(spell)) passiveSpells.push(num(spell));
       }
@@ -221,7 +224,6 @@ function buildItem(r: Row, source: "forever" | "classic"): Item | null {
     subclassId: subclass,
     stats,
     ...(weapon ? { weapon } : {}),
-    equipSpells,
     procSpells,
     passiveSpells,
     useSpells,
@@ -292,7 +294,7 @@ for (const r of db.SpellItemEnchantment) {
     if (type === 0) continue;
     if (type === 2) weaponDamage += points;
     else if (type === 3) {
-      if (!equipStats(arg, stats)) unparsed.push(names.get(arg) ?? `spell ${arg}`);
+      if (!equipStats(arg, stats, false)) unparsed.push(names.get(arg) ?? `spell ${arg}`);
     } else if (type === 5) {
       if (!addModStat(stats, num(arg), points)) unparsed.push(`stat type ${arg}`);
     } else unparsed.push(type === 1 ? `proc: ${names.get(arg) ?? arg}` : `effect type ${type}`);
@@ -302,6 +304,16 @@ for (const r of db.SpellItemEnchantment) {
 }
 await Bun.write(ENCHANTS_PATH, JSON.stringify(enchants) + "\n");
 console.log(`${enchants.length} enchants -> ${ENCHANTS_PATH}`);
+
+// Random suffixes whose enchants all made it into enchants.json.
+const enchantIds = new Set(enchants.map((e) => e.id));
+const suffixes: Suffix[] = era.ItemRandomProperties.map((r) => ({
+  id: num(r.ID),
+  name: r.Name_lang!,
+  enchants: [0, 1, 2, 3, 4].map((i) => num(r[`Enchantment_${i}`])).filter((e) => e > 0),
+})).filter((s) => s.enchants.length > 0 && s.enchants.every((e) => enchantIds.has(e)));
+await Bun.write(SUFFIXES_PATH, JSON.stringify(suffixes) + "\n");
+console.log(`${suffixes.length} suffixes -> ${SUFFIXES_PATH}`);
 
 await Bun.write(ITEMS_PATH, JSON.stringify(out) + "\n");
 console.log(`${out.length} items -> ${ITEMS_PATH}`);

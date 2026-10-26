@@ -9,6 +9,13 @@
       "fetchedAt": "2026-10-25T14:17:38.302Z"
     },
     {
+      "file": "Spell.csv",
+      "url": "https://wago.tools/db2/Spell/csv?build=1.60.1.70532",
+      "bytes": 2209387,
+      "sha256": "fd16c218c830f504bb69707acee4fc6fa3168ea04a1180d7348bfae503a2bbdf",
+      "fetchedAt": "2026-10-26T14:21:20.753Z"
+    },
+    {
       "file": "SpellEffect.csv",
       "url": "https://wago.tools/db2/SpellEffect/csv?build=1.60.1.70532",
       "bytes": 3854002,
@@ -301,6 +308,13 @@
       "bytes": 645103,
       "sha256": "613f2474479fab68b342b60d818f9b0a2d4d60c156026ee8b1830fdc2d2d77f1",
       "fetchedAt": "2026-10-25T15:20:58.874Z"
+    },
+    {
+      "file": "classic-era/ItemRandomProperties.csv",
+      "url": "https://wago.tools/db2/ItemRandomProperties/csv?build=1.15.9.70003",
+      "bytes": 69678,
+      "sha256": "66ccb3881f520279ca7f2f9f766a737f3a6c2a849de7ad4d4c3f5affdfdff60a",
+      "fetchedAt": "2026-10-26T15:47:27.720Z"
     }
   ]
 }

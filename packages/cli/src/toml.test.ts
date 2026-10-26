@@ -54,3 +54,14 @@ test("a build search's --out file extends its parent and reads back as the found
   expect(back.rotation).toEqual(rotation);
   expect(back.name).toBe("parent, build search");
 });
+
+test("a new family's ability list replaces the parent's in a build search's --out file", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "hunter-sim-"));
+  const parentPath = join(dir, "parent.toml");
+  await Bun.write(parentPath, ['race = "Orc"', "[pet]", "active = true", 'family = "Cat"', 'abilities = ["claw"]'].join("\n"));
+  const parent = await loadConfig(parentPath);
+  const build: Build = { talents: {}, pet: "Wolf", style: { position: "ranged", weaveDelayMs: 0 } };
+  const out = join(dir, "best.toml");
+  await Bun.write(out, buildToml(parent, parentPath, out, build, { actions: [] }, "note", ["bite"]));
+  expect((await loadConfig(out)).pet).toEqual({ active: true, family: "Wolf", abilities: ["bite"] });
+});

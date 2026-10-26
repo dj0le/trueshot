@@ -141,7 +141,7 @@ export function optimize(game: GameData, config: SimConfigInput, opts: OptimizeO
   const { genes: fromConfig, dropped } = actionsToGenes(config.rotation.actions);
   for (const d of dropped) log(`note: condition not searchable, dropped: ${d}`);
   const present = new Set(fromConfig.map((g) => g.action));
-  const known = buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse(config)).abilities;
+  const known = buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse(config), game.suffixes).abilities;
   const start = [
     ...fromConfig,
     ...opts.pool.filter((a) => !present.has(a) && known.has(a)).map((action) => ({ action, enabled: false, terms: [] })),

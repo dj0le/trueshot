@@ -1,0 +1,120 @@
+# Beta dungeon boss levels from the ForeverDungeonJournal addon (Data/Bosses.lua, FDJ.BOSS_LEVELS),
+# whose SOURCES.txt credits wowforevertalents.com, foreverchanges.pro and wowf.io. Ranges like "26-27"
+# are kept as written. Used by `sim beta` with calibration/foreverlogs-beta.toml.
+
+["Excavation Site: Wetlands"]
+"Saltspine" = "28"
+"Shadetooth" = "29"
+"Relic Guardian" = "31"
+
+["City of Dalaran"]
+"Atrexis the Grave Knight" = "29"
+"Arcane Anomaly" = "30"
+"Unstable Sentinel" = "31"
+"Fel Ancient" = "32"
+"Mana Devourer" = "31"
+"Arcanic Enigma" = "30"
+"Shade of the Archmage" = "33"
+
+["Gnomeregan"]
+"Grubbis" = "32"
+"Viscous Fallout" = "30"
+"Electrocutioner 6000" = "32"
+"Crowd Pummeler 9-60" = "32"
+"Mekgineer Thermaplugg" = "34"
+"Dark Iron Ambassador" = "33"
+
+["Razorfen Kraul"]
+"Roogug" = "28"
+"Aggem Thorncurse" = "30"
+"Death Speaker Jargba" = "30"
+"Overlord Ramtusk" = "32"
+"Agathelos the Raging" = "33"
+"Charlga Razorflank" = "33"
+"Blind Hunter" = "32"
+"Earthcaller Halmgar" = "32"
+
+["Scarlet Monastery: Graveyard"]
+"Interrogator Vishas" = "32"
+"Azshir the Sleepless" = "33"
+"Fallen Champion" = "33"
+"Ironspine" = "33"
+"Bloodmage Thalnos" = "34"
+
+["Scarlet Monastery: Library"]
+"Houndmaster Loksey" = "34"
+"Arcanist Doan" = "37"
+
+["Hall of Thanes"]
+"Faldrim Anvilmar" = "16"
+"Magmatus" = "16"
+"Plunder" = "16"
+"Durgen Dirgehammer" = "16"
+
+["Ruins of Lordaeron"]
+"The Baron" = "17"
+"Witherfang" = "17"
+"The Abandoned" = "18"
+"Bjork" = "19"
+"Rath'mael" = "20"
+"Viktor the Vile" = "19"
+"Lordaeron Captain" = "19"
+
+["Ragefire Chasm"]
+"Oggleflint" = "16"
+"Taragaman the Hungerer" = "16"
+"Jergosh the Invoker" = "16"
+"Bazzalan" = "16"
+
+["The Deadmines"]
+"Rhahk'Zor" = "19"
+"Miner Johnson" = "19"
+"Sneed's Shredder" = "20"
+"Sneed" = "20"
+"Gilnid" = "20"
+"Mr. Smite" = "20"
+"Captain Greenskin" = "20"
+"Edwin VanCleef" = "21"
+"Cookie" = "20"
+
+["Wailing Caverns"]
+"Lord Cobrahn" = "20"
+"Lady Anacondra" = "20"
+"Kresh" = "20"
+"Lord Pythas" = "21"
+"Skum" = "21"
+"Lord Serpentis" = "21"
+"Verdan the Everliving" = "21"
+"Mutanus the Devourer" = "22"
+"Deviate Faerie Dragon" = "20"
+
+["Shadowfang Keep"]
+"Rethilgore" = "20"
+"Fel Steed / Shadow Charger" = "19-21"
+"Razorclaw the Butcher" = "22"
+"Baron Silverlaine" = "24"
+"Commander Springvale" = "24"
+"Odo the Blindwatcher" = "24"
+"Deathsworn Captain" = "25"
+"Arugal's Voidwalker" = "24-25"
+"Fenrus the Devourer" = "25"
+"Wolf Master Nandos" = "25"
+"Archmage Arugal" = "24"
+
+["The Stockade"]
+"Targorr the Dread" = "24"
+"Kam Deepfury" = "27"
+"Hamhock" = "28"
+"Dextren Ward" = "26"
+"Bazil Thredd" = "29"
+"Bruegal Ironknuckle" = "26"
+
+["Blackfathom Deeps"]
+"Ghamoo-ra" = "25"
+"Lady Sarevess" = "25"
+"Gelihast" = "26"
+"Lorgus Jett" = "26"
+"Baron Aquanis" = "28"
+"Old Serra'kis" = "26"
+"Twilight Lord Kelris" = "27"
+"Aku'mai" = "28"

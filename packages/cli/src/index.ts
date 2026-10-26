@@ -1,16 +1,22 @@
 // hunter-sim command line; USAGE below lists the commands.
 import { parseArgs } from "node:util";
-import { type GameData, loadGameData, unconfirmed } from "@hunter-sim/data";
+import { type ActorLog, actors, type GameData, hitsBy, hunters, loadGameData, parseLog, unconfirmed } from "@hunter-sim/data";
 import {
   actionValues,
   compareResults,
   configBuild,
+  defaultPetAbilities,
+  SimConfig,
+
   describeBuild,
   optimize,
   optimizeBuild,
   petSweep,
+  specTree,
+
   simulate,
   snake,
+  specOf,
   statWeights,
   type SimConfigInput,
   type SimResult,
@@ -57,15 +63,21 @@ function print(r: SimResult): void {
 
 const USAGE = [
   "usage:",
+  "  every command that runs fights takes --fight <preset>, a fight length from overrides.toml [fights]",
+  "  (dungeon-trash-30, dungeon-boss-30, dungeon-trash-60, dungeon-boss-60, raid-boss)",
   "  bun run sim run <config.toml> [--iterations N] [--seed S]",
   "  bun run sim compare <base.toml> <variant.toml>... [--iterations N] [--seed S]",
   "  bun run sim value <config.toml> [--iterations N]      what each rotation action is worth",
   "  bun run sim weights <config.toml> [--iterations N]",
   "  bun run sim optimize <config.toml> [--budget N] [--iterations N] [--pool a,b] [--out file.toml]",
   "  bun run sim pets <config.toml> [--iterations N]       every pet family, and none, with these talents",
+  "  bun run sim calibrate <calibration.toml> <config.toml>  damage shares against recorded fights",
+  "  bun run sim log <WoWCombatLog.txt> [--actor name]     hunters and pets in a combat log; --actor lists every hit",
+  "  bun run sim beta <config.toml>...                     each config against the beta dungeon bosses, next to Forever Logs parses",
   "  bun run sim enchants <text>                           enchant ids for gear.enchants, by name",
-  "  bun run sim build <config.toml> [--budget N] [--rotation-budget N] [--rounds N] [--iterations N] [--keep-pet] [--keep-style] [--out file.toml]",
-  "                                                        talents, pet, play style and rotation searched together",
+  "  bun run sim build <config.toml> [--budget N] [--rotation-budget N] [--rounds N] [--iterations N] [--keep-pet] [--keep-style] [--spec bm|mm|sv] [--out file.toml]",
+  "                                                        talents, pet, play style and rotation searched together;",
+  "                                                        --spec keeps the most points in that tree",
 ].join("\n");
 
 // Damage and cooldown actions the optimizer may add even when the starting rotation leaves them
@@ -127,6 +139,142 @@ function printDiff(base: SimResult, other: SimResult): void {
   );
 }
 
+function printActor(a: ActorLog, label: string): void {
+  console.log(`\n${label} ${a.name} (${a.guid}), level ${[...a.levels].sort((x, y) => x - y).join(", ") || "unknown"}`);
+  console.log(
+    table([
+      ["Ability", "Damage", "Hits", "Crits", "Glances", "Misses", "Avg"],
+      ...[...a.abilities.values()]
+        .sort((x, y) => y.damage - x.damage)
+        .map((s) => {
+          const landed = s.hits + s.crits + s.glances;
+          const misses = Object.entries(s.missTypes).map(([t, n]) => `${n} ${t.toLowerCase()}`).join(", ");
+          return [s.name, String(s.damage), String(s.hits), String(s.crits), String(s.glances), misses || "0", landed ? fmt(s.damage / landed) : ""];
+        }),
+    ]),
+  );
+}
+
+// The hunters in a combat log and their pets, or every hit of one unit (by name or guid).
+function printLog(text: string, actor: string | undefined): void {
+  const events = parseLog(text);
+  const all = actors(events);
+  if (!actor) {
+    for (const { guid, hunter, pets } of hunters(all, events)) {
+      if (hunter) printActor(hunter, "Hunter");
+      else console.log(`\nHunter ${guid}: no damage of its own in the log`);
+      for (const pet of pets) printActor(pet, "  Pet");
+    }
+    return;
+  }
+  const matches = [...all.values()].filter((a) => a.guid === actor || a.name.toLowerCase() === actor.toLowerCase());
+  for (const a of matches) {
+    printActor(a, a.owner ? `Pet of ${all.get(a.owner)?.name ?? a.owner}:` : "Unit");
+    console.log(
+      table([
+        ["Time", "Ability", "Target", "Amount", "Before armor", "", "Level", "AP"],
+        ...hitsBy(events, a.guid).map((h) => [
+          fmt(h.timeMs / 1000),
+          h.ability,
+          h.target,
+          String(h.amount),
+          String(h.unmitigated),
+          h.critical ? "crit" : h.glancing ? "glance" : "",
+          h.level ? String(h.level) : "",
+          h.attackPower ? String(h.attackPower) : "",
+        ]),
+      ], 3),
+    );
+  }
+  if (matches.length === 0) console.log(`no unit named ${actor}`);
+}
+
+const CALIBRATION = new URL("../../data/calibration/", import.meta.url).pathname;
+
+type DungeonParses = { name: string; hunter: Record<string, { parses: number; min: number; p25: number; median: number; p75: number; p90: number; max: number }> };
+
+// Where a DPS lands among parses, as a percentile read off the known points.
+function percentileOf(dps: number, p: DungeonParses["hunter"][string]): number {
+  const points: [number, number][] = [[0, p.min], [25, p.p25], [50, p.median], [75, p.p75], [90, p.p90], [100, p.max]];
+  if (dps <= p.min) return 0;
+  for (let i = 1; i < points.length; i++) {
+    const [pa, a] = points[i - 1]!;
+    const [pb, b] = points[i]!;
+    if (dps <= b) return b === a ? pb : pa + ((pb - pa) * (dps - a)) / (b - a);
+  }
+  return 100;
+}
+
+// A config against each beta dungeon near its level: the target at the dungeon's mean boss level,
+// its spec's Forever Logs parses alongside. Parses carry no level or gear, so this is a range check.
+async function beta(game: GameData, config: SimConfigInput, path: string): Promise<void> {
+  const dungeons = (Bun.TOML.parse(await Bun.file(`${CALIBRATION}foreverlogs-beta.toml`).text()) as { dungeon: DungeonParses[] }).dungeon;
+  const levels = Bun.TOML.parse(await Bun.file(`${CALIBRATION}beta-boss-levels.toml`).text()) as Record<string, Record<string, string>>;
+  const level = SimConfig.parse(config).level;
+  const spec = specOf(game.data, config.talents ?? {});
+  console.log(`\n${config.name ?? path}: ${spec ?? "no spec"}, level ${level}`);
+  const rows: string[][] = [["Dungeon", "Boss level", "Sim DPS", "Parses", "p25", "Median", "p75", "p90", "Sim percentile"]];
+  for (const d of dungeons) {
+    const parses = spec ? d.hunter[spec] : undefined;
+    const bossLevels = Object.values(levels[d.name] ?? {}).map((l) => l.split("-").map(Number)).map((r) => (r[0]! + r.at(-1)!) / 2);
+    if (!parses || bossLevels.length === 0) continue;
+    const bossLevel = Math.round(bossLevels.reduce((a, b) => a + b, 0) / bossLevels.length);
+    if (bossLevel < level - 6 || bossLevel > level + 5) continue;
+    const { armor: _, ...target } = config.target ?? {};
+    const r = simulate(game, { ...config, target: { ...target, level: bossLevel } });
+    rows.push([
+      d.name,
+      String(bossLevel),
+      fmt(r.dps.mean),
+      String(parses.parses),
+      fmt(parses.p25),
+      fmt(parses.median),
+      fmt(parses.p75),
+      fmt(parses.p90),
+      fmt(percentileOf(r.dps.mean, parses), 0),
+    ]);
+  }
+  console.log(table(rows));
+  console.log("Forever Logs (https://foreverlogs.gg), beta, boss damage only");
+}
+
+// A fight recorded from a damage meter: its length, the target where known, and damage by ability.
+type RecordedFight = { name: string; durationSec: number; targetLevel?: number; targetArmor?: number; abilities: Record<string, number> };
+
+// Each recorded fight simmed at its own length and target, its damage shares next to the meter's,
+// then all fights pooled. Only abilities the meter lists count toward the shares on both sides.
+async function calibrate(game: GameData, path: string, config: SimConfigInput): Promise<void> {
+  const fights = (Bun.TOML.parse(await Bun.file(path).text()) as { fight: RecordedFight[] }).fight;
+  const pooled = new Map<string, { real: number; sim: number }>();
+  for (const f of fights) {
+    const target = { ...config.target, ...(f.targetLevel ? { level: f.targetLevel } : {}), ...(f.targetArmor !== undefined ? { armor: f.targetArmor } : {}) };
+    const { preset: _, ...fight } = config.fight ?? {};
+    const r = simulate(game, { ...config, target, fight: { ...fight, durationSec: f.durationSec, durationVariancePct: 0 } });
+    const realTotal = Object.values(f.abilities).reduce((a, b) => a + b, 0);
+    const listed = r.abilities.filter((a) => a.name in f.abilities);
+    const simTotal = listed.reduce((s, a) => s + a.dps, 0);
+    const unlisted = r.abilities.filter((a) => !(a.name in f.abilities) && a.dps > 0).map((a) => a.name);
+    console.log(`
+${f.name}, ${f.durationSec} sec: meter ${fmt(realTotal / f.durationSec)} DPS, sim ${fmt(r.dps.mean)} DPS`);
+    const rows = Object.entries(f.abilities).map(([name, dmg]) => {
+      const sim = (r.abilities.find((a) => a.name === name)?.dps ?? 0) / simTotal;
+      const p = pooled.get(name) ?? { real: 0, sim: 0 };
+      pooled.set(name, { real: p.real + dmg / realTotal, sim: p.sim + sim });
+      return [name, `${fmt((100 * dmg) / realTotal)}%`, `${fmt(100 * sim)}%`];
+    });
+    console.log(table([["Ability", "Meter", "Sim"], ...rows]));
+    if (unlisted.length) console.log(`sim only, left out of the shares: ${unlisted.join(", ")}`);
+  }
+  console.log(`
+Average share over ${fights.length} fights`);
+  console.log(
+    table([
+      ["Ability", "Meter", "Sim", "Sim / meter"],
+      ...[...pooled].map(([name, p]) => [name, `${fmt((100 * p.real) / fights.length)}%`, `${fmt((100 * p.sim) / fights.length)}%`, p.real ? fmt(p.sim / p.real, 2) : ""]),
+    ]),
+  );
+}
+
 async function main(argv: string[]): Promise<void> {
   const { values: flags, positionals } = parseArgs({
     args: argv,
@@ -141,6 +289,9 @@ async function main(argv: string[]): Promise<void> {
       "keep-style": { type: "boolean" },
       pool: { type: "string" },
       out: { type: "string" },
+      spec: { type: "string" },
+      fight: { type: "string" },
+      actor: { type: "string" },
     },
   });
   const [command, ...paths] = positionals;
@@ -191,7 +342,7 @@ async function main(argv: string[]): Promise<void> {
       ]),
     );
   } else if (command === "optimize" && paths.length === 1) {
-    const config = await loadConfig(paths[0]!);
+    const config = await loadConfig(paths[0]!, { fight: flags.fight });
     const result = optimize(game, config, {
       pool: flags.pool?.split(",") ?? poolFor(game, config),
       iterations: Number(flags.iterations ?? 300),
@@ -219,6 +370,12 @@ async function main(argv: string[]): Promise<void> {
       await Bun.write(out, `${head}\n\n${toml}\n`);
       console.log(`\nwrote ${out}`);
     }
+  } else if (command === "calibrate" && paths.length === 2) {
+    await calibrate(game, paths[0]!, await loadConfig(paths[1]!, flags));
+  } else if (command === "beta" && paths.length >= 1) {
+    for (const path of paths) await beta(game, await loadConfig(path, flags), path);
+  } else if (command === "log" && paths.length === 1) {
+    printLog(await Bun.file(paths[0]!).text(), flags.actor);
   } else if (command === "enchants" && paths.length >= 1) {
     const text = paths.join(" ").toLowerCase();
     const rows = [...game.enchants.values()].filter((e) => e.name.toLowerCase().includes(text));
@@ -244,10 +401,10 @@ async function main(argv: string[]): Promise<void> {
       ]),
     );
   } else if (command === "build" && paths.length === 1) {
-    const config = await loadConfig(paths[0]!);
+    const config = await loadConfig(paths[0]!, { fight: flags.fight });
     const iterations = Number(flags.iterations ?? 300);
     const result = optimizeBuild(game, config, {
-      build: { iterations, budget: Number(flags.budget ?? 400), mutantsPerRound: 8, climbs: 3, pets: !flags["keep-pet"], styles: !flags["keep-style"] },
+      build: { iterations, budget: Number(flags.budget ?? 400), mutantsPerRound: 8, climbs: 3, pets: !flags["keep-pet"], styles: !flags["keep-style"], spec: specTree(flags.spec) },
       rotation: { pool: poolFor(game, config), iterations, budget: Number(flags["rotation-budget"] ?? 150), mutantsPerRound: 8, confirmIterations: 3000 },
       rounds: Number(flags.rounds ?? 2),
       taught: TAUGHT,
@@ -264,11 +421,11 @@ async function main(argv: string[]): Promise<void> {
     print(c.after);
     const out = flags.out;
     if (out) {
-      if (config.pet?.abilities && result.build.pet !== configBuild(config).pet) {
-        console.log(`\nnote: ${paths[0]} sets pet.abilities for its own family; edit them in ${out}`);
-      }
+      // The parent's pet ability list names its own family's abilities; a new family gets its default.
+      const pet = result.build.pet;
+      const petAbilities = config.pet?.abilities && pet && pet !== configBuild(config).pet ? defaultPetAbilities(game.data, pet, SimConfig.parse(config).level) : undefined;
       const note = `Found by \`sim build ${paths[0]}\` (${new Date().toISOString().slice(0, 10)}): ${signed(c.pct, 2)}% DPS on ${c.after.iterations} fresh fights.`;
-      await Bun.write(out, buildToml(config, paths[0]!, out, result.build, result.best.rotation, note));
+      await Bun.write(out, buildToml(config, paths[0]!, out, result.build, result.best.rotation, note, petAbilities));
       console.log(`\nwrote ${out}`);
     }
   } else {

@@ -57,6 +57,8 @@ export const SimConfig = z.object({
     // Enchants by slot, as SpellItemEnchantment ids (generated/enchants.json). A scope's damage
     // goes on the ranged weapon.
     enchants: z.record(z.enum(GEAR_SLOTS), z.number().int()).default({}),
+    // Random suffixes by slot ("of Agility" items), as suffix ids (generated/suffixes.json).
+    suffixes: z.record(z.enum(GEAR_SLOTS), z.number().int()).default({}),
     stats: Stats,
     // Needed when no ranged item is listed.
     rangedWeapon: z.object({ min: z.number(), max: z.number(), speed: z.number() }).optional(),
@@ -112,9 +114,12 @@ export const SimConfig = z.object({
     .default({}),
   fight: z
     .object({
-      durationSec: z.number().positive().default(180),
+      // A fight-length preset from overrides.toml [fights] (dungeon-boss-30, raid-boss, ...), which
+      // durationSec and durationVariancePct override. Without either, 180 sec every fight.
+      preset: z.string().optional(),
+      durationSec: z.number().positive().optional(),
       // Each iteration's length is drawn uniformly within this many percent of durationSec.
-      durationVariancePct: z.number().min(0).max(50).default(0),
+      durationVariancePct: z.number().min(0).max(50).optional(),
       iterations: z.number().int().positive().default(1000),
       seed: z.string().default("hunter-sim"),
     })

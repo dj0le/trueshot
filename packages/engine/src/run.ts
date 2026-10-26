@@ -39,12 +39,25 @@ function summarize(xs: number[]): { mean: number; stdDev: number; error95: numbe
   return { mean, stdDev, error95: (1.96 * stdDev) / Math.sqrt(n) };
 }
 
+// A fight's length and spread: the config's own values, then its preset's, then 180 sec flat.
+export function fightLength(game: GameData, fight: SimConfig["fight"]): { durationSec: number; durationVariancePct: number } {
+  const preset = fight.preset === undefined ? undefined : game.overrides.fights[fight.preset];
+  if (fight.preset !== undefined && !preset) {
+    throw new Error(`fight: unknown preset "${fight.preset}"; known: ${Object.keys(game.overrides.fights).join(", ")}`);
+  }
+  return {
+    durationSec: fight.durationSec ?? preset?.durationSec ?? 180,
+    durationVariancePct: fight.durationVariancePct ?? preset?.durationVariancePct ?? 0,
+  };
+}
+
 export function simulate(game: GameData, input: SimConfigInput): SimResult {
   const config = SimConfig.parse(input);
-  const ch = buildCharacter(game.data, game.overrides, game.items, game.enchants, config);
+  const ch = buildCharacter(game.data, game.overrides, game.items, game.enchants, config, game.suffixes);
   const rotation = new Rotation(ch, game);
   const unimplemented = new Set<string>();
-  const { durationSec, durationVariancePct, iterations, seed } = config.fight;
+  const { iterations, seed } = config.fight;
+  const { durationSec, durationVariancePct } = fightLength(game, config.fight);
   const lengths = new Stream(`${seed}/fight-length`);
 
   const dps: number[] = [];

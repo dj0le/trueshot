@@ -6,6 +6,8 @@ export const WOWF_BUILD = "1.60.1.70532";
 export const DB2_TABLES = [
   // Spells
   "SpellName",
+  // Descriptions: whether an item's equip proc is "a chance" (its rate set by the server).
+  "Spell",
   "SpellEffect",
   "SpellMisc",
   "SpellLevels",
@@ -57,7 +59,8 @@ export const DB2_TABLES = [
 // Classic Era client: cross-checks the item formulas, and supplies stats for Forever items the
 // client does not ship (the server sends those), on the assumption they are unchanged.
 export const CLASSIC_ERA_BUILD = "1.15.9.70003";
-export const CLASSIC_ERA_TABLES = ["ItemSparse", "ItemEffect"] as const;
+// Random suffixes ("of Agility") too: Forever's client has no ItemRandomProperties table.
+export const CLASSIC_ERA_TABLES = ["ItemSparse", "ItemEffect", "ItemRandomProperties"] as const;
 
 // The one trait tree holding all three hunter talent trees, laid out side by side.
 export const HUNTER_TRAIT_TREE_ID = "1091";

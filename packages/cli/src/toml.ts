@@ -20,19 +20,36 @@ export async function readToml(path: string, seen: string[] = []): Promise<Table
   return merge(await readToml(resolve(dirname(path), parent), [...seen, path]), own);
 }
 
-export async function loadConfig(path: string, fight: { iterations?: string | undefined; seed?: string | undefined } = {}): Promise<SimConfigInput> {
+// fight.fight: a fight-length preset that replaces the config's own length and spread.
+export async function loadConfig(
+  path: string,
+  fight: { iterations?: string | undefined; seed?: string | undefined; fight?: string | undefined } = {},
+): Promise<SimConfigInput> {
   const config = (await readToml(resolve(path))) as SimConfigInput;
   config.fight = { ...config.fight };
   if (fight.iterations) config.fight.iterations = Number(fight.iterations);
   if (fight.seed) config.fight.seed = fight.seed;
+  if (fight.fight) {
+    const { durationSec: _, durationVariancePct: __, ...rest } = config.fight;
+    config.fight = { ...rest, preset: fight.fight };
+  }
   return config;
 }
 
 const tomlString = (s: string) => JSON.stringify(s);
 
 // A variant of `parent` with a build search's result: every talent is written, the parent's
-// dropped ones as 0, since tables merge key by key.
-export function buildToml(parent: SimConfigInput, parentPath: string, out: string, build: Build, rotation: SimConfigInput["rotation"], note: string): string {
+// dropped ones as 0, since tables merge key by key. petAbilities replaces the parent's pet ability
+// list, which would otherwise carry over to a new family.
+export function buildToml(
+  parent: SimConfigInput,
+  parentPath: string,
+  out: string,
+  build: Build,
+  rotation: SimConfigInput["rotation"],
+  note: string,
+  petAbilities?: string[],
+): string {
   const talents = { ...Object.fromEntries(Object.keys(parent.talents ?? {}).map((t) => [t, 0])), ...build.talents };
   return [
     `# ${note}`,
@@ -49,6 +66,8 @@ export function buildToml(parent: SimConfigInput, parentPath: string, out: strin
     "[pet]",
     `active = ${build.pet !== null}`,
     ...(build.pet ? [`family = ${tomlString(build.pet)}`] : []),
+    ...(build.pet && petAbilities ? [`abilities = [${petAbilities.map(tomlString).join(", ")}]`] : []),
+
     "",
     "[rotation]",
     `precombat = [${(rotation.precombat ?? []).map(tomlString).join(", ")}]`,

@@ -66,6 +66,8 @@ const Overrides = z.object({
   }),
   // Target presets as levels above the hunter; the attack table follows from the difference.
   targets: z.record(z.object({ levelOffset: z.number().int(), ...provenance })),
+  // Fight-length presets: a typical length, and how far each fight strays from it either way.
+  fights: z.record(z.object({ durationSec: z.number().positive(), durationVariancePct: z.number().min(0).max(50), ...provenance })),
   pet: z.object({
     inheritRangedAttackPowerPct: Value,
     // Damage per 2.0 sec swing at base attack power, per pet level.

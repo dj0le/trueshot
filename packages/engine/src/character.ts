@@ -1,6 +1,6 @@
 // Turns a config into a character: validated talents, the spells it knows, and its stats before
 // any in-combat auras. Pure: everything comes in as arguments.
-import { atLevel, type Enchant, type HunterData, type Item, type Overrides, type Spell, type SpellEffect, type Talent } from "@hunter-sim/data";
+import { atLevel, type Enchant, type HunterData, type Item, type Overrides, type Spell, type SpellEffect, type Suffix, type Talent } from "@hunter-sim/data";
 import { Aura, Stat } from "./enums";
 import type { GEAR_SLOTS, SimConfig, StatBlock } from "./config";
 
@@ -71,6 +71,7 @@ const SLOT_TYPES: Record<(typeof GEAR_SLOTS)[number], number[]> = {
 function gearStats(
   items: Map<number, Item>,
   enchants: Map<number, Enchant>,
+  suffixes: Map<number, Suffix>,
   overrides: Overrides,
   config: SimConfig,
 ): { stats: StatBlock; rangedWeapon: Character["rangedWeapon"] | undefined; weaponDamage: Partial<Record<string, number>>; notes: string[] } {
@@ -105,6 +106,12 @@ function gearStats(
     // have nothing to run.
     const unrun = item.unparsedEquip.length - item.passiveSpells.length;
     if (unrun > 0) notes.push(`${item.name}: ${unrun} equip effect(s) with no client effects, not simulated`);
+  }
+  for (const [slot, id] of Object.entries(config.gear.suffixes) as [keyof typeof SLOT_TYPES, number][]) {
+    const suffix = suffixes.get(id);
+    if (!suffix) throw new Error(`gear: suffix ${id} on ${slot} is not in suffixes.json`);
+    if (!config.gear.items[slot]) throw new Error(`gear: suffix ${suffix.name} on ${slot}, which has no item`);
+    for (const e of suffix.enchants) add(enchants.get(e)!.stats);
   }
   for (const [slot, id] of Object.entries(config.gear.enchants) as [keyof typeof SLOT_TYPES, number][]) {
     const enchant = enchants.get(id);
@@ -247,6 +254,7 @@ export function buildCharacter(
   items: Map<number, Item>,
   enchants: Map<number, Enchant>,
   config: SimConfig,
+  suffixes: Map<number, Suffix> = new Map(),
 ): Character {
   const f = overrides.formula;
   const lv = overrides.levels;
@@ -320,7 +328,7 @@ export function buildCharacter(
     }
   }
 
-  const worn = gearStats(items, enchants, overrides, config);
+  const worn = gearStats(items, enchants, suffixes, overrides, config);
   const gear = worn.stats;
   const buffs = config.buffs;
   const rangedWeapon = worn.rangedWeapon ?? config.gear.rangedWeapon;

@@ -34,6 +34,24 @@ const focusCost = (s: Spell) => s.power.find((p) => p.type === 2)?.cost ?? 0;
 
 const isBuff = (e: ResolvedEffect) => e.effect === Effect.ApplyAura && BUFF_TARGETS.has(e.implicitTarget[0]) && DAMAGE_BUFFS.has(e.aura) && e.value > 0;
 
+// The pet abilities a family knows at a level, by snake_case name.
+function knownAbilities(data: HunterData, family: PetFamily, level: number): Map<string, Spell> {
+  const known = new Map<string, Spell>();
+  for (const a of data.abilities) {
+    if (a.tab !== "Pets" || !family.abilities.includes(a.name)) continue;
+    const spell = knownRank(data, a, level);
+    if (spell) known.set(snake(a.name), spell);
+  }
+  return known;
+}
+
+// A family's default autocast at a level, what pet.abilities falls back to.
+export function defaultPetAbilities(data: HunterData, familyName: string, level: number): string[] {
+  const family = data.petFamilies.find((f) => f.name === familyName);
+  if (!family) throw new Error(`pet: unknown family "${familyName}"`);
+  return defaultPriority(knownAbilities(data, family, level));
+}
+
 // The default autocast: every ability that deals damage or raises the pet's damage. Buffs first,
 // then damage by cooldown, longest first, so the cheap filler (Claw) takes what is left. Openers
 // that need stealth or a run-up (Prowl, Charge) stay off.
@@ -74,7 +92,7 @@ export class Pet {
   // The pet's DoTs on the target. Reapplying one replaces it.
   private readonly dots: AuraSet;
   private readonly abilities: Spell[];
-  private readonly known = new Map<string, Spell>();
+  private readonly known: Map<string, Spell>;
   private wakeAt = -1;
 
   constructor(
@@ -98,12 +116,7 @@ export class Pet {
     this.auras = new AuraSet(host.queue, [...host.hawkAuras.passives, familyPassive]);
     this.dots = new AuraSet(host.queue);
 
-    const known = this.known;
-    for (const a of data.abilities) {
-      if (a.tab !== "Pets" || !family.abilities.includes(a.name)) continue;
-      const spell = knownRank(data, a, stats.level);
-      if (spell) known.set(snake(a.name), spell);
-    }
+    const known = (this.known = knownAbilities(data, family, stats.level));
     const order = priority ?? defaultPriority(known);
     for (const name of priority ?? []) {
       if (!known.has(name)) throw new Error(`pet: a ${family.name} does not know "${name}" at level ${stats.level}`);

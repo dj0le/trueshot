@@ -5,3 +5,4 @@ export { Fight, type GameData, type FightResult, type AbilityStats } from "./sim
 export { Rotation } from "./rotation";
 export * from "./optimize";
 export * from "./talents";
+export { defaultPetAbilities } from "./pet";

@@ -31,6 +31,10 @@ export type SpellProc = {
   categoryRecoveryMs: number;
   typeMask: [number, number];
   cumulative: number;
+  // An item proc whose rate the server sets: its tooltip says "a chance", its client chance every hit.
+  serverRate: boolean;
+  // Fires on critical strikes only, as its tooltip says.
+  critOnly: boolean;
 };
 
 export type Spell = {
@@ -150,6 +154,10 @@ export type ItemSet = { id: number; name: string; items: number[]; bonuses: { th
 // parts the build could not turn into stats (procs, threat, odd auras).
 export type Enchant = { id: number; name: string; stats: ItemStats; weaponDamage: number; unparsed: string[] };
 
+// One entry of generated/suffixes.json: a random suffix tier ("of Agility", +5) and the enchants
+// (generated/enchants.json) it puts on the item. From Classic Era; Forever's client lacks the table.
+export type Suffix = { id: number; name: string; enchants: number[] };
+
 // One entry of generated/items.json.
 export type Item = {
   id: number;
@@ -165,10 +173,10 @@ export type Item = {
   subclassId: number;
   stats: ItemStats;
   weapon?: { kind: "ranged" | "thrown" | "oneHand" | "twoHand"; min: number; max: number; speed: number };
-  // On-equip spells (already folded into stats where they are plain stat bonuses) and chance-on-hit spells.
-  equipSpells: number[];
+  // Chance-on-hit spells.
   procSpells: number[];
   // Equip spells that are not plain stats (procs, odd auras): the engine runs them as passives.
+  // Plain stat ones are folded into stats.
   passiveSpells: number[];
   // On-use effects (trinkets): the spell, the item's own cooldown, and the lockout it shares with
   // others of its category (20 sec between trinkets).

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { loadGameData } from "@hunter-sim/data";
-import { buildCharacter, SimConfig, simulate, type SimConfigInput } from "./index";
+import { buildCharacter, fightLength, SimConfig, simulate, type SimConfigInput } from "./index";
 import { attackTable } from "./levels";
 
 const game = await loadGameData();
@@ -627,4 +627,69 @@ test("Lacerating Strikes bleeds 40% of each Mongoose Bite, rolling what is left 
   // bleed's unticked damage is lost when the fight ends.
   expect(bleed / bite).toBeGreaterThan(0.37);
   expect(bleed / bite).toBeLessThanOrEqual(0.4);
+});
+
+test("a proc with an internal cooldown fires at most once per cooldown", () => {
+  // Satchel of Copper Bombs throws a Small Bomb with every Auto Shot; give that proc a 10 sec cooldown.
+  const id = "1318034";
+  const satchel = game.data.spells[id]!;
+  const withCooldown = {
+    ...game,
+    data: { ...game.data, spells: { ...game.data.spells, [id]: { ...satchel, proc: { ...satchel.proc!, categoryRecoveryMs: 10000 } } } },
+  };
+  const config = { ...base, gear: { items: { ranged: 285275 }, stats: { hitPct: 9 } }, fight: { durationSec: 60, iterations: 5 } };
+  const bombs = (g: typeof game) => simulate(g, config).abilities.find((a) => a.name === "Small Bomb")!.castsPerFight;
+  expect(bombs(game)).toBeGreaterThan(20);
+  // One at the first Auto Shot, then one at the first shot 10 sec or more after the last.
+  expect(bombs(withCooldown)).toBeGreaterThanOrEqual(5);
+  expect(bombs(withCooldown)).toBeLessThanOrEqual(6);
+});
+
+test("an equip proc that says \"a chance\" over a client chance of every hit runs at the weapon proc rate", () => {
+  // Hurricane: "Chance to strike your target with a Frost Arrow"; the client chance is 100.
+  const r = simulate(game, { ...base, gear: { items: { ranged: 2824 }, stats: { hitPct: 9 } }, fight: { durationSec: 600, iterations: 20 } });
+  const arrows = r.abilities.find((a) => a.name === "Frost Arrow")!.castsPerFight;
+  const ppm = game.overrides.formula.weaponProcPpm.value;
+  expect(arrows).toBeGreaterThan(ppm * 10 * 0.5);
+  expect(arrows).toBeLessThan(ppm * 10 * 1.5);
+  expect(r.unimplemented.some((u) => u.includes("Frost Arrow: proc rate is set by the server"))).toBe(true);
+});
+
+test("a proc whose tooltip says critical strikes fires on crits only", () => {
+  // Cryptstalker 6 pieces: "Your ranged critical hits cause an Adrenaline Rush, granting you 50 mana".
+  expect(game.data.spells["28752"]!.proc!.critOnly).toBe(true);
+  const six = { head: 22438, shoulder: 22439, chest: 22436, hands: 22441, waist: 22442, legs: 22437 };
+  const arcanes = (g: typeof game, items: Record<string, number>) =>
+    simulate(g, {
+      ...base,
+      gear: { ...base.gear!, items },
+      fight: { durationSec: 180, iterations: 50 },
+      rotation: { actions: [{ action: "arcane_shot" }] },
+    }).abilities.find((a) => a.name === "Arcane Shot")!.castsPerFight;
+  const spell = game.data.spells["28752"]!;
+  const everyHit = { ...game, data: { ...game.data, spells: { ...game.data.spells, "28752": { ...spell, proc: { ...spell.proc!, critOnly: false } } } } };
+  const naked = arcanes(game, {});
+  const onCrits = arcanes(game, six);
+  expect(onCrits).toBeGreaterThan(naked);
+  expect(arcanes(everyHit, six)).toBeGreaterThan(onCrits);
+});
+
+test("a fight-length preset sets the length and spread, and the config's own values win", () => {
+  const boss30 = game.overrides.fights["dungeon-boss-30"]!;
+  expect(fightLength(game, { preset: "dungeon-boss-30", iterations: 1, seed: "x" })).toEqual({ durationSec: boss30.durationSec, durationVariancePct: boss30.durationVariancePct });
+  expect(fightLength(game, { preset: "dungeon-boss-30", durationSec: 90, iterations: 1, seed: "x" }).durationSec).toBe(90);
+  expect(fightLength(game, { iterations: 1, seed: "x" })).toEqual({ durationSec: 180, durationVariancePct: 0 });
+  expect(() => simulate(game, { ...base, fight: { preset: "wipe", iterations: 1 } })).toThrow(/unknown preset/);
+  // Auto Shot alone, so casts follow the length: about 38 sec of shots against 180.
+  const shots = (preset?: string) => simulate(game, { ...base, fight: { ...(preset ? { preset } : {}), iterations: 200 } }).abilities[0]!.castsPerFight;
+  expect(shots("dungeon-boss-30") / shots()).toBeCloseTo(boss30.durationSec / 180, 1);
+});
+
+test("a random suffix adds its enchants' stats to the item's slot", () => {
+  const suffix = [...game.suffixes.values()].find((s) => s.name === "of Agility" && s.enchants.length === 1)!;
+  const agility = game.enchants.get(suffix.enchants[0]!)!.stats.agility!;
+  const ch = (suffixes: Record<string, number>) =>
+    buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({ ...base, gear: { ...base.gear!, items: { head: 252605 }, suffixes } }), game.suffixes);
+  expect(ch({ head: suffix.id }).primary.agility - ch({}).primary.agility).toBe(agility);
+  expect(() => ch({ neck: suffix.id })).toThrow(/no item/);
 });

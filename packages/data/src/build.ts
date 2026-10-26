@@ -70,6 +70,7 @@ const problems: string[] = [];
 
 const db = await tables([
   "SpellName",
+  "Spell",
   "SpellEffect",
   "SpellMisc",
   "SpellLevels",
@@ -101,6 +102,7 @@ const db = await tables([
 ]);
 
 const names = new Map(db.SpellName.map((r) => [r.ID!, r.Name_lang!]));
+const descriptions = new Map(db.Spell.map((r) => [r.ID!, r.Description_lang ?? ""]));
 const effects = bySpell(db.SpellEffect);
 const misc = bySpell(db.SpellMisc);
 const levels = bySpell(db.SpellLevels);
@@ -216,6 +218,8 @@ function buildSpell(id: string): Spell {
           categoryRecoveryMs: num(ao.ProcCategoryRecovery),
           typeMask: [num(ao.ProcTypeMask_0), num(ao.ProcTypeMask_1)],
           cumulative: num(ao.CumulativeAura),
+          serverRate: false,
+          critOnly: false,
         }
       : null,
     classOptions: co
@@ -430,6 +434,8 @@ const itemSets: ItemSet[] = db.ItemSet.flatMap((r) => {
 
 // Spell closure ==============================================================
 
+const items = (await Bun.file(ITEMS_PATH).json()) as Item[];
+
 const wanted = new Set<string>([
   ...abilities.flatMap((a) => a.ranks.map((r) => String(r.spellId))),
   ...talents.map((t) => String(t.spellId)),
@@ -441,7 +447,7 @@ const wanted = new Set<string>([
   ...petFamilies.map((p) => String(p.passiveSpellId)),
   ...itemSets.flatMap((s) => s.bonuses.map((b) => String(b.spellId))),
   // Item effects the engine runs: on-use spells, procs, and equip spells that are not plain stats.
-  ...((await Bun.file(ITEMS_PATH).json()) as Item[]).flatMap((i) =>
+  ...items.flatMap((i) =>
     [...i.useSpells.map((u) => u.spellId), ...i.procSpells, ...i.passiveSpells].map(String),
   ),
 ]);
@@ -463,6 +469,22 @@ for (let depth = 0; depth < TRIGGER_DEPTH && frontier.length > 0; depth++) {
 const spells: Record<string, Spell> = {};
 for (const id of [...wanted].sort((a, b) => num(a) - num(b))) {
   if (names.has(id)) spells[id] = buildSpell(id);
+}
+
+// Procs whose tooltip fires them on critical strikes or hits only (Resourcefulness): the client
+// carries no such condition, the server checks it.
+for (const [id, spell] of Object.entries(spells)) {
+  const procs = spell.effects.some((e) => e.aura === 42); // ProcTriggerSpell
+  if (spell.proc && procs && /\bcritical (strikes|hits)\b/i.test(descriptions.get(id) ?? "")) spell.proc.critOnly = true;
+}
+
+// Item equip procs whose tooltip gives "a chance" while the client says every hit (Hurricane's
+// Frost Arrow): the server sets the rate. Flat additions ("Adds 3 Lightning damage") keep 100%.
+for (const id of new Set(items.flatMap((i) => i.passiveSpells))) {
+  const spell = spells[String(id)];
+  const proc = spell?.proc;
+  const procs = spell?.effects.some((e) => e.aura === 42); // ProcTriggerSpell
+  if (proc && procs && proc.chance >= 100 && proc.ppm === 0 && /\bchance\b/i.test(descriptions.get(String(id)) ?? "")) proc.serverRate = true;
 }
 
 for (const link of LINKS) {

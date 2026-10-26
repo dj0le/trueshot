@@ -135,7 +135,7 @@ source = "Blizzard 15 Oct beta notes, build 70425: stand still 0.5 sec before Au
 [formula.weaponProcPpm]
 value = 1
 confidence = "guess"
-source = "Chance-on-hit weapons (Dark Iron Rifle, Blunderflame Bone Bow): the rate is server-side and not in the client. 1 proc per minute, as Classic weapon procs commonly ran"
+source = "Chance-on-hit weapons (Dark Iron Rifle, Blunderflame Bone Bow) and equip procs that say \"a chance\" over a client chance of 100 (Hurricane, Darkmoon Card: Maelstrom): the rate is server-side and not in the client. 1 proc per minute, as Classic weapon procs commonly ran"
 
 [formula.rangedHasteAffectsCastTime]
 value = 1
@@ -175,6 +175,41 @@ source = "An elite two levels up, like a dungeon mob near the top of its range"
 levelOffset = 3
 confidence = "classic"
 source = "Classic raid bosses are level 63 against level 60 players"
+
+# Fights ====================================================================
+# Fight-length presets (config fight.preset). Each fight's length is drawn within the variance of the
+# typical length, so rotations that only pay off late (holding mana, long cooldowns) are tested on
+# short and long fights alike. Pair them with a target preset: elite for dungeons, boss for raids.
+
+[fights.dungeon-trash-30]
+durationSec = 20
+durationVariancePct = 40
+confidence = "guess"
+source = "Level 30 dungeon trash pulls: about half a boss kill. No timed trash pulls on record yet"
+
+[fights.dungeon-boss-30]
+durationSec = 38
+durationVariancePct = 20
+confidence = "reported"
+source = "Level 30 beta dungeon bosses in a 5-man group died in 35, 40 and 39 sec (calibration/beta-level30.toml); most beta fights on Forever Logs ran under 60 sec"
+
+[fights.dungeon-trash-60]
+durationSec = 25
+durationVariancePct = 40
+confidence = "guess"
+source = "Level 60 dungeon trash pulls: about half a boss kill. Forever launches 2026-11-04; recheck against Forever Logs"
+
+[fights.dungeon-boss-60]
+durationSec = 60
+durationVariancePct = 30
+confidence = "guess"
+source = "Level 60 dungeon bosses in a geared 5-man group: about a minute, as in Classic Era. Recheck against Forever Logs after launch"
+
+[fights.raid-boss]
+durationSec = 180
+durationVariancePct = 25
+confidence = "guess"
+source = "Raid bosses: the sim's 3 min default, within the 1 to 4 min most Classic Era raid kills take. Recheck against Forever Logs after launch"
 
 # Crit lost against higher-level targets. Classic Era and both 1.12 server cores agree on 1% per level
 # (0.2% per point of defense over the attacker's weapon skill).

@@ -3,10 +3,14 @@ import { loadGameData } from "@hunter-sim/data";
 import {
   actionsToGenes,
   configBuild,
+  defaultPetAbilities,
   fillBuild,
   genesToActions,
   optimizeBuild,
   searchBuilds,
+  specOf,
+  specTree,
+
   talentErrors,
   talentPoints,
   withBuild,
@@ -57,6 +61,17 @@ test("the search moves points out of talents that do nothing into ones that do",
   expect(talentErrors(data, 14, r.best.talents).errors).toEqual([]);
 });
 
+test("a spec search starts deep in the spec when the config is not, and keeps every build there", () => {
+  const config = { ...base, level: 30, talents: { "Lethal Attacks": 5 } };
+  expect(specOf(data, config.talents)).toBe("Marksmanship");
+  expect(specOf(data, { "Lethal Attacks": 2, "Endurance Training": 2 })).toBeNull();
+  expect(specTree("sv")).toBe("Survival");
+  const r = searchBuilds(game, config, { iterations: 30, budget: 30, mutantsPerRound: 6, climbs: 1, configOnly: false, pets: false, styles: false, spec: "Survival", seed: "t" });
+  expect(specOf(data, r.best.talents)).toBe("Survival");
+  expect(talentErrors(data, 30, r.best.talents).errors).toEqual([]);
+  expect(() => searchBuilds(game, config, { iterations: 1, budget: 1, mutantsPerRound: 1, climbs: 1, configOnly: true, pets: false, styles: false, spec: "Frost", seed: "t" })).toThrow();
+});
+
 test("a rotation read into genes and back keeps the pet ability its macro sends", () => {
   const actions = [{ action: "intimidation", pet: "bite" }, { action: "serpent_sting", if: "!debuff.serpent_sting.up" }];
   expect(genesToActions(actionsToGenes(actions).genes)).toEqual(actions);
@@ -78,4 +93,9 @@ test("a combined search adds taught abilities, ends on a legal build, and confir
   expect(r.confirm.before.iterations).toBe(40);
   expect(r.confirm.after.iterations).toBe(40);
   expect(r.confirm.delta).toBeCloseTo(r.confirm.after.dps.mean - r.confirm.before.dps.mean, 6);
+});
+
+test("a family's default pet abilities are what it autocasts without a list", () => {
+  expect(defaultPetAbilities(data, "Cat", 60)).toEqual(expect.arrayContaining(["claw", "bite"]));
+  expect(() => defaultPetAbilities(data, "Dragon", 60)).toThrow();
 });

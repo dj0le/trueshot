@@ -1,0 +1,252 @@
+# Hunter DPS on beta dungeon bosses, from Forever Logs (https://foreverlogs.gg), phase 1 (Beta),
+# boss damage only, all difficulties. Written by `bun run foreverlogs`; do not edit by hand.
+# Parses carry no level or gear: the beta capped at 30, but low dungeons were also run below it.
+# Fetched 2026-10-26.
+
+[[dungeon]]
+name = "Blackfathom Deeps"
+bosses = [{ name = "Aku'mai", id = 4829, kills = 6 }, { name = "Old Serra'kis", id = 4830, kills = 7 }, { name = "Lady Sarevess", id = 4831, kills = 6 }, { name = "Twilight Lord Kelris", id = 4832, kills = 8 }, { name = "Ghamoo-ra", id = 4887, kills = 7 }, { name = "Gelihast", id = 6243, kills = 7 }, { name = "Baron Aquanis", id = 6729, kills = 4 }, { name = "Lorgus Jett", id = 12902, kills = 6 }]
+[dungeon.hunter."Marksmanship"]
+parses = 9
+min = 15.38
+p25 = 41.73
+median = 71.47
+p75 = 91.5
+p90 = 95.28
+max = 95.28
+[dungeon.hunter."Beast Mastery"]
+parses = 14
+min = 36.02
+p25 = 48.17
+median = 51.54
+p75 = 59.73
+p90 = 74.36
+max = 83.64
+
+[[dungeon]]
+name = "City of Dalaran"
+bosses = [{ name = "Arcane Anomaly", id = 703298, kills = 13 }, { name = "Fel Ancient", id = 703299, kills = 13 }, { name = "Mana Devourer", id = 703300, kills = 13 }, { name = "Unstable Sentinel", id = 703302, kills = 13 }, { name = "Shade of the Archmage", id = 703303, kills = 13 }, { name = "Lyn the Ignored", id = 703310, kills = 6 }, { name = "Atrexis the Grave Knight", id = 703311, kills = 12 }, { name = "Mana Wraith", id = 703312, kills = 24 }]
+[dungeon.hunter."Beast Mastery"]
+parses = 31
+min = 71.07
+p25 = 103.86
+median = 126.88
+p75 = 145.56
+p90 = 148.99
+max = 182.49
+[dungeon.hunter."Marksmanship"]
+parses = 2
+min = 15.61
+p25 = 15.61
+median = 15.61
+p75 = 56.36
+p90 = 56.36
+max = 56.36
+
+[[dungeon]]
+name = "Deadmines"
+bosses = [{ name = "Edwin VanCleef", id = 639, kills = 14 }, { name = "Sneed", id = 642, kills = 14 }, { name = "Rhahk'zor", id = 644, kills = 13 }, { name = "Captain Greenskin", id = 645, kills = 14 }, { name = "Mr. Smite", id = 646, kills = 14 }, { name = "Cookie", id = 647, kills = 14 }, { name = "Gilnid", id = 1763, kills = 14 }]
+[dungeon.hunter."Marksmanship"]
+parses = 22
+min = 19.52
+p25 = 36.4
+median = 44.34
+p75 = 66.97
+p90 = 77.86
+max = 109.81
+[dungeon.hunter."Beast Mastery"]
+parses = 26
+min = 8.43
+p25 = 16.86
+median = 29.15
+p75 = 40.73
+p90 = 51.81
+max = 127.19
+
+[[dungeon]]
+name = "Excavation Site: Wetlands"
+bosses = [{ name = "Saltspine", id = 703480, kills = 39 }, { name = "Shadetooth", id = 703481, kills = 35 }, { name = "Highland Horror", id = 703644, kills = 22 }, { name = "Relic Guardian", id = 703482, kills = 31 }]
+[dungeon.hunter."Marksmanship"]
+parses = 37
+min = 33.95
+p25 = 73.97
+median = 103.36
+p75 = 150.45
+p90 = 181.68
+max = 200.02
+[dungeon.hunter."Survival"]
+parses = 6
+min = 24.52
+p25 = 48.98
+median = 65.42
+p75 = 144.04
+p90 = 160.46
+max = 160.46
+[dungeon.hunter."Beast Mastery"]
+parses = 27
+min = 31.69
+p25 = 47.4
+median = 69.21
+p75 = 92.08
+p90 = 97.73
+max = 103.1
+
+[[dungeon]]
+name = "Razorfen Kraul"
+bosses = [{ name = "Overlord Ramtusk", id = 4420, kills = 20 }, { name = "Charlga Razorflank", id = 4421, kills = 17 }, { name = "Agathelos the Raging", id = 4422, kills = 15 }, { name = "Roogug", id = 4424, kills = 3 }, { name = "Aggem Thorncurse", id = 4428, kills = 12 }, { name = "Death Speaker Jargba", id = 4430, kills = 13 }]
+[dungeon.hunter."Survival"]
+parses = 6
+min = 130.06
+p25 = 134.82
+median = 157.52
+p75 = 174.18
+p90 = 212.46
+max = 212.46
+[dungeon.hunter."Marksmanship"]
+parses = 18
+min = 33.91
+p25 = 72.93
+median = 89.96
+p75 = 133.7
+p90 = 143.75
+max = 158.59
+[dungeon.hunter."Beast Mastery"]
+parses = 8
+min = 29.37
+p25 = 63.29
+median = 83.16
+p75 = 103.48
+p90 = 120.62
+max = 120.62
+
+[[dungeon]]
+name = "Ruins of Lordaeron"
+bosses = [{ name = "Witherfang", id = 703353, kills = 18 }, { name = "The Abandoned", id = 703357, kills = 18 }, { name = "The Baron", id = 703355, kills = 16 }, { name = "Rath'mael", id = 703354, kills = 17 }, { name = "Lordaeron Captain", id = 703408, kills = 1 }, { name = "Viktor the Vile", id = 703411, kills = 18 }, { name = "Bjork", id = 703412, kills = 17 }]
+[dungeon.hunter."Marksmanship"]
+parses = 13
+min = 22.27
+p25 = 57.98
+median = 62
+p75 = 67.23
+p90 = 71.15
+max = 75.91
+[dungeon.hunter."Beast Mastery"]
+parses = 23
+min = 5.83
+p25 = 29.7
+median = 33.36
+p75 = 49.26
+p90 = 73.49
+max = 77.5
+
+[[dungeon]]
+name = "Scarlet Monastery - Armory"
+bosses = [{ name = "Herod", id = 3975, kills = 1 }]
+[dungeon.hunter."Beast Mastery"]
+parses = 1
+min = 35.74
+p25 = 35.74
+median = 35.74
+p75 = 35.74
+p90 = 35.74
+max = 35.74
+
+[[dungeon]]
+name = "Scarlet Monastery - Graveyard"
+bosses = [{ name = "Interrogator Vishas", id = 3983, kills = 31 }, { name = "Bloodmage Thalnos", id = 4543, kills = 18 }]
+[dungeon.hunter."Survival"]
+parses = 8
+min = 103.33
+p25 = 107.15
+median = 126.13
+p75 = 135.36
+p90 = 171.36
+max = 171.36
+[dungeon.hunter."Beast Mastery"]
+parses = 14
+min = 59.09
+p25 = 74.84
+median = 102.5
+p75 = 119.83
+p90 = 128.37
+max = 136.2
+
+[[dungeon]]
+name = "Shadowfang Keep"
+bosses = [{ name = "Razorclaw the Butcher", id = 3886, kills = 25 }, { name = "Baron Silverlaine", id = 3887, kills = 25 }, { name = "Rethilgore", id = 3914, kills = 23 }, { name = "Wolf Master Nandos", id = 3927, kills = 13 }, { name = "Fenrus the Devourer", id = 4274, kills = 13 }, { name = "Archmage Arugal", id = 4275, kills = 13 }, { name = "Commander Springvale", id = 4278, kills = 25 }, { name = "Odo the Blindwatcher", id = 4279, kills = 13 }]
+[dungeon.hunter."Survival"]
+parses = 14
+min = 8.78
+p25 = 17.45
+median = 23.31
+p75 = 145.16
+p90 = 174.62
+max = 241.21
+[dungeon.hunter."Beast Mastery"]
+parses = 15
+min = 16.96
+p25 = 28.7
+median = 51.3
+p75 = 72.97
+p90 = 82.35
+max = 86.33
+[dungeon.hunter."Marksmanship"]
+parses = 8
+min = 18.65
+p25 = 27.38
+median = 27.97
+p75 = 43.8
+p90 = 69.4
+max = 69.4
+
+[[dungeon]]
+name = "The Hall of Thanes"
+bosses = [{ name = "Faldrim Anvilmar", id = 703493, kills = 3 }, { name = "Plunder", id = 703494, kills = 3 }, { name = "Durgen Dirgehammer", id = 703496, kills = 3 }]
+[dungeon.hunter."Marksmanship"]
+parses = 5
+min = 22.09
+p25 = 48.77
+median = 60.93
+p75 = 65.92
+p90 = 104.34
+max = 104.34
+
+[[dungeon]]
+name = "The Stockade"
+bosses = [{ name = "Kam Deepfury", id = 1663, kills = 11 }, { name = "Targorr the Dread", id = 1666, kills = 11 }, { name = "Hamhock", id = 1685, kills = 13 }, { name = "Dextren Ward", id = 1696, kills = 13 }, { name = "Bazil Thredd", id = 1716, kills = 13 }]
+[dungeon.hunter."Survival"]
+parses = 8
+min = 53.06
+p25 = 60.95
+median = 74.93
+p75 = 120.96
+p90 = 163.44
+max = 163.44
+[dungeon.hunter."Beast Mastery"]
+parses = 8
+min = 8.79
+p25 = 32.49
+median = 67.07
+p75 = 99.03
+p90 = 141.25
+max = 141.25
+
+[[dungeon]]
+name = "Wailing Caverns"
+bosses = [{ name = "Kresh", id = 3653, kills = 9 }, { name = "Mutanus the Devourer", id = 3654, kills = 11 }, { name = "Lord Cobrahn", id = 3669, kills = 12 }, { name = "Lord Pythas", id = 3670, kills = 13 }, { name = "Lady Anacondra", id = 3671, kills = 10 }, { name = "Lord Serpentis", id = 3673, kills = 13 }, { name = "Skum", id = 3674, kills = 12 }, { name = "Verdan the Everliving", id = 5775, kills = 13 }]
+[dungeon.hunter."Marksmanship"]
+parses = 34
+min = 9.88
+p25 = 43.48
+median = 60.09
+p75 = 74.25
+p90 = 86.25
+max = 92.47
+[dungeon.hunter."Beast Mastery"]
+parses = 17
+min = 9.15
+p25 = 33.71
+median = 38.19
+p75 = 43.21
+p90 = 64.79
+max = 79.77

@@ -24,7 +24,7 @@ import { Pet, type PetHost } from "./pet";
 import { EventQueue } from "./queue";
 import { Rng } from "./rng";
 import type { Rotation } from "./rotation";
-import { ON_LAND, PROC_IF, type ScriptContext } from "./scripts";
+import { type ScriptContext, type Scripts, scriptsFor } from "./scripts";
 import { HunterStats, type Target } from "./stats";
 
 const DAMAGE_EFFECTS = new Set<number>([
@@ -62,9 +62,6 @@ export function unknownPassiveAuras(ch: Character): string[] {
 const REACTION_MS = 100;
 
 const isChanneled = (spell: Spell) => (spell.attributes[1]! & CHANNELED_FLAGS) !== 0;
-
-// The hawk's dive is the hunter's spell, but the hawk deals it, so "pets and hawks" talents reach it.
-const HAWK_DIVE = "Summon Hawk";
 
 // Attributes_0 flags of an attack that replaces the next melee swing (Raptor Strike).
 const NEXT_SWING_FLAGS = 0x4 | 0x400;
@@ -138,6 +135,9 @@ export class Fight implements PetHost {
   readonly attackPowerPerDps: number;
   private readonly support: number[];
   private readonly scriptContext: ScriptContext;
+  private readonly scripts: Scripts;
+  // The hawk's dive is the hunter's spell, but the hawk deals it, so "pets and hawks" talents reach it.
+  private readonly hawkDive: Set<number>;
   readonly pet: Pet | null = null;
   // What reaches hawks: the pet passives the "pets and hawks" talents modify (Unleashed Fury,
   // Ferocity), without the pet's family bonus or its own buffs (Bestial Wrath).
@@ -188,6 +188,8 @@ export class Fight implements PetHost {
         if (a.pet && !this.pet.knows(a.pet)) throw new Error(`rotation: a ${family.name} does not know "${a.pet}" (${a.action})`);
       }
     }
+    this.scripts = scriptsFor(game.data);
+    this.hawkDive = this.scripts.ranks("Summon Hawk");
     this.scriptContext = {
       data: game.data,
       config: ch.config,
@@ -575,7 +577,7 @@ export class Fight implements PetHost {
     else if (r < crit) this.record(name, "crit", amount * this.calc.critMultiplier(null));
     else this.record(name, "hit", amount);
     this.selfAuras.consumeCharges(ProcFlag.DoneMeleeAutoAttack);
-    this.afterHit(ProcFlag.DoneMeleeAutoAttack, ProcFlag.TakenMeleeAutoAttack, weapon.procs, weapon.speed);
+    this.afterHit(ProcFlag.DoneMeleeAutoAttack, ProcFlag.TakenMeleeAutoAttack, weapon.procs, weapon.speed, r >= glance && r < crit);
   }
 
   // Resolving a spell =========================================================
@@ -634,6 +636,8 @@ export class Fight implements PetHost {
 
   // fromProc: a weapon proc's own spell, which cannot set off another.
   private execute(spell: Spell, isAuto = false, fromProc = false): void {
+    // Procs are cast by nothing else, so they count their own.
+    if (fromProc) this.record(spell.name, "cast");
     const effects = resolveEffects(spell);
     for (const e of effects) {
       if (!KNOWN_EFFECTS.has(e.effect)) this.report(`${spell.name} (${spell.id}): effect ${e.effect}`);
@@ -642,7 +646,7 @@ export class Fight implements PetHost {
     const damaging = effects.filter((e) => DAMAGE_EFFECTS.has(e.effect) && e.implicitTarget[0] !== TARGET_CASTER);
     // Spells that deal no damage and put nothing on the enemy (Intimidation, Bestial Wrath) cannot miss.
     const canMiss = damaging.length > 0 || effects.some((e) => TARGET_ENEMY.has(e.implicitTarget[0]));
-    const hawk = spell.name === HAWK_DIVE;
+    const hawk = this.hawkDive.has(spell.id);
     const outcome = isChanneled(spell) || !canMiss ? "hit" : this.roll(spell, isAuto, hawk ? this.hawkAuras.sum(Aura.ModCritPct) : 0);
     if (outcome === "miss") {
       this.record(spell.name, "miss");
@@ -674,21 +678,21 @@ export class Fight implements PetHost {
     const flag = melee ? ProcFlag.DoneMeleeSpell : isAuto ? ProcFlag.DoneRangedAutoAttack : ProcFlag.DoneRangedSpell;
     if (ranged || melee) this.selfAuras.consumeCharges(flag);
     this.applyAuras(spell, effects);
-    ON_LAND[spell.name]?.(this.scriptContext, { spell, damage: dealt });
+    this.scripts.onLand.get(spell.id)?.(this.scriptContext, { spell, damage: dealt });
     if (ranged) {
       const taken = isAuto ? ProcFlag.TakenRangedAutoAttack : ProcFlag.TakenRangedSpell;
-      this.afterHit(flag, taken, fromProc ? [] : this.ch.weaponProcs, this.ch.rangedWeapon.speed);
+      this.afterHit(flag, taken, fromProc ? [] : this.ch.weaponProcs, this.ch.rangedWeapon.speed, outcome === "crit");
     }
     const w = this.ch.mainHand;
-    if (melee && w) this.afterHit(flag, ProcFlag.TakenMeleeSpell, fromProc ? [] : w.procs, w.speed);
+    if (melee && w) this.afterHit(flag, ProcFlag.TakenMeleeSpell, fromProc ? [] : w.procs, w.speed, outcome === "crit");
   }
 
   // What a landed attack sets off, with the speed of the weapon it came from: the hunter's procs,
   // the weapon's chance-on-hit effects, and debuffs on the target that answer being hit.
-  private afterHit(done: number, taken: number, weaponProcs: Spell[], speed: number): void {
-    this.procs(this.selfAuras, done, "proc", speed);
+  private afterHit(done: number, taken: number, weaponProcs: Spell[], speed: number, crit: boolean): void {
+    this.procs(this.selfAuras, done, "proc", speed, crit);
     this.weaponProcs(weaponProcs, speed);
-    this.procs(this.targetAuras, taken, "target-proc", speed);
+    this.procs(this.targetAuras, taken, "target-proc", speed, crit);
   }
 
   // A trap lies where the hunter stands and springs on the target if that is within reach (in melee),
@@ -862,22 +866,31 @@ export class Fight implements PetHost {
 
   // Self auras that answer the hunter's own hits, and debuffs on the target that answer being hit
   // (Judgement of Wisdom). `speed`: the hitting weapon's, which procs per minute scale by.
-  private procs(auras: AuraSet, flag: number, stream: string, speed: number): void {
+  private procs(auras: AuraSet, flag: number, stream: string, speed: number, crit: boolean): void {
     for (const src of auras.sources()) {
       const proc = src.spell.proc;
       if (!proc || (proc.typeMask[0] & flag) === 0) continue;
+      if (proc.critOnly && !crit) continue;
       if ((this.procReadyAt.get(src.spell.id) ?? 0) > this.now) continue;
-      if (PROC_IF[src.spell.name] && !PROC_IF[src.spell.name]!(this.scriptContext)) continue;
+      const procIf = this.scripts.procIf.get(src.spell.id);
+      if (procIf && !procIf(this.scriptContext)) continue;
       for (const e of src.effects) {
         if (e.aura !== Aura.ProcTriggerSpell || !e.triggerSpell) continue;
-        const base = proc.ppm > 0 ? ppmChance(proc.ppm, speed) : proc.chance;
-        if (base > 100 && proc.ppm === 0) this.report(`${src.spell.name}: proc chance is set by the server, simulated as every hit`);
+        const serverRate = proc.ppm === 0 && proc.serverRate && proc.chance >= 100;
+        const ppm = serverRate ? this.game.overrides.formula.weaponProcPpm.value : proc.ppm;
+        const base = ppm > 0 ? ppmChance(ppm, speed) : proc.chance;
+        if (serverRate) this.report(`${src.spell.name}: proc rate is set by the server, simulated at formula.weaponProcPpm (${ppm} per minute)`);
+        else if (base > 100 && proc.ppm === 0) this.report(`${src.spell.name}: proc chance is set by the server, simulated as every hit`);
         const chance = this.calc.modded(base, src.spell, SpellModOp.ProcChance);
         if (!this.rng.stream(`${stream}:${src.spell.id}`).chance(chance)) continue;
         if (proc.categoryRecoveryMs > 0) this.procReadyAt.set(src.spell.id, this.now + proc.categoryRecoveryMs);
         const triggered = this.linkedSpell(src.spell, e.triggerSpell, "proc");
+        if (!triggered) continue;
+        // A proc that strikes the enemy (Hurricane's Frost Arrow) is an attack of its own, which
+        // cannot set off another proc.
+        if (resolveEffects(triggered).some((t) => DAMAGE_EFFECTS.has(t.effect) && t.implicitTarget[0] !== TARGET_CASTER)) this.execute(triggered, false, true);
         // A buff the proc grants ends with the aura that procs it (Badge of the Swarmguard's stacks).
-        if (triggered) this.trigger(triggered, src.expiresAt !== Infinity ? src.expiresAt - this.now : undefined);
+        else this.trigger(triggered, src.expiresAt !== Infinity ? src.expiresAt - this.now : undefined);
       }
     }
   }

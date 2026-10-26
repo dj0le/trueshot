@@ -6,6 +6,9 @@
 // moving points between talents and swapping the pet, keeping a move only when paired fights put
 // it ahead by more than the noise. Builds that break the talent rules are skipped without a fight.
 //
+// With a spec (a tree name), only builds with more points in that tree than in any other count; a
+// config outside the spec starts from a greedy build deep in it instead of its own talents.
+//
 // Talents and rotation depend on each other (a build short on mana wants a thriftier rotation), so
 // optimizeBuild alternates: the rotation for the config's build, then the build with that rotation
 // fixed, then the rotation for the new build, until the build stops changing.
@@ -48,6 +51,8 @@ export type BuildSearchOptions = {
   pets: boolean;
   // Whether the play style (ranged, melee, weaving) is searched too; it needs a melee weapon.
   styles: boolean;
+  // A talent tree the build must spend the most points in.
+  spec?: string | undefined;
   seed: string;
   onProgress?: (msg: string) => void;
   // Scores a candidate config, our own sim by default; another sim can stand in (wowsims). It may
@@ -87,10 +92,29 @@ export function describeStyle(s: Style): string {
 
 // "Beast Mastery 31 / Marksmanship 20, Cat, ranged"
 export function describeBuild(data: HunterData, b: Build): string {
-  const trees = new Map<string, number>();
-  for (const t of data.talents) trees.set(t.tree, (trees.get(t.tree) ?? 0) + (b.talents[t.name] ?? 0));
-  const split = [...trees].map(([tree, n]) => `${tree} ${n}`).join(" / ");
+  const split = [...treePoints(data, b.talents)].map(([tree, n]) => `${tree} ${n}`).join(" / ");
   return `${split}, ${b.pet ?? "no pet"}, ${describeStyle(b.style)}`;
+}
+
+const SPECS: Record<string, string> = { bm: "Beast Mastery", mm: "Marksmanship", sv: "Survival" };
+
+// A spec option's tree: a short name (bm, mm, sv) or the tree's own name.
+export function specTree(spec: string | undefined): string | undefined {
+  return spec && (SPECS[spec.toLowerCase()] ?? spec);
+}
+
+// Points per tree.
+
+export function treePoints(data: HunterData, talents: Record<string, number>): Map<string, number> {
+  const trees = new Map<string, number>();
+  for (const t of data.talents) trees.set(t.tree, (trees.get(t.tree) ?? 0) + (talents[t.name] ?? 0));
+  return trees;
+}
+
+// The tree with more points than any other, or null on a tie.
+export function specOf(data: HunterData, talents: Record<string, number>): string | null {
+  const sorted = [...treePoints(data, talents)].sort((a, b) => b[1] - a[1]);
+  return sorted[0] && sorted[0][1] > (sorted[1]?.[1] ?? 0) ? sorted[0][0] : null;
 }
 
 // Spends points down a talent order, each talent to its max before the next, and comes back to
@@ -117,14 +141,15 @@ export function fillBuild(data: HunterData, level: number, order: Talent[]): Rec
   return talents;
 }
 
-// Deep in one tree, the rest in another, for every ordered pair of trees.
-function seedBuilds(data: HunterData, level: number, pet: string | null, style: Style): { name: string; build: Build }[] {
+const inTree = (data: HunterData, tree: string) => data.talents.filter((t) => t.tree === tree).sort((a, b) => a.row - b.row || a.col - b.col);
+
+// Deep in one tree, the rest in another, for every ordered pair of trees (deep in the spec only, with one).
+function seedBuilds(data: HunterData, level: number, pet: string | null, style: Style, spec?: string): { name: string; build: Build }[] {
   const trees = [...new Set(data.talents.map((t) => t.tree))];
-  const inTree = (tree: string) => data.talents.filter((t) => t.tree === tree).sort((a, b) => a.row - b.row || a.col - b.col);
-  return trees.flatMap((a) =>
+  return trees.filter((a) => !spec || a === spec).flatMap((a) =>
     trees
       .filter((b) => b !== a)
-      .map((b) => ({ name: `deep ${a}, then ${b}`, build: { talents: fillBuild(data, level, [...inTree(a), ...inTree(b)]), pet, style } })),
+      .map((b) => ({ name: `deep ${a}, then ${b}`, build: { talents: fillBuild(data, level, [...inTree(data, a), ...inTree(data, b)]), pet, style } })),
   );
 }
 
@@ -165,6 +190,7 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
   const data = game.data;
   const parsed = SimConfig.parse(config);
   const level = parsed.level;
+  if (opts.spec && !data.talents.some((t) => t.tree === opts.spec)) throw new Error(`build search: no talent tree named ${opts.spec}`);
   const families = opts.pets ? data.petFamilies.map((f) => f.name) : null;
   const styles = opts.styles && parsed.gear.items.mainHand ? STYLES : null;
   const searchSeed = `${opts.seed}/search`;
@@ -177,7 +203,7 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
     const key = keyOf(b);
     if (seen.has(key)) return seen.get(key)!;
     let result: SimResult | null = null;
-    if (talentErrors(data, level, b.talents).errors.length === 0) {
+    if (talentErrors(data, level, b.talents).errors.length === 0 && (!opts.spec || specOf(data, b.talents) === opts.spec)) {
       try {
         result = evaluate({ ...withBuild(config, b), fight: { ...config.fight, iterations: opts.iterations, seed: searchSeed } });
         evaluated++;
@@ -205,7 +231,8 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
 
   // The play style and the pet mostly stand apart from the talents, so each is chosen once on the
   // config's talents: the style first, then the pet with it.
-  const start = configBuild(config);
+  const own = configBuild(config);
+  const start = !opts.spec || specOf(data, own.talents) === opts.spec ? own : { ...own, talents: specStart(data, level, own.talents, opts.spec) };
   const byDps = (a: Seed, b: Seed) => b.result.dps.mean - a.result.dps.mean;
   const withStyles = tryAll((styles ?? [start.style]).map((style) => ({ name: `config, ${describeStyle(style)}`, build: { ...start, style } })));
   const bestStyle = withStyles.sort(byDps)[0]?.build.style ?? start.style;
@@ -214,7 +241,7 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
   const bestPet = withPets.filter((s) => s.build.pet).sort(byDps)[0]?.build.pet ?? start.pet;
   const generated = opts.configOnly
     ? []
-    : [...new Set([bestPet, ...(families ? [null] : [])])].flatMap((pet) => seedBuilds(data, level, pet, bestStyle));
+    : [...new Set([bestPet, ...(families ? [null] : [])])].flatMap((pet) => seedBuilds(data, level, pet, bestStyle, opts.spec));
   const seeds = [...withStyles, ...withPets, ...tryAll(generated)].sort(byDps);
   if (seeds.length === 0) throw new Error("build search: no seed build can run; check the config's talents");
   for (const s of seeds.slice(0, 8)) log(`seed ${s.result.dps.mean.toFixed(1)} DPS: ${s.name} (${describeBuild(data, s.build)})`);
@@ -249,6 +276,12 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
     if (current.result.dps.mean > best.result.dps.mean) best = current;
   }
   return { best: best.build, result: best.result, evaluated };
+}
+
+// Deep in the spec, then in the tree the config spends the most in after it.
+function specStart(data: HunterData, level: number, talents: Record<string, number>, spec: string): Record<string, number> {
+  const next = [...treePoints(data, talents)].filter(([tree]) => tree !== spec).sort((a, b) => b[1] - a[1])[0]![0];
+  return fillBuild(data, level, [...inTree(data, spec), ...inTree(data, next)]);
 }
 
 export type PetRow = { pet: string | null; dps: number; delta: number; error95: number };

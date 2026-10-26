@@ -3,7 +3,7 @@
 //   bun run wowsims build                          clone or update wowsims/forever and build wowsimcli
 //   bun run wowsims run <export.json> [--iterations N] [--seed N] [--raw out.json]
 //   bun run wowsims export <config.toml> <template.json> <out.json>
-//   bun run wowsims search <config.toml> <template.json> <out.json> [--budget N] [--iterations N] [--climbs N] [--config-only]
+//   bun run wowsims search <config.toml> <template.json> <out.json> [--budget N] [--iterations N] [--climbs N] [--config-only] [--spec bm|mm|sv]
 //
 // export writes one of our configs as a wowsims export, to import in the wowsims UI or run above. The
 // template (a wowsims export) supplies what our configs do not carry in wowsims terms: raid buffs,
@@ -29,7 +29,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { loadGameData } from "@hunter-sim/data";
-import { configBuild, describeBuild, searchBuilds, SimConfig, type SimConfigInput, type SimResult, withBuild } from "@hunter-sim/engine";
+import { configBuild, describeBuild, searchBuilds, SimConfig, type SimConfigInput, type SimResult, specTree, withBuild } from "@hunter-sim/engine";
 import { loadConfig } from "./toml";
 
 const REPO = "https://github.com/wowsims/forever.git";
@@ -240,7 +240,7 @@ function wowsimsResult(ws: Wowsims, template: Json, input: SimConfigInput): SimR
   };
 }
 
-async function search(configPath: string, templatePath: string, outPath: string, budget: number, iterations: number, climbs: number, configOnly: boolean): Promise<void> {
+async function search(configPath: string, templatePath: string, outPath: string, budget: number, iterations: number, climbs: number, configOnly: boolean, spec: string | undefined): Promise<void> {
   const ws = await loadWowsims();
   const template = await Bun.file(templatePath).json();
   const game = await loadGameData();
@@ -255,6 +255,7 @@ async function search(configPath: string, templatePath: string, outPath: string,
     configOnly,
     pets: true,
     styles: true,
+    spec,
     seed: "wowsims",
     onProgress: log,
     evaluate,
@@ -390,14 +391,15 @@ async function tune(path: string, outPath: string, iterations: number): Promise<
 const { values, positionals } = parseArgs({
   args: process.argv.slice(2),
   allowPositionals: true,
-  options: { iterations: { type: "string" }, seed: { type: "string" }, raw: { type: "string" }, budget: { type: "string" }, climbs: { type: "string" }, "config-only": { type: "boolean" } },
+  options: { iterations: { type: "string" }, seed: { type: "string" }, raw: { type: "string" }, budget: { type: "string" }, climbs: { type: "string" }, "config-only": { type: "boolean" }, spec: { type: "string" } },
 });
 const [command, file, template, outFile] = positionals;
 if (command === "build") await build();
 else if (command === "export" && file && template && outFile) await exportConfig(file, template, outFile);
 else if (command === "tune" && file && template) await tune(file, template, Number(values.iterations ?? 3000));
 else if (command === "search" && file && template && outFile)
-  await search(file, template, outFile, Number(values.budget ?? 400), Number(values.iterations ?? 1000), Number(values.climbs ?? 3), !!values["config-only"]);
+  await search(file, template, outFile, Number(values.budget ?? 400), Number(values.iterations ?? 1000), Number(values.climbs ?? 3), !!values["config-only"], specTree(values.spec));
+
 else if (command === "run" && file) await run(file, Number(values.iterations ?? 3000), Number(values.seed ?? 1), values.raw);
 else {
   console.error("usage: see the top of packages/cli/src/wowsims.ts");

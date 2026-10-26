@@ -8,6 +8,8 @@
     "build:data": "bun packages/data/src/build-items.ts && bun packages/data/src/build.ts",
     "sim": "bun packages/cli/src/index.ts",
     "wowsims": "bun packages/cli/src/wowsims.ts",
+    "foreverlogs": "bun packages/data/src/foreverlogs.ts",
+    "gearquest": "bun packages/data/src/gearquest.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit -p ."
   },

@@ -1002,7 +1002,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -1132,7 +1134,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -1929,7 +1933,9 @@
      -2146819416,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -2851,7 +2857,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -3852,7 +3860,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -4052,7 +4062,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -4643,7 +4655,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -4733,7 +4747,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -4823,7 +4839,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -4913,7 +4931,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -5003,7 +5023,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -5093,7 +5115,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -5183,7 +5207,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -5273,7 +5299,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -5363,7 +5391,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -5597,7 +5627,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -5687,7 +5719,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -5879,7 +5913,9 @@
      139944,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -6009,7 +6045,9 @@
      16,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -6418,7 +6456,9 @@
      1,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -6931,7 +6971,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -7021,7 +7063,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -7262,7 +7306,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -7416,7 +7462,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -7586,7 +7634,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -7676,7 +7726,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -7766,7 +7818,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -7856,7 +7910,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -7946,7 +8002,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -8036,7 +8094,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -8126,7 +8186,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -8216,7 +8278,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -8306,7 +8370,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -8396,7 +8462,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -8486,7 +8554,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -8576,7 +8646,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -8666,7 +8738,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -8916,7 +8990,9 @@
      680,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -9006,7 +9082,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -9096,7 +9174,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -9298,7 +9378,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -9388,7 +9470,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -9478,7 +9562,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -9568,7 +9654,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -9745,7 +9833,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -9835,7 +9925,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -9925,7 +10017,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -10015,7 +10109,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -10199,7 +10295,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -10457,7 +10555,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -10627,7 +10727,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -10717,7 +10819,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -10807,7 +10911,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -10897,7 +11003,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -10987,7 +11095,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -11109,7 +11219,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -11231,7 +11343,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -11353,7 +11467,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -11443,7 +11559,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -11853,7 +11971,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -11943,7 +12063,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -12033,7 +12155,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -12203,7 +12327,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -12325,7 +12451,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -12559,7 +12687,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -12681,7 +12811,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -12915,7 +13047,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -13037,7 +13171,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -13127,7 +13263,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -13528,7 +13666,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -13730,7 +13870,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -14204,7 +14346,9 @@
      0,
      0
     ],
-    "cumulative": 5
+    "cumulative": 5,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -14526,7 +14670,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -14616,7 +14762,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -14818,7 +14966,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -15292,7 +15442,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -15734,7 +15886,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -16096,7 +16250,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -16186,7 +16342,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -16724,7 +16882,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -16814,7 +16974,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -16984,7 +17146,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -17081,7 +17245,9 @@
      139944,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -17218,7 +17384,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -17482,7 +17650,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -17612,7 +17782,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -17702,7 +17874,9 @@
      139944,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -17792,7 +17966,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -17889,7 +18065,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -18011,7 +18189,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -18101,7 +18281,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -18191,7 +18373,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -18281,7 +18465,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -18371,7 +18557,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -18461,7 +18649,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -18551,7 +18741,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -18673,7 +18865,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -18890,7 +19084,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -19561,7 +19757,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -19818,7 +20016,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -20219,7 +20419,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -21259,7 +21461,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -21349,7 +21553,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -21439,7 +21645,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -21529,7 +21737,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -21619,7 +21829,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -21709,7 +21921,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -21799,7 +22013,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -21889,7 +22105,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -22098,7 +22316,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -22745,7 +22965,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -22867,7 +23089,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -22989,7 +23213,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -23118,7 +23344,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -23208,7 +23436,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -23529,7 +23759,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -23738,7 +23970,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -23828,7 +24062,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -23918,7 +24154,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -24047,7 +24285,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -28190,7 +28430,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -28327,7 +28569,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -28464,7 +28708,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -28601,7 +28847,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -28738,7 +28986,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -28875,7 +29125,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -29012,7 +29264,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -29149,7 +29403,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -29286,7 +29542,9 @@
      -2146819416,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -29415,7 +29673,9 @@
      -2146819416,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -29537,7 +29797,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -29627,7 +29889,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -29717,7 +29981,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -29807,7 +30073,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -29897,7 +30165,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -30099,7 +30369,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -30349,7 +30621,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -30439,7 +30713,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -31291,7 +31567,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -31461,7 +31739,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -31551,7 +31831,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -31721,7 +32003,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -32590,7 +32874,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -32944,7 +33230,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33041,7 +33329,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33211,7 +33501,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33301,7 +33593,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33391,7 +33685,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33481,7 +33777,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33571,7 +33869,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33661,7 +33961,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33751,7 +34053,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33841,7 +34145,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -33931,7 +34237,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -34021,7 +34329,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -34111,7 +34421,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -34208,7 +34520,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -34473,7 +34787,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -34563,7 +34879,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -34885,7 +35203,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -35383,7 +35703,9 @@
      8,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -35977,7 +36299,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -36067,7 +36391,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -36157,7 +36483,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -36247,7 +36575,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -36337,7 +36667,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -36626,7 +36958,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -36796,7 +37130,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -37456,7 +37792,9 @@
      0,
      0
     ],
-    "cumulative": 3
+    "cumulative": 3,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -37858,7 +38196,9 @@
      0,
      0
     ],
-    "cumulative": 3
+    "cumulative": 3,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -38028,7 +38368,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -38118,7 +38460,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -38320,7 +38664,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -38410,7 +38756,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -38564,7 +38912,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -38718,7 +39068,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -38872,7 +39224,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -39026,7 +39380,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -39180,7 +39536,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -39334,7 +39692,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -39488,7 +39848,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -39642,7 +40004,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -39796,7 +40160,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -39950,7 +40316,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -40104,7 +40472,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -40258,7 +40628,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -40412,7 +40784,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -40566,7 +40940,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -40720,7 +41096,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -41746,7 +42124,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -42092,7 +42472,9 @@
      0,
      0
     ],
-    "cumulative": 3
+    "cumulative": 3,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -42294,7 +42676,9 @@
      664232,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -42568,7 +42952,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -42914,7 +43300,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -43004,7 +43392,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -43462,7 +43852,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -43584,7 +43976,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -43786,7 +44180,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -43876,7 +44272,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -44078,7 +44476,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -44168,7 +44568,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -44338,7 +44740,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 13,
@@ -44748,7 +45152,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -44838,7 +45244,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -45240,7 +45648,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -45330,7 +45740,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -45644,7 +46056,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -45734,7 +46148,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -45824,7 +46240,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -45994,7 +46412,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -46164,7 +46584,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -46261,7 +46683,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -46797,7 +47221,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -46974,7 +47400,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -47064,7 +47492,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -47273,7 +47703,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -47403,7 +47835,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -47605,7 +48039,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -48038,7 +48474,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -48981,7 +49419,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -49071,7 +49511,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -49161,7 +49603,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -49251,7 +49695,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -49341,7 +49787,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -49718,7 +50166,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -49808,7 +50258,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -49898,7 +50350,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 6,
@@ -50003,7 +50457,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -50181,7 +50637,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -50271,7 +50729,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -50361,7 +50821,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -50531,7 +50993,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -50621,7 +51085,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -50711,7 +51177,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -50888,7 +51356,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -51210,7 +51680,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -51444,7 +51916,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -51629,7 +52103,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -51974,7 +52450,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -52064,7 +52542,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -52154,7 +52634,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -52492,7 +52974,9 @@
      2428928,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -52590,7 +53074,9 @@
      87376,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -52983,7 +53469,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -53472,7 +53960,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -53722,7 +54212,9 @@
      87376,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -54562,7 +55054,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -55801,7 +56295,9 @@
      65556,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -57123,7 +57619,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 7,
@@ -57413,7 +57911,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -58900,7 +59400,9 @@
      139944,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 10,
@@ -59510,7 +60012,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -59968,7 +60472,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -60241,7 +60747,9 @@
      69972,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -60339,7 +60847,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -61181,7 +61691,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -61350,7 +61862,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -61512,7 +62026,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -61682,7 +62198,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -61859,7 +62377,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -61981,7 +62501,9 @@
      0,
      0
     ],
-    "cumulative": 3
+    "cumulative": 3,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -62071,7 +62593,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -62161,7 +62685,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -62251,7 +62777,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -62341,7 +62869,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -62431,7 +62961,9 @@
      2,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -62521,7 +63053,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -63283,7 +63817,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -63373,7 +63909,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -63735,7 +64273,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -63825,7 +64365,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -63947,7 +64489,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -64037,7 +64581,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -64127,7 +64673,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -64489,7 +65037,9 @@
      172712,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -64659,7 +65209,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -64749,7 +65301,9 @@
      65536,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -64839,7 +65393,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -64929,7 +65485,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -65083,7 +65641,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -65173,7 +65733,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -65263,7 +65825,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -65353,7 +65917,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -65562,7 +66128,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -65691,7 +66259,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -65781,7 +66351,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -65951,7 +66523,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -66041,7 +66615,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 11,
@@ -66139,7 +66715,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -66853,7 +67431,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -67007,7 +67587,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -67129,7 +67711,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -67219,7 +67803,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -67309,7 +67895,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -67407,7 +67995,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -67497,7 +68087,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -67587,7 +68179,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 6,
@@ -67685,7 +68279,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 5,
@@ -67783,7 +68379,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 8,
@@ -68025,7 +68623,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68122,7 +68722,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68212,7 +68814,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68309,7 +68913,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68406,7 +69012,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68496,7 +69104,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68586,7 +69196,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68683,7 +69295,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68780,7 +69394,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68877,7 +69493,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -68967,7 +69585,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -69065,7 +69685,9 @@
      87376,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -69323,7 +69945,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 6,
@@ -69508,7 +70132,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -69606,7 +70232,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -70384,7 +71012,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 6,
@@ -70482,7 +71112,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -70572,7 +71204,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -70742,7 +71376,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -70840,7 +71476,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -71002,7 +71640,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -71212,7 +71852,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -71302,7 +71944,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -71400,7 +72044,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -71522,7 +72168,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -71779,7 +72427,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -71964,7 +72614,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -72054,7 +72706,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -72144,7 +72798,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -72234,7 +72890,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -72324,7 +72982,9 @@
      81920,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -72414,7 +73074,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -72584,7 +73246,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -72786,7 +73450,9 @@
      87376,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -72884,7 +73550,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -72974,7 +73642,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -73400,7 +74070,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -73666,7 +74338,9 @@
      680,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -73788,7 +74462,9 @@
      680,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -73878,7 +74554,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -73968,7 +74646,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -74250,7 +74930,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -74737,7 +75419,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 10,
@@ -74835,7 +75519,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 6,
@@ -75093,7 +75779,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -75183,7 +75871,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -75273,7 +75963,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -75427,7 +76119,9 @@
      340,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -75517,7 +76211,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -76119,7 +76815,9 @@
      4436,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -76209,7 +76907,9 @@
      16384,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -76387,7 +77087,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -76477,7 +77179,9 @@
      65536,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -76607,7 +77311,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -76737,7 +77443,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -76859,7 +77567,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -76964,7 +77674,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -77174,7 +77886,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 4,
@@ -77272,7 +77986,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -77370,7 +78086,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 5,
@@ -77468,7 +78186,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -77566,7 +78286,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 7,
@@ -77664,7 +78386,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 8,
@@ -77762,7 +78486,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 11,
@@ -78252,7 +78978,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -78342,7 +79070,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -78432,7 +79162,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -78522,7 +79254,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -78619,7 +79353,9 @@
      60,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -78780,7 +79516,9 @@
      60,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -78941,7 +79679,9 @@
      60,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -79271,7 +80011,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -79361,7 +80103,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -79451,7 +80195,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -79541,7 +80287,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -79799,7 +80547,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -79889,7 +80639,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -79979,7 +80731,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -80069,7 +80823,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -80159,7 +80915,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -80249,7 +81007,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -80339,7 +81099,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -80429,7 +81191,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -80679,7 +81443,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 7,
@@ -81857,7 +82623,9 @@
      680,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -81986,7 +82754,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -82115,7 +82885,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -82244,7 +83016,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -82373,7 +83147,9 @@
      0,
      0
     ],
-    "cumulative": 5
+    "cumulative": 5,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -82503,7 +83279,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -82600,7 +83378,9 @@
      0,
      0
     ],
-    "cumulative": 5
+    "cumulative": 5,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -82737,7 +83517,9 @@
      0,
      0
     ],
-    "cumulative": 5
+    "cumulative": 5,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -82867,7 +83649,9 @@
      0,
      0
     ],
-    "cumulative": 20
+    "cumulative": 20,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -82957,7 +83741,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -83395,7 +84181,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -83652,7 +84440,9 @@
      0,
      0
     ],
-    "cumulative": 5
+    "cumulative": 5,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -83782,7 +84572,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -83904,7 +84696,9 @@
      340,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -84257,7 +85051,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -84347,7 +85143,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -84437,7 +85235,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -85287,7 +86087,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -85417,7 +86219,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -85747,7 +86551,9 @@
      65536,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -85837,7 +86643,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -85927,7 +86735,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -86049,7 +86859,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -86139,7 +86951,9 @@
      65536,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -86229,7 +87043,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -86788,7 +87604,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 8,
@@ -86886,7 +87704,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -87008,7 +87828,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -87098,7 +87920,9 @@
      16384,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -87196,7 +88020,9 @@
      16384,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -87294,7 +88120,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -87399,7 +88227,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -87560,7 +88390,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -87721,7 +88553,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -88072,7 +88906,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -88466,7 +89302,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -88556,7 +89394,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -88646,7 +89486,9 @@
      131072,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -88768,7 +89610,9 @@
      0,
      0
     ],
-    "cumulative": 20
+    "cumulative": 20,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -88858,7 +89702,9 @@
      16384,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -88956,7 +89802,9 @@
      340,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -89046,7 +89894,9 @@
      0,
      0
     ],
-    "cumulative": 6
+    "cumulative": 6,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -89136,7 +89986,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -89226,7 +90078,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -89476,7 +90330,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -89646,7 +90502,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -89736,7 +90594,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -89914,7 +90774,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -90004,7 +90866,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -90094,7 +90958,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -90184,7 +91050,9 @@
      340,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -90274,7 +91142,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -90364,7 +91234,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -90534,7 +91406,9 @@
      340,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -90656,7 +91530,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -90785,7 +91661,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -90939,7 +91817,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -91029,7 +91909,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -91119,7 +92001,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -91209,7 +92093,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -91411,7 +92297,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -91533,7 +92421,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -91623,7 +92513,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -91721,7 +92613,9 @@
      87376,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -91811,7 +92705,9 @@
      0,
      0
     ],
-    "cumulative": 5
+    "cumulative": 5,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -92157,7 +93053,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -92327,7 +93225,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -92425,7 +93325,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -92523,7 +93425,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": true
    },
    "classOptions": {
     "set": 9,
@@ -92621,7 +93525,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -92711,7 +93617,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -92969,7 +93877,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -93059,7 +93969,9 @@
      65536,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -93157,7 +94069,9 @@
      65536,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -93255,7 +94169,9 @@
      131072,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -93345,7 +94261,9 @@
      65536,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -93435,7 +94353,9 @@
      131072,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 3,
@@ -93533,7 +94453,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -93623,7 +94545,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -93745,7 +94669,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -93835,7 +94761,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -93957,7 +94885,9 @@
      16384,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -94127,7 +95057,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -94217,7 +95149,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -94419,7 +95353,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -94829,7 +95765,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -94919,7 +95857,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -95017,7 +95957,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 7,
@@ -95115,7 +96057,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 7,
@@ -95213,7 +96157,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 7,
@@ -95311,7 +96257,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -95481,7 +96429,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -95683,7 +96633,9 @@
      0,
      0
     ],
-    "cumulative": 10
+    "cumulative": 10,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -95805,7 +96757,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -95895,7 +96849,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -95985,7 +96941,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -96075,7 +97033,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -96165,7 +97125,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -96255,7 +97217,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -96345,7 +97309,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -96435,7 +97401,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -96685,7 +97653,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -97255,7 +98225,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -97377,7 +98349,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -97499,7 +98473,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -97589,7 +98565,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -98023,7 +99001,9 @@
      0,
      0
     ],
-    "cumulative": 1
+    "cumulative": 1,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -98153,7 +99133,9 @@
      2,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -98283,7 +99265,9 @@
      2,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -98725,7 +99709,9 @@
      272,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": true
    },
    "classOptions": {
     "set": 9,
@@ -98855,7 +99841,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -99265,7 +100253,9 @@
      340,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -99547,7 +100537,9 @@
      16384,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": true
    },
    "classOptions": null,
    "effects": [
@@ -99717,7 +100709,9 @@
      0,
      4
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -100407,7 +101401,9 @@
      68,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -100497,7 +101493,9 @@
      81964,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -100963,7 +101961,9 @@
      256,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -101093,7 +102093,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -101271,7 +102273,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -101457,7 +102461,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -101547,7 +102553,9 @@
      680,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -101637,7 +102645,9 @@
      87376,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -101927,7 +102937,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -102017,7 +103029,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -102299,7 +103313,9 @@
      81920,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -102389,7 +103405,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -102807,7 +103825,9 @@
      256,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -102993,7 +104013,9 @@
      16,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -103091,7 +104113,9 @@
      16,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -103309,7 +104333,9 @@
      262144,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -103775,7 +104801,9 @@
      340,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -103945,7 +104973,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -105171,7 +106201,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -105509,7 +106541,9 @@
      320,
      0
     ],
-    "cumulative": 12
+    "cumulative": 12,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -105599,7 +106633,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -106376,7 +107412,9 @@
      256,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -106866,7 +107904,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": true
    },
    "classOptions": {
     "set": 9,
@@ -106964,7 +108004,9 @@
      256,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -107294,7 +108336,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": true
    },
    "classOptions": {
     "set": 9,
@@ -107480,7 +108524,9 @@
      0,
      0
     ],
-    "cumulative": 7
+    "cumulative": 7,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -107730,7 +108776,9 @@
      320,
      0
     ],
-    "cumulative": 4
+    "cumulative": 4,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -107908,7 +108956,9 @@
      0,
      0
     ],
-    "cumulative": 1
+    "cumulative": 1,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -108013,7 +109063,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -108255,7 +109307,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -108345,7 +109399,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -108467,7 +109523,9 @@
      16384,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -108557,7 +109615,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -114093,7 +115153,9 @@
      0,
      0
     ],
-    "cumulative": 1
+    "cumulative": 1,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -114198,7 +115260,9 @@
      0,
      0
     ],
-    "cumulative": 1
+    "cumulative": 1,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -114303,7 +115367,9 @@
      0,
      0
     ],
-    "cumulative": 1
+    "cumulative": 1,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -114408,7 +115474,9 @@
      0,
      0
     ],
-    "cumulative": 1
+    "cumulative": 1,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -114513,7 +115581,9 @@
      0,
      0
     ],
-    "cumulative": 1
+    "cumulative": 1,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -114771,7 +115841,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -114869,7 +115941,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -114967,7 +116041,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -115145,7 +116221,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -115347,7 +116425,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 0,
@@ -115557,7 +116637,9 @@
      87380,
      0
     ],
-    "cumulative": 1
+    "cumulative": 1,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -115807,7 +116889,9 @@
      -2146784600,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -116089,7 +117173,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -116291,7 +117377,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -117425,7 +118513,9 @@
      -2146784600,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -117515,7 +118605,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -117605,7 +118697,9 @@
      139944,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -117855,7 +118949,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -118137,7 +119233,9 @@
      340,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -118451,7 +119549,9 @@
      139944,
      0
     ],
-    "cumulative": 99
+    "cumulative": 99,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -118877,7 +119977,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -118999,7 +120101,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -119089,7 +120193,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -119371,7 +120477,9 @@
      65536,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -119621,7 +120729,9 @@
      2114560,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -120588,7 +121698,9 @@
      -2146819416,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -120685,7 +121797,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -120854,7 +121968,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -121023,7 +122139,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -121345,7 +122463,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -121435,7 +122555,9 @@
      4,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -121821,7 +122943,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -122559,7 +123683,9 @@
      131072,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -122649,7 +123775,9 @@
      -2146784600,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -122739,7 +123867,9 @@
      139944,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -122989,7 +124119,9 @@
      139944,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -123159,7 +124291,9 @@
      139944,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -123329,7 +124463,9 @@
      40,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -124683,7 +125819,9 @@
      328020,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -124781,7 +125919,9 @@
      340,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -124879,7 +126019,9 @@
      16,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -125463,7 +126605,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -125593,7 +126737,9 @@
      16,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -125690,7 +126836,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -125827,7 +126975,9 @@
      320,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": {
     "set": 9,
@@ -125957,7 +127107,9 @@
      -2146819416,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -126207,7 +127359,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -126457,7 +127611,9 @@
      0,
      32
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -127027,7 +128183,9 @@
      20,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -127756,7 +128914,9 @@
      64,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -127846,7 +129006,9 @@
      64,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -127936,7 +129098,9 @@
      64,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -128026,7 +129190,9 @@
      64,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -128116,7 +129282,9 @@
      64,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -128206,7 +129374,9 @@
      64,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -128296,7 +129466,9 @@
      64,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -128386,7 +129558,9 @@
      64,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -128476,7 +129650,9 @@
      65876,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -128566,7 +129742,9 @@
      0,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -128976,7 +130154,9 @@
      65876,
      0
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": true,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -129706,7 +130886,9 @@
      0,
      0
     ],
-    "cumulative": 1
+    "cumulative": 1,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
@@ -129828,7 +131010,9 @@
      4116,
      32
     ],
-    "cumulative": 0
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
    },
    "classOptions": null,
    "effects": [
