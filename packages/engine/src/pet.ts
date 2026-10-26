@@ -16,9 +16,14 @@ export type PetHost = {
   readonly queue: EventQueue;
   readonly rng: Rng;
   readonly attackPowerPerDps: number;
-  // The hunter's numbers: spell modifiers (which reach pet passives), the ranged attack power the
-  // pet inherits, the target's armor without the hunter's own penetration, and Focused Fire.
-  readonly calc: Pick<HunterStats, "modded" | "moddedEffects" | "ownRangedAttackPower" | "armorMultiplier" | "sharedDamagePct">;
+  // The hunter's numbers: spell modifiers (which reach pet passives), the attack power, crit and hit
+  // the pet inherits, the target's armor without the hunter's own penetration, and Focused Fire.
+  readonly calc: Pick<
+    HunterStats,
+    "modded" | "moddedEffects" | "ownRangedAttackPower" | "meleeAttackPower" | "sheetCritPct" | "hitPct" | "armorMultiplier" | "sharedDamagePct"
+  >;
+  // The part of the hunter's crit that comes from Agility, which crit suppression treats apart.
+  readonly agilityCritPct: number;
   // The pet passives hawks share (Unleashed Fury, Ferocity), which the pet builds on.
   readonly hawkAuras: AuraSet;
   record(name: string, outcome: "hit" | "crit" | "miss" | "glance" | "tick" | "cast", amount?: number): void;
@@ -100,8 +105,8 @@ export class Pet {
     private data: HunterData,
     private o: Overrides["pet"],
     readonly family: PetFamily,
-    // The pet's level, its base attack power there, and its attack table against the target.
-    private readonly stats: { level: number; baseAttackPower: number; table: AttackTable },
+    // The pet's level, its creature weapon's DPS there, and its attack table against the target.
+    private readonly stats: { level: number; creatureDps: number; table: AttackTable },
     priority: string[] | undefined,
     // When the pet stops attacking for the rest of the fight (pet.attackingPct).
     private readonly attackingUntil: number,
@@ -133,8 +138,20 @@ export class Pet {
 
   // own: the pet itself; otherwise a hawk, which has only the auras hawks share.
   attackPower(own = true): number {
-    const inherited = (this.host.calc.ownRangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100;
-    return this.stats.baseAttackPower + inherited + (own ? this.auras.sum(Aura.ModAttackPower) : 0);
+    const c = this.host.calc;
+    const inherited = (Math.max(c.ownRangedAttackPower(), c.meleeAttackPower()) * this.o.inheritAttackPowerPct.value) / 100;
+    const base = this.stats.creatureDps * this.o.attackPowerPerCreatureDps.value;
+    return base + inherited + (own ? this.auras.sum(Aura.ModAttackPower) : 0);
+  }
+
+  // Melee and spell miss with the hunter's hit inherited.
+  private missPct(): number {
+    const t = this.stats.table;
+    return Math.max(0, t.missPct - Math.max(0, this.host.calc.hitPct() - t.hitPenaltyPct));
+  }
+
+  private spellMissPct(): number {
+    return Math.max(1, this.stats.table.spellMissPct - this.host.calc.hitPct() * this.o.spellHitPerHit.value);
   }
 
   // A hawk's hit is measured as a share of a happy pet's (pet.hawk), so happiness stays in; Focused
@@ -145,10 +162,13 @@ export class Pet {
     return happy * (1 + this.host.calc.sharedDamagePct() / 100) * this.auras.damageMultiplier(school);
   }
 
+  // The hunter's sheet crit plus the pet's own crit auras (Ferocity), less the target's suppression,
+  // which takes extra off crit that is not from Agility. Pets have no crit of their own.
   private critPct(own: boolean): number {
-    const auraCrit = (own ? this.auras : this.host.hawkAuras).sum(Aura.ModCritPct);
+    const total = this.host.calc.sheetCritPct() + (own ? this.auras : this.host.hawkAuras).sum(Aura.ModCritPct);
+    const auraCrit = Math.max(0, total - this.host.agilityCritPct);
     const t = this.stats.table;
-    return this.o.baseCritPct.value + auraCrit - t.critSuppressionPct - Math.min(auraCrit, t.auraCritSuppressionPct);
+    return Math.max(0, total - t.critSuppressionPct - Math.min(auraCrit, t.auraCritSuppressionPct));
   }
 
   private focusNow(): number {
@@ -174,7 +194,7 @@ export class Pet {
   private whiteHit(name: string, streams: string, scale: number, own: boolean): void {
     const rng = this.host.rng.stream(`${streams}-auto`).next() * 100;
     const t = this.stats.table;
-    const dodge = t.missPct + t.dodgePct;
+    const dodge = this.missPct() + t.dodgePct;
     const glance = dodge + t.glancingPct;
     const crit = glance + this.critPct(own);
     if (rng < dodge) {
@@ -182,13 +202,13 @@ export class Pet {
       return;
     }
     if (own) this.auras.consumeCharges(ProcFlag.DoneMeleeAutoAttack);
-    // Base damage already carries the pet's base attack power; the rest scales it (vmangos).
-    const perLevel = this.o.baseDamagePerLevel;
-    const speedScale = this.o.attackSpeedSec.value / 2;
-    const base = this.host.rng.stream(`${streams}-damage`).range(perLevel.min, perLevel.max) * this.stats.level * speedScale;
+    // A creature's weapon of the pet's level over 2.0 sec, plus attack power, scaled to the swing.
+    const spread = this.o.swingSpreadPct.value / 100;
+    const weapon = 2 * this.stats.creatureDps * this.host.rng.stream(`${streams}-damage`).range(1 - spread, 1 + spread);
+    const speed = this.o.attackSpeedSec.value;
     let amount =
-      base *
-      (0.7 + (0.3 * this.attackPower(own)) / this.stats.baseAttackPower) *
+      (weapon + (this.attackPower(own) / 14) * 2) *
+      (speed / 2) *
       this.damageMultiplier(School.Physical, own) *
       this.host.calc.armorMultiplier() *
       scale;
@@ -322,7 +342,7 @@ export class Pet {
       const r = this.host.rng.stream("pet-special").next() * 100;
       const t = this.stats.table;
       const avoid =
-        spell.defenseType === DefenseType.Magic ? t.spellMissPct : t.missPct + (spell.defenseType === DefenseType.Melee ? t.dodgePct : 0);
+        spell.defenseType === DefenseType.Magic ? this.spellMissPct() : this.missPct() + (spell.defenseType === DefenseType.Melee ? t.dodgePct : 0);
       if (r < avoid) {
         this.host.record(name, "miss");
         return;

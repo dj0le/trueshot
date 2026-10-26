@@ -22,7 +22,7 @@ const Levels = z.object({
     // str, agi, sta, int, spi
     races: z.record(z.object({ stats: z.array(StatRow), ...provenance })),
   }),
-  pet: z.object({ attackPower: Table }),
+  pet: z.object({ creatureDps: Table }),
   creatureArmor: Table,
 });
 export type Levels = z.infer<typeof Levels>;
@@ -69,12 +69,16 @@ const Overrides = z.object({
   // Fight-length presets: a typical length, and how far each fight strays from it either way.
   fights: z.record(z.object({ durationSec: z.number().positive(), durationVariancePct: z.number().min(0).max(50), ...provenance })),
   pet: z.object({
-    inheritRangedAttackPowerPct: Value,
-    // Damage per 2.0 sec swing at base attack power, per pet level.
-    baseDamagePerLevel: Range,
+    // Share of the hunter's higher attack power (melee or ranged) the pet gains.
+    inheritAttackPowerPct: Value,
+    // Share of the hunter's hit the pet gains as spell hit (melee hit is the hunter's whole).
+    spellHitPerHit: Value,
+    // How far either side of twice the creature DPS a 2.0 sec swing's damage spreads.
+    swingSpreadPct: Value,
+    // The pet's own attack power per point of creature DPS.
+    attackPowerPerCreatureDps: Value,
     focusPerSecond: Value,
     happinessDamagePct: Value,
-    baseCritPct: Value,
     attackSpeedSec: Value,
     hawk: z.object({ arrivalSec: Value, durationSec: Value, maxActive: Value, hitPctOfPetMelee: Value, attackIntervalSec: Value }),
   }),
@@ -127,7 +131,7 @@ export async function loadOverrides(path = OVERRIDES_PATH, levelsPath = LEVELS_P
   };
   check("hunter.baseMana", levels.hunter.baseMana.values.length, hunterLevels);
   check("hunter.agilityPerCrit", levels.hunter.agilityPerCrit.values.length, hunterLevels);
-  check("pet.attackPower", levels.pet.attackPower.values.length, hunterLevels);
+  check("pet.creatureDps", levels.pet.creatureDps.values.length, hunterLevels);
   check("creatureArmor", levels.creatureArmor.values.length, hunterLevels + 3);
   for (const [race, r] of Object.entries(levels.hunter.races)) check(`hunter.races.${race}`, r.stats.length, hunterLevels);
   return { ...overrides, levels };

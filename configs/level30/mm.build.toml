@@ -1,4 +1,4 @@
-# Found by `sim build configs/level30/mm.toml` (2026-10-26): +50.41% DPS on 5000 fresh fights.
+# Found by `sim build configs/level30/mm.toml` (2026-10-26): +45.41% DPS on 5000 fresh fights.
 extends = "mm.toml"
 name = "Level 30 mm, GearQuest good gear, build search"
 position = "weave"
@@ -9,15 +9,14 @@ maxAutoShotDelayMs = 900
 [talents]
 "Lethal Attacks" = 5
 "Efficiency" = 2
-"Improved Tracking" = 4
 "Careful Aim" = 5
 "Trueshot Aura" = 1
+"Improved Tracking" = 5
 "Improved Stings" = 3
-"Deadly Aspects" = 1
 
 [pet]
 active = true
-family = "Wind Serpent"
+family = "Raptor"
 
 [rotation]
 precombat = ["aspect_of_the_hawk", "hunters_mark", "trueshot_aura"]
@@ -27,7 +26,7 @@ action = "multi_shot"
 
 [[rotation.actions]]
 action = "serpent_sting"
-if = "!debuff.serpent_sting.up & fight.remains > 9"
+if = "!debuff.serpent_sting.up"
 
 [[rotation.actions]]
 action = "arcane_shot"

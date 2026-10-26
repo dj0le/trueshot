@@ -47,7 +47,7 @@ client build or to an override that records where it came from.
 | 37 | items.json carries Season of Discovery items (ids 23xxxx, item level 80+, many with +% haste) because they sit in Forever's Item table; check which really exist in Forever and drop the rest | DONE, 3,274 SoD items and the client's test items dropped; no +% haste gear is left in Forever's data |
 | 38 | Audit leftovers from b983b01..HEAD: hawk dive (HAWK_DIVE) and ON_LAND scripts keyed by spell name, Renataki's Refocus keyed by item name because on-use spells take the item's name; Expose Prey's Hunter's Mark condition (PROC_IF) and Focused Fire as name lookups instead of overrides keyed by spell id; `sim build --out` keeps the parent's pet.abilities when the family changes; Item.equipSpells is read by nothing, and an equip spell with one unknown effect has its known stats counted twice (only Runeblade of Baron Rivendare today, harmless); proc internal cooldowns have no test, since no item in the data has one that shows in results | packages/engine, packages/data, packages/cli | | DONE. Scripts key on spell ids (every rank of an ability, Refocus by its spell), hawk dive by Summon Hawk's ranks, Expose Prey's condition by the talent's spell; talent passives keep their names, which are the config's keys. `sim build --out` writes the new family's default pet abilities. Item.equipSpells dropped, and an item equip spell keeps its stats only when all of its effects are stats. Proc internal cooldowns have a test, which found that procs striking the enemy did nothing: Hurricane's Frost Arrow, the bomb satchels, Darkmoon Card: Maelstrom and Heart of Wyrmthalak now deal damage, and equip procs that say "a chance" over a client chance of every hit run at formula.weaponProcPpm |
 | 39 | Build search by spec: `--spec bm|mm|sv` keeps the most points in that tree (also `bun run wowsims search`) | packages/engine/src/talents.ts | DONE |
-| 40 | Decide the open model differences with wowsims, from the evidence in docs/wowsims-evidence.md: Serpent Sting and Arcane Shot attack power scaling, Serpent Sting ticks critting, pet crit and hit inheritance, pet attack power source, pet base damage and focus rate, the 0.5 sec melee retry when weaving, and Curse of Recklessness's value and stacking in configs/wowsims | packages/data/overrides.toml, packages/engine | WAITING on the user |
+| 40 | Decide the open model differences with wowsims, from the evidence in docs/wowsims-evidence.md: Serpent Sting and Arcane Shot attack power scaling, Serpent Sting ticks critting, pet crit and hit inheritance, pet attack power source, pet base damage and focus rate, the 0.5 sec melee retry when weaving, and Curse of Recklessness's value and stacking in configs/wowsims | packages/data/overrides.toml, packages/engine | Pet DONE (2026-10-26): it swings a creature's weapon of its level (ExpectedStat, 2x creature DPS ±20% plus AP/14 x 2, own AP 4.2 x creature DPS), inherits the hunter's sheet crit, melee hit and 17/8 of it as spell hit, and 10% of the higher attack power; focus 5 a sec; no crit of its own. The stream's wolf now hits 49 per 1.2 sec swing against 41-61 seen, and the stream fights sim 129/111/112 against 129/121/150. The rest WAITING on the user |
 
 Tasks 1 to 10, 18 and 19 give a working "run my setup" CLI for Marksmanship. Task 20 follows because
 pets carry the weakest data. Task 21 comes last because it needs a whole melee model.
@@ -163,13 +163,17 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
   505. A public beta log measures Serpent Sting at about 3% of ranged attack power a tick, and Arcane
   Shot well above its tooltip; Blizzard's notes say pets inherit the hunter's crit and hit. None of it
   is in the model yet (task 40).
-- Level 30 against the beta (2026-10-26): the build search on GearQuest's "good" level 30 gear, in a
-  party, finds BM 21/0/0, MM 1/16/4 and SV 0/0/21, all weaving with a Wind Serpent, at 156-159 DPS
-  against a level 31 elite (configs/level30/*.build.toml). `sim beta` puts that at the 85th to 100th
-  percentile of beta hunter parses on Forever Logs in the dungeons near level 30; only SV in
-  Razorfen Kraul (median 158) is matched by the parses. Parses carry no level or gear, so this only
-  bounds the sim. The one hunter we can rebuild (the stream's Troll BM, configs/beta/bm-troll-30.toml)
-  sims 96-111 DPS against 120-150 on the meter: 20-35% low, about what the weak pet would explain.
+- Level 30 against the beta (2026-10-26, after the pet change in task 40): the build search on
+  GearQuest's "good" level 30 gear, in a party, finds BM 16/5/0, MM 0/16/5 and SV 0/0/21, all weaving
+  with a Raptor, at 167-170 DPS against a level 31 elite (configs/level30/*.build.toml). `sim beta`
+  puts that at the 90th to 100th percentile of beta hunter parses on Forever Logs in the dungeons
+  near level 30; SV in Razorfen Kraul (median 158, p75 174) is the closest match. Parses carry no level
+  or gear, so this only bounds the sim. The one hunter we can rebuild (the stream's Troll BM,
+  configs/beta/bm-troll-30.toml) sims 129/111/112 DPS against 129/121/150 on the meter (96-111
+  before the pet change).
+- With the new pet, `sim build --spec` on the MythicSim gear finds the same talents as before:
+  BM 31/16/4 at 358.1 DPS, MM 7/37/7 at 327.9 and SV 7/10/34 at 366.1, all weaving with a Wind Serpent
+  (ranged BM 327.2, MM 298.4 on configs/*.build.toml). The pet is a third of BM's damage now.
 - Lone Wolf beats keeping the pet once the pet attacks less than about 84% of the fight in wowsims
   (93% here, where the pet is weaker).
 

@@ -1,4 +1,4 @@
-# Found by `sim build configs/level30/sv.toml` (2026-10-26): +50.69% DPS on 5000 fresh fights.
+# Found by `sim build configs/level30/sv.toml` (2026-10-26): +44.79% DPS on 5000 fresh fights.
 extends = "sv.toml"
 name = "Level 30 sv, GearQuest good gear, build search"
 position = "weave"
@@ -17,7 +17,7 @@ maxAutoShotDelayMs = 900
 
 [pet]
 active = true
-family = "Wind Serpent"
+family = "Raptor"
 
 [rotation]
 precombat = ["aspect_of_the_hawk", "hunters_mark", "trueshot_aura"]

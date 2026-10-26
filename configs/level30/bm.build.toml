@@ -1,4 +1,4 @@
-# Found by `sim build configs/level30/bm.toml` (2026-10-26): +45.75% DPS on 5000 fresh fights.
+# Found by `sim build configs/level30/bm.toml` (2026-10-26): +44.26% DPS on 5000 fresh fights.
 extends = "bm.toml"
 name = "Level 30 bm, GearQuest good gear, build search"
 position = "weave"
@@ -12,12 +12,11 @@ maxAutoShotDelayMs = 900
 "Focused Fire" = 2
 "Unleashed Fury" = 5
 "Summon Hawk" = 1
-"Ferocity" = 4
-"Bestial Discipline" = 1
+"Lethal Attacks" = 5
 
 [pet]
 active = true
-family = "Wind Serpent"
+family = "Raptor"
 
 [rotation]
 precombat = ["aspect_of_the_hawk", "hunters_mark", "trueshot_aura"]
@@ -27,10 +26,11 @@ action = "multi_shot"
 
 [[rotation.actions]]
 action = "serpent_sting"
-if = "!debuff.serpent_sting.up & fight.remains > 9"
+if = "!debuff.serpent_sting.up & fight.remains > 6"
 
 [[rotation.actions]]
-action = "arcane_shot"
+action = "immolation_trap"
+if = "fight.remains > 3"
 
 [[rotation.actions]]
 action = "bestial_wrath"
@@ -40,20 +40,19 @@ action = "sniper_shot"
 
 [[rotation.actions]]
 action = "summon_hawk"
+if = "fight.remains > 12"
 
 [[rotation.actions]]
 action = "mongoose_bite"
 
 [[rotation.actions]]
 action = "raptor_strike"
-if = "mana.pct > 10"
 
 [[rotation.actions]]
-action = "immolation_trap"
-if = "fight.remains > 12"
-
-[[rotation.actions]]
-action = "explosive_trap"
+action = "arcane_shot"
 
 [[rotation.actions]]
 action = "rapid_fire"
+
+[[rotation.actions]]
+action = "explosive_trap"

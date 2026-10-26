@@ -227,26 +227,33 @@ source = "Classic beta testing, 60k+ hits: ~1.8% more on aura crit, ~4.8% total 
 
 # Pets =======================================================================
 
-# How much of the hunter's ranged AP the pet gains. Classic pets did not scale with hunter gear at all;
-# scaling arrived in TBC. Forever behaviour unknown.
-[pet.inheritRangedAttackPowerPct]
+# What the pet gains from the hunter (the client's Hunter Pet Scaling, 415429, lists the stats without
+# amounts; the server sets them). Its crit is the hunter's (Blizzard, Oct 16: "Fixed an issue where pets
+# were only ever inheriting the player's Melee Critical Strike chance"), and its melee hit the hunter's.
+[pet.inheritAttackPowerPct]
 value = 10
-confidence = "guess"
-source = "wow-forever-rotation.vercel.app assumption"
+confidence = "reported"
+source = "10% of the higher of melee and ranged attack power: Warcraft Tavern's Forever hunter guide; Blizzard's deep dive: pets get increased stats based on their hunter's gear; beta pet sheets read the owner's 10% beside the pet's own"
 
-# Pet white damage per 2.0 sec swing at the pet's base attack power, per pet level. Attack power
-# above base scales it by 0.7 + 0.3 * AP / baseAP. Pets keep their native speed with damage scaled
-# to it, so the sim normalizes everything to 2.0 sec.
-[pet.baseDamagePerLevel]
-min = 1.2075
-max = 1.5225
-confidence = "classic"
-source = "vmangos Pet::InitStatsForLevel (L * 1.15 * 1.05 to L * 1.45 * 1.05), 'from vanilla pet tab screenshots'; 72-91 at 60. cmangos uses 0.75-1.125 * L + AP/14 instead"
+[pet.spellHitPerHit]
+value = 2.125
+confidence = "reported"
+source = "17/8 of the hunter's ranged hit as spell hit: forever-bugs issue 394 (closed as fixed), as wowsims/forever sim/hunter/pets.go has it; not read on a pet sheet"
+
+[pet.swingSpreadPct]
+value = 20
+confidence = "reported"
+source = "Beta pet sheets (level 11 Carrion Bird 20-27, level 17 Cat 28-37) as wowsims/forever sim/hunter/pets.go reads them. Five pets in a public beta log hit within about 8% either side (docs/wowsims-evidence.md), a small sample"
+
+[pet.attackPowerPerCreatureDps]
+value = 4.2
+confidence = "reported"
+source = "Beta pet sheets: attack power 36, 61 and 103 at levels 11, 17 and 30, the creature DPS x 4.2 rounded down (wowsims/forever sim/hunter/pets.go), with nothing from Strength"
 
 [pet.focusPerSecond]
-value = 10
-confidence = "guess"
-source = "wow-forever-rotation.vercel.app uses 10 per sec. Classic's rate is not pinned down; measure in game"
+value = 5
+confidence = "classic"
+source = "vmangos: 25 focus per 5 sec tick; wowsims/forever uses 5 per sec too. Forever players say focus regenerates continuously; the rate is not measured"
 
 [pet.happinessDamagePct]
 value = 25
@@ -256,15 +263,10 @@ source = "Classic: a happy pet deals 125% damage"
 # The pet's miss, dodge and glancing follow from the level gap like the hunter's (attackTable in
 # the engine). Whether pets glance is not confirmed.
 
-[pet.baseCritPct]
-value = 5
-confidence = "guess"
-source = "Pet base melee crit, unknown"
-
 [pet.attackSpeedSec]
 value = 2.0
 confidence = "classic"
-source = "Classic normalizes pet DPS to a 2.0 sec swing whatever the native speed"
+source = "Pet DPS is the same whatever the native speed: a 1.31 sec pet in a public beta log hits for about 0.65 of a 2.0 sec pet's swing (docs/wowsims-evidence.md), as Classic normalized it. Beta players reported fast cats out-damaging slow ones before that"
 
 # Summon Hawk's hawk. Its attacks are server-side, so nothing about them is in the client.
 [pet.hawk.arrivalSec]

@@ -368,8 +368,10 @@ test("hawks and the dive get Unleashed Fury and Ferocity, but not Bestial Wrath"
 });
 
 test("pets autocast every damage ability they know, and magic ones miss on the spell table", () => {
-  const pet = (family: string) =>
-    simulate(game, { ...base, pet: { active: true, family }, fight: { durationSec: 120, iterations: 50 } }).abilities.filter((a) => a.name.startsWith("Pet:"));
+  const pet = (family: string, hitPct = 0) =>
+    simulate(game, { ...base, gear: { ...base.gear!, stats: { hitPct } }, pet: { active: true, family }, fight: { durationSec: 120, iterations: 50 } }).abilities.filter((a) =>
+      a.name.startsWith("Pet:"),
+    );
   expect(pet("Crab").map((a) => a.name)).toContain("Pet: Pinch");
   expect(pet("Gorilla").map((a) => a.name)).toContain("Pet: Thunderstomp");
   // Prowl needs stealth before the pull; it stays off.
@@ -377,6 +379,8 @@ test("pets autocast every damage ability they know, and magic ones miss on the s
   const breath = pet("Wind Serpent").find((a) => a.name === "Pet: Lightning Breath")!;
   expect(breath.missPct).toBeGreaterThan(14);
   expect(breath.missPct).toBeLessThan(20);
+  // The hunter's 9% hit reaches the pet as 17/8 of it in spell hit: 17% less 19%, floored at 1%.
+  expect(pet("Wind Serpent", 9).find((a) => a.name === "Pet: Lightning Breath")!.missPct).toBeLessThan(3);
 });
 
 test("pet autocast puts long cooldowns first and leaves out openers and abilities that do no damage", () => {
@@ -692,4 +696,18 @@ test("a random suffix adds its enchants' stats to the item's slot", () => {
     buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({ ...base, gear: { ...base.gear!, items: { head: 252605 }, suffixes } }), game.suffixes);
   expect(ch({ head: suffix.id }).primary.agility - ch({}).primary.agility).toBe(agility);
   expect(() => ch({ neck: suffix.id })).toThrow(/no item/);
+});
+
+test("the pet inherits the hunter's crit and hit, and swings a creature's weapon of its level", () => {
+  const melee = (stats: Record<string, number>) =>
+    simulate(game, { ...base, level: 30, gear: { rangedWeapon: { min: 20, max: 38, speed: 2.8 }, stats }, target: { preset: "normal" }, pet: { active: true, family: "Wolf" }, fight: { durationSec: 600, iterations: 30 } })
+      .abilities.find((a) => a.name === "Pet: Melee")!;
+  const plain = melee({});
+  expect(melee({ critPct: 20 }).critPct - plain.critPct).toBeGreaterThan(15);
+  expect(melee({ hitPct: 5 }).missPct).toBeLessThan(plain.missPct);
+  // Level 30: 2 x 24.69 creature DPS plus (103.7 own + 10% of the hunter's) attack power / 7, happy
+  // (x1.25), before armor; the normal target's armor at 30 takes about a fifth.
+  const before = melee({ critPct: -100 }).avgHit;
+  expect(before).toBeGreaterThan(55);
+  expect(before).toBeLessThan(70);
 });

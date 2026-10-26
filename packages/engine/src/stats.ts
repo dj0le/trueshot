@@ -145,10 +145,19 @@ export class HunterStats {
     return this.game.overrides.formula.runSpeedYdPerSec.value * (1 + pct / 100);
   }
 
+  // Hit from gear, talents and buffs.
+  hitPct(): number {
+    return this.ch.hitPct + this.selfAuras.sum(Aura.ModHitChance);
+  }
+
   missPct(): number {
     const t = this.target.table;
-    const hit = this.ch.hitPct + this.selfAuras.sum(Aura.ModHitChance);
-    return Math.max(0, t.missPct - Math.max(0, hit - t.hitPenaltyPct));
+    return Math.max(0, t.missPct - Math.max(0, this.hitPct() - t.hitPenaltyPct));
+  }
+
+  // Crit as the character sheet shows it, before the target takes any off; the pet inherits it.
+  sheetCritPct(): number {
+    return this.ch.critPct + this.selfAuras.sum(Aura.ModCritPct);
   }
 
   // Crit chance after the target's suppression; a spell adds its own crit modifiers.

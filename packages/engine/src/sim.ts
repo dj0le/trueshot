@@ -131,6 +131,7 @@ export class Fight implements PetHost {
   private readonly stats = new Map<string, AbilityStats>();
   private readonly target: Target;
   readonly calc: HunterStats;
+  readonly agilityCritPct: number;
   private readonly autoShot: Spell;
   readonly attackPowerPerDps: number;
   private readonly support: number[];
@@ -167,6 +168,7 @@ export class Fight implements PetHost {
       creatureMask: 1 << (CreatureType[t.creatureType] - 1),
     };
     this.calc = new HunterStats(ch, game, this.selfAuras, this.targetAuras, this.target);
+    this.agilityCritPct = ch.agilityCritPct;
     this.autoShot = game.data.spells["75"]!;
     this.attackPowerPerDps = game.overrides.formula.attackPowerPerDps.value;
     const preset = ch.config.support;
@@ -182,7 +184,7 @@ export class Fight implements PetHost {
       const family = game.data.petFamilies.find((p) => p.name === ch.config.pet.family);
       if (!family) throw new Error(`pet: unknown family "${ch.config.pet.family}"`);
       const attackingUntil = (durationMs * ch.config.pet.attackingPct) / 100;
-      const pet = { level: ch.level, baseAttackPower: atLevel(lv, lv.pet.attackPower.values, ch.level), table: this.target.table };
+      const pet = { level: ch.level, creatureDps: atLevel(lv, lv.pet.creatureDps.values, ch.level), table: this.target.table };
       this.pet = new Pet(this, game.data, game.overrides.pet, family, pet, ch.config.pet.abilities, attackingUntil);
       for (const a of ch.config.rotation.actions) {
         if (a.pet && !this.pet.knows(a.pet)) throw new Error(`rotation: a ${family.name} does not know "${a.pet}" (${a.action})`);
