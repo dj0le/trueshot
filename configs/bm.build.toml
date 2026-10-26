@@ -1,10 +1,14 @@
-# Found by `sim build configs/bm-cat.optimized.toml` (2026-10-26): +7.58% DPS on 5000 fresh fights.
+# Found by `sim build configs/bm-cat.optimized.toml` (2026-10-26): +15.12% DPS on 5000 fresh fights.
 extends = "bm-cat.optimized.toml"
-name = "BM, MythicSim gear, build search"
+name = "BM cat, MythicSim gear, build search"
+position = "weave"
+
+[weave]
+maxAutoShotDelayMs = 900
 
 [talents]
 "Deadly Aspects" = 5
-"Endurance Training" = 1
+"Endurance Training" = 0
 "Focused Fire" = 2
 "Improved Aspect of the Monkey" = 2
 "Bestial Swiftness" = 1
@@ -16,12 +20,13 @@ name = "BM, MythicSim gear, build search"
 "Frenzy" = 5
 "Bestial Wrath" = 1
 "Lethal Attacks" = 5
-"Efficiency" = 3
-"Careful Aim" = 4
+"Efficiency" = 4
+"Careful Aim" = 5
 "Improved Arcane Shot" = 0
-"Improved Tracking" = 4
 "Trueshot Aura" = 1
+"Improved Tracking" = 2
 "Improved Stings" = 3
+"Pathfinding" = 1
 
 [pet]
 active = true
@@ -35,35 +40,34 @@ action = "hunters_mark"
 if = "!debuff.hunters_mark.up"
 
 [[rotation.actions]]
-action = "serpent_sting"
-if = "!debuff.serpent_sting.up"
-
-[[rotation.actions]]
-action = "arcane_shot"
-if = "mana.pct > 50"
-
-[[rotation.actions]]
-action = "blood_fury"
-
-[[rotation.actions]]
 action = "berserking"
 
 [[rotation.actions]]
 action = "elunes_light"
 
 [[rotation.actions]]
-action = "aimed_shot"
-if = "mana.pct > 20"
+action = "bestial_wrath"
 
 [[rotation.actions]]
-action = "multi_shot"
-if = "mana.pct > 40"
+action = "sniper_shot"
 
 [[rotation.actions]]
 action = "rapid_fire"
 
 [[rotation.actions]]
-action = "bestial_wrath"
+action = "mongoose_bite"
 
 [[rotation.actions]]
-action = "sniper_shot"
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up"
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "mana.pct > 25"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "arcane_shot"
+if = "mana.pct > 40"

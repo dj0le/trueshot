@@ -1,15 +1,19 @@
-# Found by `sim build configs/mm-lone-wolf.optimized.toml` (2026-10-26): +10.09% DPS on 5000 fresh fights.
+# Found by `sim build configs/mm-lone-wolf.optimized.toml` (2026-10-26): +18.08% DPS on 5000 fresh fights.
 extends = "mm-lone-wolf.optimized.toml"
-name = "MM with a pet, MythicSim gear, build search"
+name = "MM Lone Wolf, MythicSim gear, build search"
+position = "weave"
+
+[weave]
+maxAutoShotDelayMs = 1200
 
 [talents]
-"Hawk Eye" = 0
+"Hawk Eye" = 2
 "Lethal Attacks" = 5
 "Improved Stings" = 3
 "Efficiency" = 5
 "Careful Aim" = 5
 "Rapid Killing" = 2
-"Improved Arcane Shot" = 1
+"Improved Arcane Shot" = 0
 "Lone Wolf" = 0
 "Trueshot Aura" = 1
 "Mortal Shots" = 5
@@ -18,9 +22,8 @@ name = "MM with a pet, MythicSim gear, build search"
 "Ranged Weapon Specialization" = 5
 "Sniper Shot" = 1
 "Deadly Aspects" = 5
-"Focused Fire" = 2
 "Improved Tracking" = 5
-"Improved Aspect of the Monkey" = 1
+"Focused Fire" = 2
 
 [pet]
 active = true
@@ -30,13 +33,14 @@ family = "Wind Serpent"
 precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
 
 [[rotation.actions]]
-action = "bestial_wrath"
-
-[[rotation.actions]]
-action = "blood_fury"
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
 
 [[rotation.actions]]
 action = "rapid_fire"
+
+[[rotation.actions]]
+action = "blood_fury"
 
 [[rotation.actions]]
 action = "aimed_shot"
@@ -46,19 +50,17 @@ if = "mana.pct > 15"
 action = "berserking"
 
 [[rotation.actions]]
+action = "elunes_light"
+
+[[rotation.actions]]
 action = "serpent_sting"
 if = "!debuff.serpent_sting.up"
 
 [[rotation.actions]]
-action = "hunters_mark"
-if = "!debuff.hunters_mark.up"
+action = "bestial_wrath"
 
 [[rotation.actions]]
 action = "summon_hawk"
 
 [[rotation.actions]]
-action = "sniper_shot"
-if = "mana.pct > 80"
-
-[[rotation.actions]]
-action = "elunes_light"
+action = "mongoose_bite"

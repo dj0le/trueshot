@@ -36,7 +36,7 @@ client build or to an override that records where it came from.
 | 26 | Set bonuses and enchants on gear | packages/data/src/build-items.ts | DONE. Sets come from Forever's ItemSet table (it reworks Beaststalker: 3pc +30 attack power, 4pc root escape, 5pc 5% chance on auto attacks for 200 mana, 6pc 8 mp5) and turn on as passives by pieces worn; `gear.enchants` takes SpellItemEnchantment ids (`sim enchants <text>` finds them), stat and scope enchants only, procs are task 27. Dragonstalker 8pc Expose Weakness uses the client's 100% proc chance; the tooltip says "a chance" and no source gives the real rate |
 | 27 | Item chance-on-hit procs | packages/engine | DONE, with on-use items. Worn on-use items (trinkets) are off-GCD actions named after the item, with their own cooldown and the 20 sec lockout their category shares; the rotation and build searches may add them. Equip spells that are not plain stats run as passives (proc auras, stacking buffs, armor penetration, attack power against a creature type). Ranged weapon procs (Dark Iron Rifle) fire at formula.weaponProcPpm, a guess; Badge of the Swarmguard's rate is a guess too. Forever reworked Devilsaur Eye into a root; Mark of the Champion and the new Blackhand's Breadth on-use have no client effects, so they do nothing in the sim. Melee weapon procs wait for task 21 |
 | 28 | Support presets (solo, party, raid) so rotations can be compared with and without outside mana: Blessing of Wisdom, Mana Spring, Judgement of Wisdom from the Forever client; Major Mana Potion and Demonic/Dark Rune as off-GCD rotation actions on their item cooldowns | packages/engine | DONE, party and raid presets are guesses at who is in the group; MythicSim party buffs still to match |
-| 29 | Melee weaving: step in for Raptor Strike between Auto Shots, which MythicSim does for all three specs | packages/engine | |
+| 29 | Melee weaving: step in for Raptor Strike between Auto Shots, which MythicSim does for all three specs | packages/engine | DONE. `position = "weave"` walks in after an Auto Shot when the main-hand swing is ready on arrival and the walk back delays the next Auto Shot by at most weave.maxAutoShotDelayMs; one swing (Raptor Strike if queued), melee abilities while there, then back out, Auto Shot restarting a reaction later. Distances and run speed from wowsims/forever PR 575 (12 yd to 4.99 yd at 7 yd/sec, highest speed bonus counts). The build search tries ranged, melee and weaving at 0.3-2 sec delays |
 | 30 | Rotation comparison: variant configs that `extends` a base, `sim compare` with several variants and a per-ability diff, `sim value` for what each action is worth | packages/cli | DONE |
 | 31 | Fight-length presets: level 30 dungeon trash and bosses (mostly under 60 sec on Forever Logs), level 60 dungeon, raid boss | configs | |
 | 32 | Procs that need a crit (Resourcefulness): fire only on critical strikes | packages/engine | |
@@ -99,6 +99,12 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
   (+7.6% over bm-cat.optimized) and MM 8/38/5 with a Wind Serpent at 269.3 (+10.1% over
   mm-lone-wolf.optimized), configs/bm.build.toml and configs/mm.build.toml. Both take Improved
   Tracking and Trueshot Aura; MM drops Lone Wolf for a pet. These assume the pet attacks all fight.
+- Weaving wins for all three specs once the build search can choose it (5000 fresh fights, same gear):
+  SV 31/13/7 weaving 303.0 DPS, BM 31/18/2 weaving 296.2, MM 39/7/5 weaving 292.2, all with a Wind
+  Serpent (configs/*.build.toml). Pure melee SV is 239.0 and ranged BM 276.7. The best Auto Shot delay
+  is 0.9 sec for BM and 1.2 sec for MM and SV; with a 15% quiver no weave fits without delaying the
+  shot at all. BM and MM weave with white swings only: the rotation search drops Raptor Strike, whose
+  mana is worth more on shots.
 - Survival in melee does 239.0 DPS after the build search (SV 31 / MM 13 / BM 7, Wind Serpent,
   configs/sv.build.toml), against 276.7 for BM and 271.8 for MM on the same gear. That gear is
   MythicSim's ranged set with Barbarous Blade as the only melee weapon, so melee gear could close
@@ -127,6 +133,7 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
 | beastmaster.io | Forever pet list (attack speed, abilities), family damage modifiers | Modifiers are Classic values. No stated license, use as reference |
 | GearQuestForever addon data | Level 60 BiS lists per spec | Classic BiS guides, not Forever-tuned |
 | MythicSim tier list | Reference DPS per spec | Calibration target only |
+| wowsims/forever (github.com/wowsims/forever) | A full Forever sim with hunter presets; PR 575 measured weaving (leg times, distances, best Auto Shot delay) | Reference for mechanics and a second calibration target (task 14) |
 
 Not in client data and needing overrides: pet family damage modifiers, pet base stats, server
 hotfixes. Each override records its source and whether it is guessed or measured.
