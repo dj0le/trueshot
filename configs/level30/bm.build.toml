@@ -1,0 +1,59 @@
+# Found by `sim build configs/level30/bm.toml` (2026-10-26): +45.75% DPS on 5000 fresh fights.
+extends = "bm.toml"
+name = "Level 30 bm, GearQuest good gear, build search"
+position = "weave"
+
+[weave]
+maxAutoShotDelayMs = 900
+
+[talents]
+"Deadly Aspects" = 5
+"Endurance Training" = 3
+"Focused Fire" = 2
+"Unleashed Fury" = 5
+"Summon Hawk" = 1
+"Ferocity" = 4
+"Bestial Discipline" = 1
+
+[pet]
+active = true
+family = "Wind Serpent"
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "hunters_mark", "trueshot_aura"]
+
+[[rotation.actions]]
+action = "multi_shot"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up & fight.remains > 9"
+
+[[rotation.actions]]
+action = "arcane_shot"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "raptor_strike"
+if = "mana.pct > 10"
+
+[[rotation.actions]]
+action = "immolation_trap"
+if = "fight.remains > 12"
+
+[[rotation.actions]]
+action = "explosive_trap"
+
+[[rotation.actions]]
+action = "rapid_fire"

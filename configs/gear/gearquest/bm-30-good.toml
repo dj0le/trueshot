@@ -1,0 +1,26 @@
+# GearQuest Forever good gear for a level 30 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 30; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 7413  # Infiltrator Cap of the Monkey
+neck = 12047  # Spectral Necklace of Agility
+shoulder = 277051  # Azure Gustwoven Spaulders
+back = 15147  # Ghostwalker Cloak of Agility
+chest = 4255  # Green Leather Armor
+wrist = 14590  # Hawkeye's Bracers
+hands = 4107  # Tiger Hunter Gloves
+waist = 252459  # Prowler's Leather Belt
+legs = 252517  # Trapper's Leather Legguards
+feet = 20123  # Highlander's Mail Greaves
+finger1 = 1491  # Ring of Precision
+finger2 = 10298  # Gnomeregan Band of Agility
+trinket1 = 21568  # Rune of Duty
+mainHand = 4126  # Guerrilla Cleaver
+offHand = 2941  # Prison Shank
+ranged = 9456  # Glass Shooter
+
+[gear.suffixes]
+head = 605
+neck = 132
+back = 151
+finger2 = 132

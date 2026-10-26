@@ -1,0 +1,25 @@
+# GearQuest Forever average gear for a level 60 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 60; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 16677  # Beaststalker's Cap
+neck = 11946  # Fire Opal Necklace of Agility
+shoulder = 20680  # Abyssal Mail Pauldrons
+back = 15190  # Grand Cloak of Agility
+chest = 22060  # Beastmaster's Tunic
+wrist = 13120  # Deepfury Bracers
+hands = 20713  # Desertstalkers's Gauntlets
+waist = 272395  # Assassin's Waistguard
+legs = 15676  # Magnificent Leggings of Agility
+feet = 18506  # Mongoose Boots
+finger1 = 19893  # Zanzil's Seal
+finger2 = 19905  # Zanzil's Band
+trinket1 = 270276  # Cleansed Vilebranch Icon
+trinket2 = 276337  # Thaelemaches' Talisman
+mainHand = 21134  # Dark Edge of Insanity
+ranged = 21478  # Bow of Taut Sinew
+
+[gear.suffixes]
+neck = 211
+back = 212
+legs = 370

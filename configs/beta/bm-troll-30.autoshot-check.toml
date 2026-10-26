@@ -1,0 +1,17 @@
+# Auto Shot alone on a level 23 mob, crits off, for checking the gear guess in bm-troll-30.toml
+# against the stream's floating combat text (106-107 a hit).
+extends = "bm-troll-30.toml"
+name = "Beta Troll BM, Auto Shot on a level 23 mob"
+
+[gear.stats]
+critPct = -100
+
+[target]
+level = 23
+
+[fight]
+durationSec = 60
+iterations = 50
+
+[rotation]
+actions = []

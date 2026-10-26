@@ -1,0 +1,25 @@
+# GearQuest Forever average gear for a level 30 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 30; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 6204  # Tribal Worg Helm
+neck = 281290  # Replica Crescent Necklace
+shoulder = 4252  # Dark Leather Shoulders
+back = 9860  # Archer's Cloak of Agility
+chest = 4119  # Raptor Hunter Tunic
+wrist = 270033  # Demonhide Bracers
+hands = 6408  # Insignia Gloves
+waist = 7406  # Infiltrator Cord of the Tiger
+legs = 252500  # Brawler's Leather Pants
+feet = 4055  # Insignia Boots
+finger1 = 10298  # Gnomeregan Band of the Tiger
+finger2 = 12007  # Prairie Ring of the Tiger
+trinket1 = 21568  # Rune of Duty
+mainHand = 19573  # Lorekeeper's Staff
+ranged = 19565  # Outrunner's Bow
+
+[gear.suffixes]
+back = 167
+waist = 684
+finger1 = 678
+finger2 = 678

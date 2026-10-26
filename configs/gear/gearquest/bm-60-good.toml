@@ -1,0 +1,21 @@
+# GearQuest Forever good gear for a level 60 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 60; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 19875  # Bloodstained Coif
+neck = 19621  # Maelstrom's Wrath
+shoulder = 21665  # Mantle of Wicked Revenge
+back = 13122  # Dark Phantom Cape
+chest = 16466  # Field Marshal's Chain Breastplate
+wrist = 19587  # Forest Stalker's Bracers
+hands = 16463  # Marshal's Chain Grips
+waist = 272396  # Shifter's Belt
+legs = 20617  # Ancient Corroded Leggings
+feet = 22061  # Beastmaster's Boots
+finger1 = 21596  # Ring of the Godslayer
+finger2 = 19432  # Circle of Applied Force
+trinket1 = 270275  # Cleansed Vilebranch Medallion
+trinket2 = 23041  # Slayer's Crest
+mainHand = 18203  # Eskhandar's Right Claw
+offHand = 19859  # Fang of the Faceless
+ranged = 17072  # Blastershot Launcher

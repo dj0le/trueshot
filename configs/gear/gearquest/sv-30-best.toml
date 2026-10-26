@@ -1,0 +1,24 @@
+# GearQuest Forever best gear for a level 30 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 30; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 15339  # Pathfinder Hat of the Tiger
+neck = 19541  # Sentinel's Medallion
+shoulder = 2278  # Forest Tracker Epaulets
+back = 13108  # Tigerstrike Mantle
+chest = 252508  # Brawler's Leather Tunic
+wrist = 270080  # Arathi Armbands
+hands = 4107  # Tiger Hunter Gloves
+waist = 252459  # Prowler's Leather Belt
+legs = 270057  # Stromgarde Operative Pants
+feet = 15142  # Ghostwalker Boots of Agility
+finger1 = 7686  # Ironspine's Eye
+finger2 = 19517  # Protector's Band
+trinket1 = 21119  # Talisman of Arathor
+trinket2 = 21568  # Rune of Duty
+mainHand = 7753  # Bloodspiller
+ranged = 17687  # Master Hunter's Rifle
+
+[gear.suffixes]
+head = 693
+feet = 172

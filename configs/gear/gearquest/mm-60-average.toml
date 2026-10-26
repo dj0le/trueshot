@@ -1,0 +1,24 @@
+# GearQuest Forever average gear for a level 60 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 60; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 16677  # Beaststalker's Cap
+neck = 18205  # Eskhandar's Collar
+shoulder = 19691  # Bloodsoul Shoulders
+back = 15190  # Grand Cloak of Agility
+chest = 19685  # Primal Batskin Jerkin
+wrist = 22668  # Bracers of Subterfuge
+hands = 19390  # Taut Dragonhide Gloves
+waist = 22010  # Beastmaster's Belt
+legs = 15676  # Magnificent Leggings of Agility
+feet = 18506  # Mongoose Boots
+finger1 = 19432  # Circle of Applied Force
+finger2 = 20624  # Ring of the Unliving
+trinket1 = 19406  # Drake Fang Talisman
+trinket2 = 276337  # Thaelemaches' Talisman
+mainHand = 250615  # Thorium Poleaxe
+ranged = 21478  # Bow of Taut Sinew
+
+[gear.suffixes]
+back = 212
+legs = 370

@@ -1,0 +1,26 @@
+# GearQuest Forever average gear for a level 30 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 30; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 4724  # Humbert's Helm
+neck = 7731  # Ghostshard Talisman
+shoulder = 15116  # Rigid Shoulders of Agility
+back = 9867  # Renegade Cloak of the Monkey
+chest = 252450  # Defender's Leather Tunic
+wrist = 897  # Madwolf Bracers
+hands = 9832  # Scaled Leather Gloves of the Monkey
+waist = 20120  # Highlander's Mail Girdle
+legs = 15344  # Pathfinder Pants of Agility
+feet = 6601  # Dervish Boots of Agility
+finger1 = 1076  # Defias Renegade Ring
+finger2 = 2933  # Seal of Wrynn
+trinket1 = 21568  # Rune of Duty
+mainHand = 756  # Tunnel Pick
+ranged = 19565  # Outrunner's Bow
+
+[gear.suffixes]
+shoulder = 151
+back = 596
+hands = 599
+legs = 211
+feet = 167

@@ -1,0 +1,37 @@
+# A level 30 hunter on GearQuest Forever's "good" gear for the spec, in a 5-man group against a
+# beta dungeon boss (elite, two levels up), for comparing with beta parses on Forever Logs
+# (packages/data/calibration/foreverlogs-beta.toml). Talents, pet, style and rotation come from
+# `sim build configs/level30/bm.toml --spec bm --out configs/level30/bm.build.toml`.
+extends = "../gear/gearquest/bm-30-good.toml"
+name = "Level 30 bm, GearQuest good gear"
+level = 30
+race = "Human"
+support = "party"
+
+[gear]
+ammoDps = 7.5        # Razor Arrow, the level 25 arrow
+quiverHastePct = 12
+
+[pet]
+active = true
+family = "Wolf"
+
+[target]
+preset = "elite"
+
+[fight]
+preset = "dungeon-boss-30"
+iterations = 1000
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "hunters_mark"]
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!dot.serpent_sting.ticking"
+
+[[rotation.actions]]
+action = "multi_shot"
+
+[[rotation.actions]]
+action = "arcane_shot"

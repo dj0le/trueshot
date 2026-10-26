@@ -1,0 +1,23 @@
+# GearQuest Forever best gear for a level 30 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 30; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 252512  # Brawler's Leather Helm
+neck = 19541  # Sentinel's Medallion
+shoulder = 2264  # Mantle of Thieves
+back = 13108  # Tigerstrike Mantle
+chest = 7374  # Dusky Leather Armor
+wrist = 270091  # Seadog's Battered Cuffs
+hands = 270072  # Alterac Assassin's Gloves
+waist = 252521  # Stalker's Leather Belt
+legs = 9509  # Petrolspill Leggings
+feet = 15142  # Ghostwalker Boots of Agility
+finger1 = 281634  # Field Researcher's Loop
+finger2 = 7686  # Ironspine's Eye
+trinket1 = 21119  # Talisman of Arathor
+trinket2 = 21568  # Rune of Duty
+mainHand = 6679  # Armor Piercer
+ranged = 17686  # Master Hunter's Bow
+
+[gear.suffixes]
+feet = 172

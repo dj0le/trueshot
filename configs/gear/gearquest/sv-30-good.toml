@@ -1,0 +1,26 @@
+# GearQuest Forever good gear for a level 30 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 30; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 10406  # Scaled Leather Headband of the Tiger
+neck = 12047  # Spectral Necklace of the Tiger
+shoulder = 277043  # Cloudy Gustwoven Spaulders
+back = 7460  # Knight's Cloak of the Tiger
+chest = 2041  # Tunic of Westfall
+wrist = 18948  # Barbaric Bracers
+hands = 15355  # Headhunter's Mitts of the Tiger
+waist = 252521  # Stalker's Leather Belt
+legs = 6690  # Ferine Leggings
+feet = 20123  # Highlander's Mail Greaves
+finger1 = 270053  # Ring of Ruin
+finger2 = 13097  # Thunderbrow Ring
+trinket1 = 21568  # Rune of Duty
+mainHand = 8226  # The Butcher
+offHand = 13033  # Zealot Blade
+ranged = 9456  # Glass Shooter
+
+[gear.suffixes]
+head = 690
+neck = 678
+back = 681
+hands = 687

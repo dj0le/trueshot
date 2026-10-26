@@ -1,0 +1,21 @@
+# GearQuest Forever good gear for a level 60 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 60; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 21366  # Striker's Diadem
+neck = 21664  # Barbed Choker
+shoulder = 16468  # Field Marshal's Chain Spaulders
+back = 18511  # Shifting Cloak
+chest = 21370  # Striker's Hauberk
+wrist = 22668  # Bracers of Subterfuge
+hands = 22715  # Gloves of the Tormented
+waist = 22442  # Cryptstalker Girdle
+legs = 19887  # Bloodstained Legplates
+feet = 16462  # Marshal's Chain Boots
+finger1 = 23067  # Ring of the Cryptstalker
+finger2 = 21596  # Ring of the Godslayer
+trinket1 = 22954  # Kiss of the Spider
+trinket2 = 274759  # Everlook Pathcarver
+mainHand = 21673  # Silithid Claw
+offHand = 21244  # Blessed Qiraji Pugio
+ranged = 17072  # Blastershot Launcher

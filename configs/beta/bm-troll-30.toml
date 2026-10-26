@@ -1,0 +1,64 @@
+# The level 30 Troll BM hunter from the beta stream in packages/data/calibration/beta-level30.toml
+# (youtu.be/keeiGM1B-LU), for `sim calibrate`. The gear is unknown, so the bow and agility are set
+# so Auto Shot lands for about 106 on a level 23 mob, as its floating combat text showed. The pet is
+# a wolf with a 1.2 sec attack speed (Faster Attack).
+name = "Beta Troll BM, level 30"
+level = 30
+race = "Troll"
+support = "party"
+
+# The talents said on stream (Focused Fire 2, Endurance Training 3, Bestial Swiftness 1, Unleashed
+# Fury 5, Summon Hawk, Ferocity 5, Bestial Discipline, Intimidation 1, Frenzy 1) do not fit 21 points
+# under Forever's row rules: Frenzy alone needs 25. This keeps the pet talents that fit, filling the
+# first two rows with Deadly Aspects and Improved Aspect of the Monkey, and Ferocity at 4 to make room.
+[talents]
+"Deadly Aspects" = 2
+"Endurance Training" = 3
+"Focused Fire" = 2
+"Improved Aspect of the Monkey" = 3
+"Bestial Swiftness" = 1
+"Unleashed Fury" = 5
+"Ferocity" = 4
+"Summon Hawk" = 1
+
+[gear]
+ammoDps = 7.5        # Razor Arrow, the level 25 arrow
+quiverHastePct = 12
+
+[gear.rangedWeapon]  # a level 30 green bow, 14 DPS
+min = 33
+max = 48
+speed = 2.9
+
+[gear.stats]
+agility = 40
+hitPct = 0
+
+[pet]
+active = true
+family = "Wolf"
+
+[target]
+preset = "elite"
+
+[fight]
+preset = "dungeon-boss-30"
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "hunters_mark"]
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!dot.serpent_sting.ticking"
+
+[[rotation.actions]]
+action = "multi_shot"
+
+[[rotation.actions]]
+action = "aimed_shot"
+
+[[rotation.actions]]
+action = "arcane_shot"

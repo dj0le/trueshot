@@ -1,0 +1,20 @@
+# GearQuest Forever best gear for a level 60 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 60; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 16846  # Giantstalker's Helmet
+neck = 19377  # Prestor's Talisman of Connivery
+shoulder = 21665  # Mantle of Wicked Revenge
+back = 13340  # Cape of the Black Baron
+chest = 16942  # Dragonstalker's Breastplate
+wrist = 22443  # Cryptstalker Wristguards
+hands = 21672  # Gloves of Enforcement
+waist = 272396  # Shifter's Belt
+legs = 16847  # Giantstalker's Leggings
+feet = 16849  # Giantstalker's Boots
+finger1 = 21202  # Signet Ring of the Bronze Dragonflight
+finger2 = 22961  # Band of Reanimation
+trinket1 = 21180  # Earthstrike
+trinket2 = 23041  # Slayer's Crest
+mainHand = 13262  # Ashbringer
+ranged = 19361  # Ashjre'thul, Crossbow of Smiting

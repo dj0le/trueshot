@@ -1,0 +1,19 @@
+# GearQuest Forever average gear for a level 30 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 30; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 277044  # Cloudy Windraveled Cover
+neck = 281290  # Replica Crescent Necklace
+shoulder = 4252  # Dark Leather Shoulders
+back = 2805  # Yeti Fur Cloak
+chest = 14405  # Resilient Robe
+wrist = 13106  # Glowing Magical Bracelets
+hands = 7690  # Ebon Vise
+waist = 3562  # Belt of Vindication
+legs = 252501  # Trapper's Leather Pants
+feet = 10402  # Blackened Defias Boots
+finger1 = 277209  # Ponderous Loop
+finger2 = 1491  # Ring of Precision
+trinket1 = 21568  # Rune of Duty
+mainHand = 19573  # Lorekeeper's Staff
+ranged = 19565  # Outrunner's Bow

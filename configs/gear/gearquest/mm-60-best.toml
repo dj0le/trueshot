@@ -1,0 +1,20 @@
+# GearQuest Forever best gear for a level 60 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 60; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 16846  # Giantstalker's Helmet
+neck = 19377  # Prestor's Talisman of Connivery
+shoulder = 22439  # Cryptstalker Spaulders
+back = 21403  # Cloak of the Unseen Path
+chest = 22436  # Cryptstalker Tunic
+wrist = 22443  # Cryptstalker Wristguards
+hands = 22441  # Cryptstalker Handguards
+waist = 272397  # Ranger's Belt
+legs = 22437  # Cryptstalker Legguards
+feet = 22440  # Cryptstalker Boots
+finger1 = 21202  # Signet Ring of the Bronze Dragonflight
+finger2 = 22961  # Band of Reanimation
+trinket1 = 22954  # Kiss of the Spider
+trinket2 = 21180  # Earthstrike
+mainHand = 13056  # Frenzied Striker
+ranged = 19361  # Ashjre'thul, Crossbow of Smiting

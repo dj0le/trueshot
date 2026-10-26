@@ -1,0 +1,25 @@
+# GearQuest Forever average gear for a level 60 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 60; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 10226  # Nightshade Helmet of the Tiger
+neck = 13089  # Skibi's Pendant
+shoulder = 19691  # Bloodsoul Shoulders
+back = 10267  # Masterwork Cape of Agility
+chest = 22191  # Obsidian Mail Tunic
+wrist = 13120  # Deepfury Bracers
+hands = 279257  # Mourning Handguards
+waist = 272522  # Premier Legionnaire's Shadowhide Girdle
+legs = 15676  # Magnificent Leggings of Agility
+feet = 21645  # Hive Tunneler's Boots
+finger1 = 20624  # Ring of the Unliving
+finger2 = 21402  # Signet of the Unseen Path
+trinket1 = 23001  # Eye of Diminution
+trinket2 = 274760  # Everlook Delivery Bot
+mainHand = 19354  # Draconic Avenger
+ranged = 21478  # Bow of Taut Sinew
+
+[gear.suffixes]
+head = 720
+back = 267
+legs = 370

@@ -1,0 +1,25 @@
+# GearQuest Forever good gear for a level 30 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 30; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 3020  # Enduring Cap
+neck = 271920  # Seal of the Expedition
+shoulder = 277043  # Cloudy Gustwoven Spaulders
+back = 7460  # Knight's Cloak of the Monkey
+chest = 2041  # Tunic of Westfall
+wrist = 14590  # Hawkeye's Bracers
+hands = 6727  # Razzeric's Racing Grips
+waist = 252520  # Skulker's Leather Belt
+legs = 15456  # Lightstep Leggings
+feet = 4055  # Insignia Boots
+finger1 = 12007  # Prairie Ring of the Falcon
+finger2 = 12008  # Savannah Ring of the Falcon
+trinket1 = 21568  # Rune of Duty
+mainHand = 8226  # The Butcher
+offHand = 2941  # Prison Shank
+ranged = 9456  # Glass Shooter
+
+[gear.suffixes]
+back = 596
+finger1 = 248
+finger2 = 248
