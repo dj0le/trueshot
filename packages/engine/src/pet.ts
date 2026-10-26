@@ -5,7 +5,7 @@ import type { HunterData, Overrides, PetFamily, Spell } from "@hunter-sim/data";
 import { AuraSet } from "./auras";
 import type { AttackTable } from "./levels";
 import { type ActiveSpell, knownRank, type ResolvedEffect, resolveEffects, snake } from "./character";
-import { Aura, DefenseType, Effect, IGNORED_AURAS, ProcFlag, School, SpellModOp, TARGET_ENEMY } from "./enums";
+import { Aura, DefenseType, Effect, IGNORED_AURAS, ProcFlag, School, SpellModOp } from "./enums";
 import type { EventQueue } from "./queue";
 import type { Rng } from "./rng";
 
@@ -28,16 +28,34 @@ export type PetHost = {
   report(what: string): void;
 };
 
-// Default ability priority, filtered to what the family knows. Buffs first, then damage.
-const DEFAULT_PRIORITY = [
-  "tricksters_dance",
-  "furious_howl",
-  "savage_rend",
-  "dismember",
-  "bite",
-  "lightning_breath",
-  "claw",
-];
+// Pet buffs that raise its damage.
+const DAMAGE_BUFFS = new Set<number>([Aura.ModMeleeHaste, Aura.ModAttackPower, Aura.ModDamagePercentDone]);
+// Buffs land on the pet itself (1) or its group around it (56, Furious Howl).
+const BUFF_TARGETS = new Set([1, 56]);
+const STEALTH = 16;
+const CHARGE = 96;
+
+const isBuff = (e: ResolvedEffect) => e.effect === Effect.ApplyAura && BUFF_TARGETS.has(e.implicitTarget[0]) && DAMAGE_BUFFS.has(e.aura) && e.value > 0;
+
+// The default autocast: every ability that deals damage or raises the pet's damage. Buffs first,
+// then damage by cooldown, longest first, so the cheap filler (Claw) takes what is left. Openers
+// that need stealth or a run-up (Prowl, Charge) stay off.
+function defaultPriority(known: Map<string, Spell>): string[] {
+  const kind = (s: Spell) => {
+    const effects = resolveEffects(s);
+    if (effects.some((e) => e.effect === CHARGE || e.aura === STEALTH)) return null;
+    if (effects.some(isBuff)) return 0;
+    const damage = effects.some((e) => e.effect === Effect.SchoolDamage || (e.effect === Effect.ApplyAura && e.aura === Aura.PeriodicDamage));
+    return damage ? 1 : null;
+  };
+  const cooldown = (s: Spell) => Math.max(s.cooldownMs, s.categoryCooldownMs);
+  const cost = (s: Spell) => s.power.find((p) => p.type === 2)?.cost ?? 0;
+  return [...known]
+    .map(([name, spell]) => ({ name, spell, kind: kind(spell) }))
+    .filter((a) => a.kind !== null)
+    .sort((a, b) => a.kind! - b.kind! || cooldown(b.spell) - cooldown(a.spell) || cost(b.spell) - cost(a.spell))
+    .map((a) => a.name);
+}
 
 // Pet auras the sim reads, plus those with no effect on its damage (defensive, cosmetic or out of
 // scope). Anything else is reported.
@@ -48,7 +66,7 @@ const KNOWN_PET_AURAS = new Set<number>([
   Aura.ModDamagePercentDone,
   Aura.ProcTriggerSpell, // handled by the proc check
   ...IGNORED_AURAS,
-  13, 22, 29, 31, 49, 101, 118, 133, 142, 230, 563,
+  13, 22, 26, 29, 31, 33, 49, 67, 101, 118, 133, 142, 230, 563,
 ]);
 
 export class Pet {
@@ -90,7 +108,7 @@ export class Pet {
       const spell = knownRank(data, a, stats.level);
       if (spell) known.set(snake(a.name), spell);
     }
-    const order = priority ?? DEFAULT_PRIORITY;
+    const order = priority ?? defaultPriority(known);
     for (const name of priority ?? []) {
       if (!known.has(name)) throw new Error(`pet: a ${family.name} does not know "${name}" at level ${stats.level}`);
     }
@@ -294,7 +312,8 @@ export class Pet {
     if (spell.defenseType !== DefenseType.None) {
       const r = this.host.rng.stream("pet-special").next() * 100;
       const t = this.stats.table;
-      const avoid = t.missPct + (spell.defenseType === DefenseType.Melee ? t.dodgePct : 0);
+      const avoid =
+        spell.defenseType === DefenseType.Magic ? t.spellMissPct : t.missPct + (spell.defenseType === DefenseType.Melee ? t.dodgePct : 0);
       if (r < avoid) {
         this.host.record(name, "miss");
         return;
@@ -334,8 +353,8 @@ export class Pet {
         }
       });
     }
-    // Buffs on the pet itself (Trickster's Dance, Furious Howl).
-    const buffs = auraEffects.filter((e) => e.aura !== Aura.PeriodicDamage && !TARGET_ENEMY.has(e.implicitTarget[0]));
+    // Buffs on the pet itself (Trickster's Dance, Furious Howl), not debuffs around it (Demoralizing Screech).
+    const buffs = auraEffects.filter((e) => e.aura !== Aura.PeriodicDamage && BUFF_TARGETS.has(e.implicitTarget[0]));
     if (buffs.length > 0) this.addAura(spell, buffs, spell.durationMs);
   }
 

@@ -4,6 +4,8 @@ import type { Overrides } from "@hunter-sim/data";
 
 export type AttackTable = {
   missPct: number;
+  // Magic attacks (the pet's Lightning Breath, Sonic Blast) miss on their own table.
+  spellMissPct: number;
   // Hit from gear and talents below this much does nothing.
   hitPenaltyPct: number;
   // Taken off crit chance (negative against lower-level targets, which are easier to crit).
@@ -29,8 +31,12 @@ export function attackTable(f: Overrides["formula"], attackerLevel: number, targ
   // Glancing: 10% plus 2% per point of defense over skill; damage between low and high, here the mean.
   const low = clamp(1.3 - 0.05 * gap, 0.01, 0.91);
   const high = clamp(1.2 - 0.03 * gap, 0.2, 0.99);
+  // vmangos Unit::MagicSpellHitResult against a creature: 96% hit minus 1% per level up to +2, then
+  // 11% per level (+3 = 83%), between 1% and 99%. Partial resists are not modelled.
+  const spellHit = levels < 3 ? 96 - levels : 94 - (levels - 2) * 11;
   return {
     missPct,
+    spellMissPct: 100 - clamp(spellHit, 1, 99),
     hitPenaltyPct: gap > 10 ? 1 : 0,
     critSuppressionPct,
     auraCritSuppressionPct: levels >= 3 ? f.auraCritSuppressionPct.value : 0,

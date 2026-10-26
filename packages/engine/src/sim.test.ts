@@ -226,10 +226,10 @@ test("a pet attacking half the fight does about half its damage", () => {
 test("the attack table follows the level gap", () => {
   const f = game.overrides.formula;
   const boss = attackTable(f, 60, 63);
-  expect(boss).toMatchObject({ missPct: 8, hitPenaltyPct: 1, critSuppressionPct: 3, auraCritSuppressionPct: 1.8, dodgePct: 6.5, glancingPct: 40 });
+  expect(boss).toMatchObject({ missPct: 8, spellMissPct: 17, hitPenaltyPct: 1, critSuppressionPct: 3, auraCritSuppressionPct: 1.8, dodgePct: 6.5, glancingPct: 40 });
   expect(boss.glancingPenaltyPct).toBeCloseTo(35, 5);
   expect(attackTable(f, 30, 32)).toMatchObject({ missPct: 6, hitPenaltyPct: 0, critSuppressionPct: 2, auraCritSuppressionPct: 0 });
-  expect(attackTable(f, 30, 30)).toMatchObject({ missPct: 5, critSuppressionPct: 0, glancingPct: 10 });
+  expect(attackTable(f, 30, 30)).toMatchObject({ missPct: 5, spellMissPct: 4, critSuppressionPct: 0, glancingPct: 10 });
 });
 
 test("a level 30 hunter knows level 30 ranks, has level 30 stats, and fights a level 30 target", () => {
@@ -365,4 +365,16 @@ test("hawks and the dive get Unleashed Fury and Ferocity, but not Bestial Wrath"
   const none = run(bm, [], "normal").find((a) => a.name === "Summon Hawk")!.critPct;
   expect(ferocity - none).toBeGreaterThan(7);
   expect(ferocity - none).toBeLessThan(13);
+});
+
+test("pets autocast every damage ability they know, and magic ones miss on the spell table", () => {
+  const pet = (family: string) =>
+    simulate(game, { ...base, pet: { active: true, family }, fight: { durationSec: 120, iterations: 50 } }).abilities.filter((a) => a.name.startsWith("Pet:"));
+  expect(pet("Crab").map((a) => a.name)).toContain("Pet: Pinch");
+  expect(pet("Gorilla").map((a) => a.name)).toContain("Pet: Thunderstomp");
+  // Prowl needs stealth before the pull; it stays off.
+  expect(pet("Cat").map((a) => a.name)).not.toContain("Pet: Prowl");
+  const breath = pet("Wind Serpent").find((a) => a.name === "Pet: Lightning Breath")!;
+  expect(breath.missPct).toBeGreaterThan(14);
+  expect(breath.missPct).toBeLessThan(20);
 });
