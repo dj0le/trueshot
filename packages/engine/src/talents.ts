@@ -50,6 +50,9 @@ export type BuildSearchOptions = {
   styles: boolean;
   seed: string;
   onProgress?: (msg: string) => void;
+  // Scores a candidate config, our own sim by default; another sim can stand in (wowsims). It may
+  // throw when the setup cannot run, which skips the candidate.
+  evaluate?: (config: SimConfigInput) => SimResult;
 };
 
 export type BuildSearchResult = { best: Build; result: SimResult; evaluated: number };
@@ -165,6 +168,7 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
   const families = opts.pets ? data.petFamilies.map((f) => f.name) : null;
   const styles = opts.styles && parsed.gear.items.mainHand ? STYLES : null;
   const searchSeed = `${opts.seed}/search`;
+  const evaluate = opts.evaluate ?? ((c: SimConfigInput) => simulate(game, c));
   const seen = new Map<string, SimResult | null>();
   let evaluated = 0;
 
@@ -175,7 +179,7 @@ export function searchBuilds(game: GameData, config: SimConfigInput, opts: Build
     let result: SimResult | null = null;
     if (talentErrors(data, level, b.talents).errors.length === 0) {
       try {
-        result = simulate(game, { ...withBuild(config, b), fight: { ...config.fight, iterations: opts.iterations, seed: searchSeed } });
+        result = evaluate({ ...withBuild(config, b), fight: { ...config.fight, iterations: opts.iterations, seed: searchSeed } });
         evaluated++;
       } catch {
         result = null;
