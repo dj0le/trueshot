@@ -45,6 +45,7 @@ client build or to an override that records where it came from.
 | 35 | Estimate vs actual: sim my character's real gear and talents next to a log of the same boss, and the tier presets, to split the gap into execution and gear | packages/cli | BLOCKED, needs task 25 or 13 for my logs, and task 23 below level 60 |
 | 36 | Racials: Skyborne Wind Blessed (+3% haste, from the talentsforever racials list), Troll Berserking, Orc Blood Fury and pet bonus, Dwarf and Troll weapon skills; plus a haste stat in gear and buffs | packages/engine | DONE, damage racials from the client (passives always on, Blood Fury, Berserking and Elune's Light as actions) and a hastePct stat. Forever has no Orc pet bonus or weapon skill racials. Skyborne base stats are still copied from Human |
 | 37 | items.json carries Season of Discovery items (ids 23xxxx, item level 80+, many with +% haste) because they sit in Forever's Item table; check which really exist in Forever and drop the rest | DONE, 3,274 SoD items and the client's test items dropped; no +% haste gear is left in Forever's data |
+| 38 | Audit leftovers from b983b01..HEAD: hawk dive (HAWK_DIVE) and ON_LAND scripts keyed by spell name, Renataki's Refocus keyed by item name because on-use spells take the item's name; Expose Prey's Hunter's Mark condition (PROC_IF) and Focused Fire as name lookups instead of overrides keyed by spell id; `sim build --out` keeps the parent's pet.abilities when the family changes; Item.equipSpells is read by nothing, and an equip spell with one unknown effect has its known stats counted twice (only Runeblade of Baron Rivendare today, harmless); proc internal cooldowns have no test, since no item in the data has one that shows in results | packages/engine, packages/data, packages/cli | |
 
 Tasks 1 to 10, 18 and 19 give a working "run my setup" CLI for Marksmanship. Task 20 follows because
 pets carry the weakest data. Task 21 comes last because it needs a whole melee model.
@@ -71,6 +72,12 @@ pets carry the weakest data. Task 21 comes last because it needs a whole melee m
   forever-hunter wiki and a Blizzard forum thread; Robcat's Oct 16 video). Channels (Volley) still hold
   it. A beta player remembers the cast bar "hiccuping" when an Auto Shot fired mid-cast; whether that
   costs cast time is unknown, so the cast is left untouched until logs say otherwise.
+- Lacerating Strikes refreshes the way Deep Wounds does: a bite on a live bleed adds the unticked
+  damage to the new one, spreads the sum over a full set of ticks and keeps the old tick timer
+  (wowsims/forever talents_survival.go). No Forever source says, so in-game testing is required.
+- Weaving stays in melee to finish a cast or channel started there, and waits out the GCD once for a
+  reactive ability (Mongoose Bite opened by the swing). Other melee abilities wait for the next weave:
+  waiting for every GCD stalls Auto Shot (sv.build lost 37 DPS that way).
 - All TypeScript on Bun. The engine is pure (no I/O), so it runs unchanged in the CLI now and in a
   SvelteKit web worker later. Rust/WASM only if the optimizer outgrows it, and then only the inner loop.
 

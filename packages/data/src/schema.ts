@@ -56,6 +56,8 @@ export type Spell = {
   preventionType: number;
   mechanic: number;
   dispelType: number;
+  // The aura state the caster needs (SpellAuraRestrictions): 1 after a dodge, 7 after a parry; 0 for none.
+  casterAuraState: number;
   power: SpellPower[];
   proc: SpellProc | null;
   classOptions: { set: number; mask: [number, number, number, number] } | null;

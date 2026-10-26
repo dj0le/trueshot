@@ -130,7 +130,15 @@ export const snake = (name: string) =>
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_|_$/g, "");
 
+// A spell's effects without a talent rank, built once per spell; callers copy before changing them.
+const baseEffects = new WeakMap<Spell, ResolvedEffect[]>();
+
 export function resolveEffects(spell: Spell, talent?: Talent, rank?: number): ResolvedEffect[] {
+  if (!talent) {
+    let cached = baseEffects.get(spell);
+    if (!cached) baseEffects.set(spell, (cached = spell.effects.map((e) => ({ ...e, value: e.basePoints }))));
+    return cached;
+  }
   return spell.effects.map((e) => {
     const perRank = talent?.rankEffects.find((r) => r.effectIndex === e.index);
     const value = perRank && rank ? (perRank.values[rank - 1] ?? e.basePoints) : e.basePoints;
@@ -201,6 +209,13 @@ function scriptedEffects(talent: Talent, effects: ResolvedEffect[]): ResolvedEff
   return effects.map((e) => (e.aura === Aura.Dummy ? { ...e, aura: Aura.ModDamagePercentDone, miscValue: [127, 0] } : e));
 }
 
+// A talent whose ranks set its proc trigger's value ("a 10% chance" at rank 2) keeps its chance
+// there, while the spell's own proc chance stays at 100 (Expose Prey, Resourcefulness).
+function withRankProcChance(spell: Spell, talent: Talent, effects: ResolvedEffect[]): Spell {
+  const trigger = effects.find((e) => e.aura === Aura.ProcTriggerSpell && talent.rankEffects.some((r) => r.effectIndex === e.index));
+  return trigger && spell.proc ? { ...spell, proc: { ...spell.proc, chance: trigger.value } } : spell;
+}
+
 // Every action a rotation can name, whether or not this character knows it. Keep in step with the
 // ability sources buildCharacter assembles below.
 export function actionNames(data: HunterData, items: Map<number, Item>): Set<string> {
@@ -243,7 +258,8 @@ export function buildCharacter(
   for (const t of validateTalents(data, config)) {
     if (!t.passive || !passiveApplies(t, config.pet.active)) continue;
     const spell = data.spells[String(t.spellId)]!;
-    passives.push({ spell, effects: scriptedEffects(t, resolveEffects(spell, t, config.talents[t.name])), source: t.name });
+    const effects = scriptedEffects(t, resolveEffects(spell, t, config.talents[t.name]));
+    passives.push({ spell: withRankProcChance(spell, t, effects), effects, source: t.name });
   }
 
   // Abilities a talent teaches are only known with the talent taken.

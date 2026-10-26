@@ -1,6 +1,17 @@
 import { expect, test } from "bun:test";
 import { loadGameData } from "@hunter-sim/data";
-import { configBuild, fillBuild, searchBuilds, talentErrors, talentPoints, withBuild, type SimConfigInput } from "./index";
+import {
+  actionsToGenes,
+  configBuild,
+  fillBuild,
+  genesToActions,
+  optimizeBuild,
+  searchBuilds,
+  talentErrors,
+  talentPoints,
+  withBuild,
+  type SimConfigInput,
+} from "./index";
 
 const game = await loadGameData();
 const data = game.data;
@@ -44,4 +55,27 @@ test("the search moves points out of talents that do nothing into ones that do",
   const r = searchBuilds(game, config, { iterations: 50, budget: 40, mutantsPerRound: 6, climbs: 1, configOnly: true, pets: false, styles: false, seed: "t" });
   expect(r.best.talents["Endurance Training"] ?? 0).toBeLessThan(5);
   expect(talentErrors(data, 14, r.best.talents).errors).toEqual([]);
+});
+
+test("a rotation read into genes and back keeps the pet ability its macro sends", () => {
+  const actions = [{ action: "intimidation", pet: "bite" }, { action: "serpent_sting", if: "!debuff.serpent_sting.up" }];
+  expect(genesToActions(actionsToGenes(actions).genes)).toEqual(actions);
+});
+
+test("a combined search adds taught abilities, ends on a legal build, and confirms on the same fresh fights", () => {
+  const config = { ...base, level: 14, talents: { "Endurance Training": 5 } };
+  const r = optimizeBuild(game, config, {
+    build: { iterations: 30, budget: 25, mutantsPerRound: 5, climbs: 1, pets: false, styles: false },
+    rotation: { pool: ["arcane_shot"], iterations: 30, budget: 4, mutantsPerRound: 2, confirmIterations: 30 },
+    rounds: 1,
+    taught: { precombat: ["trueshot_aura"], actions: ["raptor_strike"] },
+    confirmIterations: 40,
+    seed: "t",
+  });
+  expect(talentErrors(data, 14, r.best.talents ?? {}).errors).toEqual([]);
+  expect(r.build).toEqual(configBuild(r.best));
+  expect(r.best.rotation.precombat).toContain("trueshot_aura");
+  expect(r.confirm.before.iterations).toBe(40);
+  expect(r.confirm.after.iterations).toBe(40);
+  expect(r.confirm.delta).toBeCloseTo(r.confirm.after.dps.mean - r.confirm.before.dps.mean, 6);
 });

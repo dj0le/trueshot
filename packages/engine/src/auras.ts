@@ -18,16 +18,21 @@ export class AuraSet {
   constructor(
     private readonly queue: EventQueue,
     readonly passives: readonly ActiveSpell[] = [],
-    private readonly onChange: () => void = () => {},
-  ) {}
+    // Told the effects of each aura that comes, goes or changes.
+    private readonly onChange: (effects: readonly ResolvedEffect[]) => void = () => {},
+  ) {
+    this.passiveRows = passives.map((p) => ({ ...p, expiresAt: Infinity }));
+  }
+
+  private readonly passiveRows: (ActiveSpell & { expiresAt: number })[];
 
   get(spellId: number): AuraInstance | undefined {
     return this.active.get(spellId);
   }
 
-  // Passives first, then active auras.
-  sources(): ActiveSpell[] {
-    return [...this.passives, ...this.active.values()];
+  // Passives first (lasting forever), then active auras.
+  sources(): (ActiveSpell & { expiresAt: number })[] {
+    return [...this.passiveRows, ...this.active.values()];
   }
 
   effects(): ResolvedEffect[] {
@@ -79,35 +84,37 @@ export class AuraSet {
     const stacks = maxStacks > 1 ? Math.min(maxStacks, (this.active.get(spell.id)?.stacks ?? 0) + 1) : 1;
     const stacked = stacks > 1 ? effects.map((e) => ({ ...e, value: e.value * stacks })) : effects;
     this.active.set(spell.id, { spell, effects: stacked, expiresAt, token, source: spell.name, charges: spell.proc?.charges ?? 0, stacks });
-    this.changed();
+    this.changed(stacked);
     schedule?.(isLive);
     if (duration !== Infinity) {
       this.queue.push(expiresAt, () => {
         if (!isLive()) return;
         this.active.delete(spell.id);
-        this.changed();
+        this.changed(stacked);
       });
     }
   }
 
   remove(spellId: number): void {
-    if (this.active.delete(spellId)) this.changed();
+    const a = this.active.get(spellId);
+    if (!a) return;
+    this.active.delete(spellId);
+    this.changed(a.effects);
   }
 
-  // A successful attack of the given proc flag uses up one charge of each aura listening for it,
-  // except the ones in `keep` (a reactive ability's activation, which only that ability spends).
-  consumeCharges(flag: number, keep?: ReadonlySet<number>): void {
+  // A successful attack of the given proc flag uses up one charge of each aura listening for it.
+  consumeCharges(flag: number): void {
     for (const [id, a] of this.active) {
-      if (a.charges === 0 || (a.spell.proc!.typeMask[0] & flag) === 0 || keep?.has(id)) continue;
+      if (a.charges === 0 || (a.spell.proc!.typeMask[0] & flag) === 0) continue;
       if (--a.charges === 0) {
         this.active.delete(id);
-        this.changed();
+        this.changed(a.effects);
       }
     }
   }
 
-  private changed(): void {
+  private changed(effects: readonly ResolvedEffect[]): void {
     this.cache = null;
-    this.onChange();
+    this.onChange(effects);
   }
 }

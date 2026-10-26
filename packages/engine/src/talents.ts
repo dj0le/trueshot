@@ -30,7 +30,9 @@ const STYLES: Style[] = [
   { position: "melee", weaveDelayMs: 0 },
   ...[300, 600, 900, 1200, 1500, 2000].map((weaveDelayMs) => ({ position: "weave" as const, weaveDelayMs })),
 ];
-const sameStyle = (a: Style, b: Style) => a.position === b.position && (a.position !== "weave" || a.weaveDelayMs === b.weaveDelayMs);
+// The weave delay matters only when weaving.
+const styleKey = (s: Style) => `${s.position}:${s.position === "weave" ? s.weaveDelayMs : 0}`;
+const sameStyle = (a: Style, b: Style) => styleKey(a) === styleKey(b);
 
 export type BuildSearchOptions = {
   // Fights per candidate.
@@ -129,8 +131,7 @@ const talentKey = (b: Build) =>
       .filter(([, r]) => r > 0)
       .sort(),
   );
-const keyOf = (b: Build) =>
-  JSON.stringify([talentKey(b), b.pet, b.style.position, b.style.position === "weave" ? b.style.weaveDelayMs : 0]);
+const keyOf = (b: Build) => JSON.stringify([talentKey(b), b.pet, styleKey(b.style)]);
 
 function mutate(b: Build, rng: Stream, data: HunterData, level: number, families: string[] | null, styles: Style[] | null): Build {
   if (families && rng.next() < 0.15) return { ...b, pet: rng.pick([null, ...families.filter((f) => f !== b.pet)]) };
@@ -159,9 +160,10 @@ function mutate(b: Build, rng: Stream, data: HunterData, level: number, families
 export function searchBuilds(game: GameData, config: SimConfigInput, opts: BuildSearchOptions): BuildSearchResult {
   const log = opts.onProgress ?? (() => {});
   const data = game.data;
-  const level = SimConfig.parse(config).level;
+  const parsed = SimConfig.parse(config);
+  const level = parsed.level;
   const families = opts.pets ? data.petFamilies.map((f) => f.name) : null;
-  const styles = opts.styles && SimConfig.parse(config).gear.items.mainHand ? STYLES : null;
+  const styles = opts.styles && parsed.gear.items.mainHand ? STYLES : null;
   const searchSeed = `${opts.seed}/search`;
   const seen = new Map<string, SimResult | null>();
   let evaluated = 0;

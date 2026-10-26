@@ -5,9 +5,10 @@ import type { HunterData, Overrides, PetFamily, Spell } from "@hunter-sim/data";
 import { AuraSet } from "./auras";
 import type { AttackTable } from "./levels";
 import { type ActiveSpell, knownRank, type ResolvedEffect, resolveEffects, snake } from "./character";
-import { Aura, DefenseType, Effect, IGNORED_AURAS, ProcFlag, School, SpellModOp } from "./enums";
+import { Aura, DefenseType, Effect, IGNORED_AURAS, ProcFlag, School, SpellModOp, TARGET_CASTER, TARGET_CASTER_PARTY } from "./enums";
 import type { EventQueue } from "./queue";
 import type { Rng } from "./rng";
+import type { HunterStats } from "./stats";
 
 // What the pet needs from the fight it is in.
 export type PetHost = {
@@ -15,15 +16,11 @@ export type PetHost = {
   readonly queue: EventQueue;
   readonly rng: Rng;
   readonly attackPowerPerDps: number;
-  // A value with the hunter's spell modifiers applied.
-  modded(base: number, spell: Spell, op: number): number;
-  moddedEffects(spell: Spell, effects: ResolvedEffect[]): ResolvedEffect[];
-  ownRangedAttackPower(): number;
+  // The hunter's numbers: spell modifiers (which reach pet passives), the ranged attack power the
+  // pet inherits, the target's armor without the hunter's own penetration, and Focused Fire.
+  readonly calc: Pick<HunterStats, "modded" | "moddedEffects" | "ownRangedAttackPower" | "armorMultiplier" | "sharedDamagePct">;
   // The pet passives hawks share (Unleashed Fury, Ferocity), which the pet builds on.
   readonly hawkAuras: AuraSet;
-  armorMultiplier(): number;
-  // Damage-done bonuses the pet shares with the hunter (Focused Fire).
-  sharedDamagePct(): number;
   record(name: string, outcome: "hit" | "crit" | "miss" | "glance" | "tick" | "cast", amount?: number): void;
   report(what: string): void;
 };
@@ -31,9 +28,9 @@ export type PetHost = {
 // Pet buffs that raise its damage.
 const DAMAGE_BUFFS = new Set<number>([Aura.ModMeleeHaste, Aura.ModAttackPower, Aura.ModDamagePercentDone]);
 // Buffs land on the pet itself (1) or its group around it (56, Furious Howl).
-const BUFF_TARGETS = new Set([1, 56]);
-const STEALTH = 16;
-const CHARGE = 96;
+const BUFF_TARGETS = new Set([TARGET_CASTER, TARGET_CASTER_PARTY]);
+// A pet ability's focus cost.
+const focusCost = (s: Spell) => s.power.find((p) => p.type === 2)?.cost ?? 0;
 
 const isBuff = (e: ResolvedEffect) => e.effect === Effect.ApplyAura && BUFF_TARGETS.has(e.implicitTarget[0]) && DAMAGE_BUFFS.has(e.aura) && e.value > 0;
 
@@ -43,17 +40,16 @@ const isBuff = (e: ResolvedEffect) => e.effect === Effect.ApplyAura && BUFF_TARG
 function defaultPriority(known: Map<string, Spell>): string[] {
   const kind = (s: Spell) => {
     const effects = resolveEffects(s);
-    if (effects.some((e) => e.effect === CHARGE || e.aura === STEALTH)) return null;
+    if (effects.some((e) => e.effect === Effect.Charge || e.aura === Aura.ModStealth)) return null;
     if (effects.some(isBuff)) return 0;
     const damage = effects.some((e) => e.effect === Effect.SchoolDamage || (e.effect === Effect.ApplyAura && e.aura === Aura.PeriodicDamage));
     return damage ? 1 : null;
   };
   const cooldown = (s: Spell) => Math.max(s.cooldownMs, s.categoryCooldownMs);
-  const cost = (s: Spell) => s.power.find((p) => p.type === 2)?.cost ?? 0;
   return [...known]
     .map(([name, spell]) => ({ name, spell, kind: kind(spell) }))
     .filter((a) => a.kind !== null)
-    .sort((a, b) => a.kind! - b.kind! || cooldown(b.spell) - cooldown(a.spell) || cost(b.spell) - cost(a.spell))
+    .sort((a, b) => a.kind! - b.kind! || cooldown(b.spell) - cooldown(a.spell) || focusCost(b.spell) - focusCost(a.spell))
     .map((a) => a.name);
 }
 
@@ -96,7 +92,7 @@ export class Pet {
     const familySpell = data.spells[String(family.passiveSpellId)]!;
     const familyPassive: ActiveSpell = {
       spell: familySpell,
-      effects: host.moddedEffects(familySpell, resolveEffects(familySpell)),
+      effects: host.calc.moddedEffects(familySpell, resolveEffects(familySpell)),
       source: familySpell.name,
     };
     this.auras = new AuraSet(host.queue, [...host.hawkAuras.passives, familyPassive]);
@@ -124,7 +120,7 @@ export class Pet {
 
   // own: the pet itself; otherwise a hawk, which has only the auras hawks share.
   attackPower(own = true): number {
-    const inherited = (this.host.ownRangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100;
+    const inherited = (this.host.calc.ownRangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100;
     return this.stats.baseAttackPower + inherited + (own ? this.auras.sum(Aura.ModAttackPower) : 0);
   }
 
@@ -133,7 +129,7 @@ export class Pet {
   private damageMultiplier(school: number, own = true): number {
     const happy = 1 + this.o.happinessDamagePct.value / 100;
     if (!own) return happy * this.host.hawkAuras.damageMultiplier(school);
-    return happy * (1 + this.host.sharedDamagePct() / 100) * this.auras.damageMultiplier(school);
+    return happy * (1 + this.host.calc.sharedDamagePct() / 100) * this.auras.damageMultiplier(school);
   }
 
   private critPct(own: boolean): number {
@@ -181,7 +177,7 @@ export class Pet {
       base *
       (0.7 + (0.3 * this.attackPower(own)) / this.stats.baseAttackPower) *
       this.damageMultiplier(School.Physical, own) *
-      this.host.armorMultiplier() *
+      this.host.calc.armorMultiplier() *
       scale;
     if (rng < glance) {
       amount *= 1 - t.glancingPenaltyPct / 100;
@@ -240,7 +236,7 @@ export class Pet {
       if (!proc) continue;
       for (const e of p.effects) {
         if (e.aura !== Aura.ProcTriggerSpell || !e.triggerSpell) continue;
-        const chance = this.host.modded(proc.chance, p.spell, SpellModOp.ProcChance);
+        const chance = this.host.calc.modded(proc.chance, p.spell, SpellModOp.ProcChance);
         if (!this.host.rng.stream(`pet-proc:${p.spell.id}`).chance(chance)) continue;
         const triggered = this.data.spells[String(e.triggerSpell)]!;
         this.addAura(triggered, resolveEffects(triggered), triggered.durationMs);
@@ -284,7 +280,7 @@ export class Pet {
     const now = this.host.now;
     const ready = this.cooldowns.get(spell.id) ?? 0;
     if (ready > now) return ready;
-    const cost = spell.power.find((p) => p.type === 2)?.cost ?? 0;
+    const cost = focusCost(spell);
     const focus = this.focusNow();
     if (focus < cost) return now + Math.ceil((cost - focus) / this.focusRate());
     this.focus = focus - cost;
@@ -326,13 +322,16 @@ export class Pet {
         amount += e.value * (1 + this.host.rng.stream("pet-damage").range(-e.variance / 2, e.variance / 2));
       }
       amount *= this.damageMultiplier(spell.school);
-      if (spell.school === School.Physical) amount *= this.host.armorMultiplier();
+      if (spell.school === School.Physical) amount *= this.host.calc.armorMultiplier();
       if (this.host.rng.stream("pet-special-crit").chance(this.critPct(true))) {
         this.host.record(name, "crit", amount * 2);
         this.onCrit();
       } else {
         this.host.record(name, "hit", amount);
       }
+    } else {
+      // An ability that lands without direct damage (Web) still hits; its ticks come later.
+      this.host.record(name, "hit");
     }
     // After the crit roll, which the charge applied to.
     if (spell.defenseType === DefenseType.Melee) this.auras.consumeCharges(ProcFlag.DoneMeleeSpell);

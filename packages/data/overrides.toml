@@ -275,6 +275,12 @@ source = "A raid: Blessing of Wisdom, Mana Spring Totem (10 mana per 2 sec), Jud
 # Server-side changes the client tables do not have. Each one replaces one spell effect's base points.
 
 # Summon Hawk's dive: the tooltip adds 5% of ranged attack power; the client effect has no coefficient.
+[[auraState]]
+spell = 1310726
+state = 1
+confidence = "confirmed"
+source = "Expose Prey tooltip: activates Mongoose Bite, which the client gates on aura state 1 (after a dodge)"
+
 [[hotfix]]
 spell = 1293527
 effectIndex = 0
@@ -459,3 +465,9 @@ effectIndex = 1
 apCoefficient = 0.01
 confidence = "reported"
 source = "Explosive Trap rank 3 burn: 10% over 10 ticks of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 1310726
+procTypeMask = 0
+confidence = "confirmed"
+source = "Expose Prey's activation: its one charge listens for any melee spell, but the tooltip says it activates Mongoose Bite, which spends it (overrides auraState)"

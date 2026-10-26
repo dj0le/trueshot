@@ -9,13 +9,6 @@
       "fetchedAt": "2026-10-25T14:17:38.302Z"
     },
     {
-      "file": "Spell.csv",
-      "url": "https://wago.tools/db2/Spell/csv?build=1.60.1.70532",
-      "bytes": 2209387,
-      "sha256": "fd16c218c830f504bb69707acee4fc6fa3168ea04a1180d7348bfae503a2bbdf",
-      "fetchedAt": "2026-10-26T09:42:20.803Z"
-    },
-    {
       "file": "SpellEffect.csv",
       "url": "https://wago.tools/db2/SpellEffect/csv?build=1.60.1.70532",
       "bytes": 3854002,
@@ -91,6 +84,13 @@
       "bytes": 402429,
       "sha256": "c9d9fb6eed8a7f09f7b64dd98222cdefa507cf45ae0c9e45f2d08148beaf65cf",
       "fetchedAt": "2026-10-25T14:17:44.556Z"
+    },
+    {
+      "file": "SpellAuraRestrictions.csv",
+      "url": "https://wago.tools/db2/SpellAuraRestrictions/csv?build=1.60.1.70532",
+      "bytes": 14162,
+      "sha256": "7c57d12d2eb4f4f6f6715e80b0acb366a2e60f6ea69ccba2a2792e3abc0958e2",
+      "fetchedAt": "2026-10-26T12:40:14.727Z"
     },
     {
       "file": "SpellProcsPerMinute.csv",
@@ -301,20 +301,6 @@
       "bytes": 645103,
       "sha256": "613f2474479fab68b342b60d818f9b0a2d4d60c156026ee8b1830fdc2d2d77f1",
       "fetchedAt": "2026-10-25T15:20:58.874Z"
-    },
-    {
-      "file": "classic-era/ItemSet.csv",
-      "url": "https://wago.tools/db2/ItemSet/csv?build=1.15.9.70003",
-      "bytes": 46056,
-      "sha256": "7e1164cc35e83c1899846b1f80b03ef97f0a837e3cc6f427b38d1d2a3f40c42a",
-      "fetchedAt": "2026-10-26T09:39:29.747Z"
-    },
-    {
-      "file": "classic-era/ItemSetSpell.csv",
-      "url": "https://wago.tools/db2/ItemSetSpell/csv?build=1.15.9.70003",
-      "bytes": 28183,
-      "sha256": "d1b424dc7cf7249b1d5b0035ca0d843ddc9cac117554fbc15e58c2fe979dd512",
-      "fetchedAt": "2026-10-26T09:39:30.093Z"
     }
   ]
 }

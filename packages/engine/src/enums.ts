@@ -17,6 +17,8 @@ export const Effect = {
   WeaponDamage: 58,
   ApplyAreaAuraRaid: 65,
   NormalizedWeaponDamage: 121,
+  // A run-up to the target (a pet's Charge).
+  Charge: 96,
 } as const;
 
 export const Aura = {
@@ -24,6 +26,7 @@ export const Aura = {
   // Mana every few seconds: Blessing of Wisdom, Mana Spring.
   PeriodicEnergize: 24,
   Dummy: 4,
+  ModStealth: 16,
   ProcTriggerSpell: 42,
   ModDamagePercentDone: 79,
   // Damage done to some creature types (Improved Tracking on a Track spell); the mask is in miscValue.
@@ -96,6 +99,8 @@ export const IGNORED_EFFECTS = new Set<number>([
 export const TARGET_ENEMY = new Set([6, 25]);
 export const TARGET_PET = 5;
 export const TARGET_CASTER = 1;
+// The caster's party around it (Furious Howl).
+export const TARGET_CASTER_PARTY = 56;
 
 // Attributes_1 flags marking a channeled spell.
 export const CHANNELED_FLAGS = 0x4 | 0x40;
@@ -138,7 +143,9 @@ export const School = {
 // Classic proc flags, the events an aura's proc typeMask listens for.
 export const ProcFlag = {
   DoneMeleeAutoAttack: 0x4,
+  TakenMeleeAutoAttack: 0x8,
   DoneMeleeSpell: 0x10,
+  TakenMeleeSpell: 0x20,
   DoneRangedAutoAttack: 0x40,
   TakenRangedAutoAttack: 0x80,
   DoneRangedSpell: 0x100,

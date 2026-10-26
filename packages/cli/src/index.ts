@@ -1,13 +1,10 @@
 // hunter-sim command line; USAGE below lists the commands.
-//
-// A config may start with `extends = "other.toml"` (relative to itself) and set only what differs.
-// Tables merge key by key; anything else, rotation.actions included, replaces the parent's value.
-import { dirname, relative, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { loadGameData, unconfirmed } from "@hunter-sim/data";
+import { type GameData, loadGameData, unconfirmed } from "@hunter-sim/data";
 import {
   actionValues,
   compareResults,
+  configBuild,
   describeBuild,
   optimize,
   optimizeBuild,
@@ -15,10 +12,10 @@ import {
   simulate,
   snake,
   statWeights,
-  type ActionConfig,
   type SimConfigInput,
   type SimResult,
 } from "@hunter-sim/engine";
+import { actionsToml, buildToml, loadConfig } from "./toml";
 
 const fmt = (n: number, digits = 1) => n.toFixed(digits);
 const signed = (n: number, digits = 1) => `${n >= 0 ? "+" : ""}${fmt(n, digits)}`;
@@ -56,30 +53,6 @@ function print(r: SimResult): void {
   if (r.unimplemented.length > 0) {
     console.log(`\nNot simulated yet (${r.unimplemented.length}):\n  ${r.unimplemented.join("\n  ")}`);
   }
-}
-
-type Table = Record<string, unknown>;
-const isTable = (v: unknown): v is Table => typeof v === "object" && v !== null && !Array.isArray(v);
-
-function merge(parent: Table, child: Table): Table {
-  const out = { ...parent };
-  for (const [k, v] of Object.entries(child)) out[k] = isTable(v) && isTable(out[k]) ? merge(out[k] as Table, v) : v;
-  return out;
-}
-
-async function readToml(path: string, seen: string[] = []): Promise<Table> {
-  if (seen.includes(path)) throw new Error(`config: extends loops back to ${path}`);
-  const { extends: parent, ...own } = Bun.TOML.parse(await Bun.file(path).text()) as Table;
-  if (typeof parent !== "string") return own;
-  return merge(await readToml(resolve(dirname(path), parent), [...seen, path]), own);
-}
-
-async function loadConfig(path: string, fight: { iterations?: string | undefined; seed?: string | undefined } = {}): Promise<SimConfigInput> {
-  const config = (await readToml(resolve(path))) as SimConfigInput;
-  config.fight = { ...config.fight };
-  if (fight.iterations) config.fight.iterations = Number(fight.iterations);
-  if (fight.seed) config.fight.seed = fight.seed;
-  return config;
 }
 
 const USAGE = [
@@ -128,7 +101,7 @@ const TAUGHT = {
 };
 
 // The default pool plus the on-use items the config wears (trinkets).
-function poolFor(game: Awaited<ReturnType<typeof loadGameData>>, config: SimConfigInput): string[] {
+function poolFor(game: GameData, config: SimConfigInput): string[] {
   const worn = Object.values(config.gear.items ?? {}).flatMap((id) => game.items.get(id) ?? []);
   return [...DEFAULT_POOL, ...worn.filter((i) => i.useSpells.length).map((i) => snake(i.name))];
 }
@@ -152,43 +125,6 @@ function printDiff(base: SimResult, other: SimResult): void {
       ["Mana left %", signed(other.manaLeftPct - base.manaLeftPct), ""],
     ]),
   );
-}
-
-const tomlString = (s: string) => JSON.stringify(s);
-
-// A variant of `parent` with a build search's result: every talent is written, the parent's
-// dropped ones as 0, since tables merge key by key.
-function buildToml(parent: SimConfigInput, parentPath: string, out: string, best: SimConfigInput, note: string): string {
-  const talents = { ...Object.fromEntries(Object.keys(parent.talents ?? {}).map((t) => [t, 0])), ...best.talents };
-  const pet = best.pet ?? {};
-  return [
-    `# ${note}`,
-    `extends = ${tomlString(relative(dirname(resolve(out)), resolve(parentPath)))}`,
-    `name = ${tomlString(`${parent.name ?? "unnamed"}, build search`)}`,
-    `position = ${tomlString(best.position ?? "ranged")}`,
-    "",
-    "[weave]",
-    `maxAutoShotDelayMs = ${best.weave?.maxAutoShotDelayMs ?? 1200}`,
-    "",
-    "[talents]",
-    ...Object.entries(talents).map(([t, r]) => `${tomlString(t)} = ${r}`),
-    "",
-    "[pet]",
-    `active = ${pet.active ?? false}`,
-    ...(pet.active ? [`family = ${tomlString(pet.family ?? "Cat")}`] : []),
-    "",
-    "[rotation]",
-    `precombat = [${(best.rotation.precombat ?? []).map(tomlString).join(", ")}]`,
-    "",
-    actionsToml(best.rotation.actions),
-    "",
-  ].join("\n");
-}
-
-function actionsToml(actions: ActionConfig[]): string {
-  return actions
-    .map((a) => `[[rotation.actions]]\naction = "${a.action}"${a.if ? `\nif = "${a.if}"` : ""}`)
-    .join("\n\n");
 }
 
 async function main(argv: string[]): Promise<void> {
@@ -328,12 +264,11 @@ async function main(argv: string[]): Promise<void> {
     print(c.after);
     const out = flags.out;
     if (out) {
-      const parent = await loadConfig(paths[0]!);
-      if (parent.pet?.abilities && result.best.pet?.family !== (parent.pet.family ?? "Cat")) {
+      if (config.pet?.abilities && result.build.pet !== configBuild(config).pet) {
         console.log(`\nnote: ${paths[0]} sets pet.abilities for its own family; edit them in ${out}`);
       }
       const note = `Found by \`sim build ${paths[0]}\` (${new Date().toISOString().slice(0, 10)}): ${signed(c.pct, 2)}% DPS on ${c.after.iterations} fresh fights.`;
-      await Bun.write(out, buildToml(parent, paths[0]!, out, result.best, note));
+      await Bun.write(out, buildToml(config, paths[0]!, out, result.build, result.best.rotation, note));
       console.log(`\nwrote ${out}`);
     }
   } else {

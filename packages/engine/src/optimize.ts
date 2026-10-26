@@ -19,7 +19,8 @@ export type Term =
   // Only when the action's own debuff or DoT is not on the target.
   | { kind: "debuffDown" };
 
-export type Gene = { action: string; enabled: boolean; terms: Term[] };
+// pet: the pet ability the action's macro sends, kept as written.
+export type Gene = { action: string; enabled: boolean; terms: Term[]; pet?: string };
 
 function termToExpr(action: string, t: Term): string {
   switch (t.kind) {
@@ -35,7 +36,11 @@ function termToExpr(action: string, t: Term): string {
 export function genesToActions(genes: Gene[]): ActionConfig[] {
   return genes
     .filter((g) => g.enabled)
-    .map((g) => (g.terms.length ? { action: g.action, if: g.terms.map((t) => termToExpr(g.action, t)).join(" & ") } : { action: g.action }));
+    .map((g) => ({
+      action: g.action,
+      ...(g.terms.length ? { if: g.terms.map((t) => termToExpr(g.action, t)).join(" & ") } : {}),
+      ...(g.pet ? { pet: g.pet } : {}),
+    }));
 }
 
 const describe = (genes: Gene[]) =>
@@ -56,7 +61,7 @@ export function actionsToGenes(actions: ActionConfig[]): { genes: Gene[]; droppe
       else if (part === `!dot.${a.action}.ticking` || part === `!debuff.${a.action}.up`) terms.push({ kind: "debuffDown" });
       else dropped.push(`${a.action}: ${part}`);
     }
-    return { action: a.action, enabled: true, terms };
+    return { action: a.action, enabled: true, terms, ...(a.pet ? { pet: a.pet } : {}) };
   });
   return { genes, dropped };
 }

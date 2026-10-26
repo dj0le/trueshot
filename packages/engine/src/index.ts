@@ -1,6 +1,7 @@
 export * from "./config";
 export * from "./character";
 export * from "./run";
-export { Fight, Rotation, type GameData, type FightResult, type AbilityStats } from "./sim";
+export { Fight, type GameData, type FightResult, type AbilityStats } from "./sim";
+export { Rotation } from "./rotation";
 export * from "./optimize";
 export * from "./talents";

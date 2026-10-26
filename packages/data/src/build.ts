@@ -80,6 +80,7 @@ const db = await tables([
   "SpellDuration",
   "SpellRange",
   "SpellAuraOptions",
+  "SpellAuraRestrictions",
   "SpellProcsPerMinute",
   "SpellClassOptions",
   "TraitNode",
@@ -107,6 +108,7 @@ const power = bySpell(db.SpellPower);
 const cooldowns = bySpell(db.SpellCooldowns);
 const categories = bySpell(db.SpellCategories);
 const auraOptions = bySpell(db.SpellAuraOptions);
+const restrictions = bySpell(db.SpellAuraRestrictions);
 const classOptions = bySpell(db.SpellClassOptions);
 const castTimes = byId(db.SpellCastTimes);
 const durations = byId(db.SpellDuration);
@@ -197,6 +199,7 @@ function buildSpell(id: string): Spell {
     preventionType: num(cat?.PreventionType),
     mechanic: num(cat?.Mechanic),
     dispelType: num(cat?.DispelType),
+    casterAuraState: num(restrictions.get(id)?.[0]?.CasterAuraState),
     power: (power.get(id) ?? [])
       .sort((a, b) => num(a.OrderIndex) - num(b.OrderIndex))
       .map((p) => ({
@@ -409,7 +412,7 @@ const setSpells = groupBy(db.ItemSetSpell, (r) => r.ItemSetID!);
 const HUNTER_CLASS_SET = 9;
 const hunterArmor = (id: number) => {
   const item = itemRows.get(String(id));
-  return !!item && hunterCanUse(item) && !(item.ClassID === "4" && item.SubclassID === "1");
+  return !!item && hunterCanUse(item) && !(num(item.ClassID) === 4 && num(item.SubclassID) === 1);
 };
 const forHunters = (spellId: number) => {
   const co = classOptions.get(String(spellId))?.[0];

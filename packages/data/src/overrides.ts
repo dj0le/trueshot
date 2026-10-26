@@ -27,6 +27,10 @@ const Levels = z.object({
 });
 export type Levels = z.infer<typeof Levels>;
 
+// Hotfix fields that change one effect, and ones that change the spell's proc.
+const EFFECT_FIELDS = ["basePoints", "apCoefficient", "miscValue", "classMask"] as const;
+const PROC_FIELDS = ["procTypeMask", "procChance", "procPpm"] as const;
+
 const Overrides = z.object({
   formula: z.object({
     rangedAttackPowerPerAgility: Value,
@@ -74,6 +78,9 @@ const Overrides = z.object({
   }),
   // Buffs and debuffs other players keep up, by preset name, as client spell ids.
   support: z.record(z.object({ spells: z.array(z.number()), ...provenance })),
+  // Auras that raise a caster aura state the server sets (Expose Prey's activation, the dodge state
+  // Mongoose Bite needs). Casting a spell that needs the state uses the aura up.
+  auraState: z.array(z.object({ spell: z.number(), state: z.number(), ...provenance })),
   hotfix: z.array(
     z
       .object({
@@ -95,11 +102,11 @@ const Overrides = z.object({
         ...provenance,
       })
       .refine(
-        (h) => [h.basePoints, h.apCoefficient, h.miscValue, h.classMask, h.procTypeMask, h.procChance, h.procPpm].some((v) => v !== undefined),
-        "a hotfix needs basePoints, apCoefficient, miscValue, classMask or a proc field",
+        (h) => [...EFFECT_FIELDS, ...PROC_FIELDS].some((k) => h[k] !== undefined),
+        `a hotfix needs one of ${[...EFFECT_FIELDS, ...PROC_FIELDS].join(", ")}`,
       )
       .refine(
-        (h) => h.effectIndex !== undefined || [h.basePoints, h.apCoefficient, h.miscValue, h.classMask].every((v) => v === undefined),
+        (h) => h.effectIndex !== undefined || EFFECT_FIELDS.every((k) => h[k] === undefined),
         "an effect hotfix needs effectIndex",
       ),
   ),

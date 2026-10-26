@@ -2,7 +2,8 @@
 import { buildCharacter } from "./character";
 import { SimConfig, type SimConfigInput } from "./config";
 import { Stream } from "./rng";
-import { Fight, type GameData, Rotation, unknownPassiveAuras } from "./sim";
+import { Rotation } from "./rotation";
+import { Fight, type GameData, unknownPassiveAuras } from "./sim";
 
 export type AbilitySummary = {
   name: string;

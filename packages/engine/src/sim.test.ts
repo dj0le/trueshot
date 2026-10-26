@@ -379,6 +379,20 @@ test("pets autocast every damage ability they know, and magic ones miss on the s
   expect(breath.missPct).toBeLessThan(20);
 });
 
+test("pet autocast puts long cooldowns first and leaves out openers and abilities that do no damage", () => {
+  const pet = (family: string) =>
+    simulate(game, { ...base, pet: { active: true, family }, fight: { durationSec: 120, iterations: 50 } }).abilities.filter((a) => a.name.startsWith("Pet:"));
+  // Mine! (90 sec) goes out at the pull and again at 90 sec, ahead of the Claw filler.
+  const bird = pet("Bird of Prey");
+  expect(bird.find((a) => a.name === "Pet: Mine!")!.castsPerFight).toBe(2);
+  expect(bird.map((a) => a.name)).not.toContain("Pet: Dive");
+  // Web deals its damage as ticks; a Web that lands counts as a hit, not a miss.
+  const web = pet("Spider").find((a) => a.name === "Pet: Web")!;
+  expect(web.ticksPerFight).toBeGreaterThan(0);
+  expect(web.missPct).toBeLessThan(30);
+  expect(pet("Boar").map((a) => a.name)).not.toContain("Pet: Charge");
+});
+
 test("set bonuses turn on by pieces worn, and enchants add stats and scope damage", () => {
   // Beaststalker Bindings, Gloves and Pants: three pieces, so +30 ranged attack power (and resistances).
   const three = { wrist: 16681, hands: 16676, legs: 16678 };
@@ -584,4 +598,33 @@ test("fire traps spring only when placed in melee, and Clever Traps and Survival
   // Survival Tactics: 10% less to miss.
   const tactics = run("melee", { ...sv, "Survival Tactics": 2 })!;
   expect(plain.missPct - tactics.missPct).toBeGreaterThan(7);
+});
+
+test("Lacerating Strikes bleeds 40% of each Mongoose Bite, rolling what is left into a refresh", () => {
+  const talents = {
+    "Improved Tracking": 5,
+    "Savage Strikes": 2,
+    Survivalist: 5,
+    Surefooted: 3,
+    "Clever Traps": 2,
+    "Survival Tactics": 2,
+    "Predator's Edge": 5,
+    "Expose Prey": 2,
+    "Lightning Reflexes": 5,
+    "Lacerating Strikes": 1,
+  };
+  const r = simulate(game, {
+    ...base,
+    position: "melee",
+    talents,
+    gear: { items: { mainHand: 18520, ranged: 18680 }, stats: { hitPct: 9, mp5: 10000 } },
+    fight: { durationSec: 600, iterations: 20 },
+    rotation: { actions: [{ action: "hunters_mark", if: "!debuff.hunters_mark.up" }, { action: "mongoose_bite" }] },
+  }).abilities;
+  const bite = r.find((a) => a.name === "Mongoose Bite")!.dps;
+  const bleed = r.find((a) => a.name === "Lacerating Strikes")!.dps;
+  // Bites land every few seconds on a 21 sec bleed, so most refresh a live one. Only the last
+  // bleed's unticked damage is lost when the fight ends.
+  expect(bleed / bite).toBeGreaterThan(0.37);
+  expect(bleed / bite).toBeLessThanOrEqual(0.4);
 });

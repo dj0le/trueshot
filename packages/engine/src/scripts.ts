@@ -42,10 +42,6 @@ export const ON_LAND: Record<string, (ctx: ScriptContext, landed: Landed) => voi
   },
 };
 
-// Talent procs whose chance per rank is the proc effect's value ("a 10% chance" at rank 2), while
-// the spell's own proc chance stays at 100.
-export const PROC_CHANCE_IN_EFFECT = new Set(["Expose Prey", "Resourcefulness"]);
-
 // Procs that only fire under a condition their tooltip states and the client data does not carry.
 export const PROC_IF: Record<string, (ctx: ScriptContext) => boolean> = {
   // "Grants your melee and ranged attacks against enemies afflicted by Hunter's Mark a 10% chance".
