@@ -23,7 +23,7 @@ client build or to an override that records where it came from.
 | 13 | Combat log parser and sim vs log report | packages/data/src/combatlog | BLOCKED, needs a Forever Logs API key with events:read (task 25) or raw logs from other hunters |
 | 14 | Calibration against the MythicSim reference sims | tests/golden | |
 | 15 | Rotation optimizer: search over priority list orderings and thresholds | packages/engine/src/optimize | DONE |
-| 16 | Talent optimizer and pet sweep: rank talent builds and pet families for a given gear set. Talents follow their tooltip text where the client data is bugged, so audit each talent against its description first and override the bugged ones | packages/cli | NEXT. Audit done and the ranged fixes applied (overrides.toml hotfixes, "tooltip wins"). Still open from the audit: Improved Tracking (target has no creature type), the hawk dive missing Unleashed Fury, Ferocity and Mortal Shots, Bestial Wrath reaching hawks, Efficiency cutting Summon Hawk's cost, and the melee talents (Strider Kick and Counterattack damage add instead of multiply, Predator's Edge off-hand, Lacerating Strikes, Expose Prey). Then the build search itself. Unanswered: does Ranged Weapon Specialization reach Arcane Shot, and can Quick Shots proc off special shots (both set to the tooltip reading) |
+| 16 | Talent optimizer and pet sweep: rank talent builds and pet families for a given gear set. Talents follow their tooltip text where the client data is bugged, so audit each talent against its description first and override the bugged ones | packages/engine/src/talents.ts, packages/cli | DONE. `sim build` searches talents, pet and rotation together (rotation, then talents and pet from seeds and hill climbing, then rotation again); `sim pets` ranks every family on one build. Audit fixes: Improved Tracking through the Track spells (target.creatureType), hawks share only the "pets and hawks" passives (no Bestial Wrath), the dive gets Unleashed Fury and Ferocity, Efficiency skips Summon Hawk; pets autocast every damage ability and their magic attacks use spell hit. The melee talents (Strider Kick, Counterattack, Predator's Edge, Lacerating Strikes, Expose Prey) move to task 21. Unanswered: does Ranged Weapon Specialization reach Arcane Shot, and can Quick Shots proc off special shots (both set to the tooltip reading) |
 | 17 | SvelteKit front end with the engine in a web worker | packages/web | |
 | 18 | Target presets: normal level 60, elite 62, boss 63 (armor, level-based miss and crit) | packages/engine/src/targets | DONE |
 | 19 | Marksmanship: talents, abilities, default priority list | packages/engine/src/specs/mm | DONE |
@@ -95,6 +95,13 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
   255.1 vs 244.5 DPS over 180 sec), after task 23's crit suppression and pet damage and the talent
   tooltip fixes. Break-even is the pet attacking about 85% of the fight; below that MM wins
   (`pet.attackingPct`). Before task 23 MM led by 0.3%.
+- The build search (task 16) beats both hand-made builds: BM 31/16/4 with a Wind Serpent at 274.4 DPS
+  (+7.6% over bm-cat.optimized) and MM 8/38/5 with a Wind Serpent at 269.3 (+10.1% over
+  mm-lone-wolf.optimized), configs/bm.build.toml and configs/mm.build.toml. Both take Improved
+  Tracking and Trueshot Aura; MM drops Lone Wolf for a pet. These assume the pet attacks all fight.
+- Wind Serpent leads every pet sweep by about 2% (Lightning Breath is nature damage, so armor does
+  not touch it), then Raptor, Cat and Bird of Prey within 1%. It rests on pet abilities not scaling
+  with attack power and on no partial resists, both unverified.
 - MM with a pet instead of Lone Wolf (+20% damage without a pet) gains 1.2% when the pet attacks all
   fight; Lone Wolf wins once the pet attacks less than about 93% of it.
 - With Careful Aim 5/5, intellect is worth about as much as agility for MM (task 12).

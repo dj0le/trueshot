@@ -110,12 +110,13 @@ export function knownRank(data: HunterData, ability: HunterData["abilities"][num
   return rank && data.spells[String(rank.spellId)];
 }
 
-function validateTalents(data: HunterData, config: SimConfig): Talent[] {
+// What is wrong with a talent build at a level, or nothing. Taken talents come back in `chosen`.
+export function talentErrors(data: HunterData, level: number, talents: Record<string, number>): { errors: string[]; chosen: Talent[] } {
   const errors: string[] = [];
   const chosen: Talent[] = [];
   const pointsInTree = new Map<string, number>();
 
-  for (const [name, rank] of Object.entries(config.talents)) {
+  for (const [name, rank] of Object.entries(talents)) {
     if (rank === 0) continue;
     const t = data.talents.find((x) => x.name === name);
     if (!t) {
@@ -128,21 +129,27 @@ function validateTalents(data: HunterData, config: SimConfig): Talent[] {
   }
 
   const total = [...pointsInTree.values()].reduce((a, b) => a + b, 0);
-  const available = Math.max(0, config.level - 9);
-  if (total > available) errors.push(`${total} talent points spent, level ${config.level} has ${available}`);
+  const available = talentPoints(level);
+  if (total > available) errors.push(`${total} talent points spent, level ${level} has ${available}`);
 
   for (const t of chosen) {
     // Row n needs 5 * (n - 1) points spent in rows above it in the same tree.
     const above = chosen
       .filter((o) => o.tree === t.tree && o.row < t.row)
-      .reduce((sum, o) => sum + config.talents[o.name]!, 0);
+      .reduce((sum, o) => sum + talents[o.name]!, 0);
     if (above < 5 * (t.row - 1)) errors.push(`${t.name} needs ${5 * (t.row - 1)} points above it in ${t.tree}, has ${above}`);
     for (const req of t.requires) {
       const reqTalent = data.talents.find((x) => x.name === req)!;
-      if ((config.talents[req] ?? 0) < reqTalent.maxRank) errors.push(`${t.name} requires ${req} at max rank`);
+      if ((talents[req] ?? 0) < reqTalent.maxRank) errors.push(`${t.name} requires ${req} at max rank`);
     }
   }
+  return { errors, chosen };
+}
 
+export const talentPoints = (level: number) => Math.max(0, level - 9);
+
+function validateTalents(data: HunterData, config: SimConfig): Talent[] {
+  const { errors, chosen } = talentErrors(data, config.level, config.talents);
   if (errors.length > 0) throw new Error(`talents:\n  ${errors.join("\n  ")}`);
   return chosen;
 }

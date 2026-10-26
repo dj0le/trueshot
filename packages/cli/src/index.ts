@@ -2,13 +2,16 @@
 //
 // A config may start with `extends = "other.toml"` (relative to itself) and set only what differs.
 // Tables merge key by key; anything else, rotation.actions included, replaces the parent's value.
-import { dirname, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { loadGameData, unconfirmed } from "@hunter-sim/data";
 import {
   actionValues,
   compareResults,
+  describeBuild,
   optimize,
+  optimizeBuild,
+  petSweep,
   simulate,
   statWeights,
   type ActionConfig,
@@ -85,6 +88,9 @@ const USAGE = [
   "  bun run sim value <config.toml> [--iterations N]      what each rotation action is worth",
   "  bun run sim weights <config.toml> [--iterations N]",
   "  bun run sim optimize <config.toml> [--budget N] [--iterations N] [--pool a,b] [--out file.toml]",
+  "  bun run sim pets <config.toml> [--iterations N]       every pet family, and none, with these talents",
+  "  bun run sim build <config.toml> [--budget N] [--rotation-budget N] [--rounds N] [--iterations N] [--keep-pet] [--out file.toml]",
+  "                                                        talents, pet and rotation searched together",
 ].join("\n");
 
 // Damage and cooldown actions the optimizer may add even when the starting rotation leaves them
@@ -101,6 +107,10 @@ const DEFAULT_POOL = [
   "arcane_shot",
   "volley",
 ];
+
+// Abilities talents teach, which a build search adds to the rotation when missing. Intimidation is
+// left out: casting it costs DPS (PLAN.md findings).
+const TAUGHT = { precombat: ["trueshot_aura"], actions: ["bestial_wrath", "sniper_shot", "summon_hawk"] };
 
 // Where a variant's damage moved, ability by ability.
 function printDiff(base: SimResult, other: SimResult): void {
@@ -123,6 +133,33 @@ function printDiff(base: SimResult, other: SimResult): void {
   );
 }
 
+const tomlString = (s: string) => JSON.stringify(s);
+
+// A variant of `parent` with a build search's result: every talent is written, the parent's
+// dropped ones as 0, since tables merge key by key.
+function buildToml(parent: SimConfigInput, parentPath: string, out: string, best: SimConfigInput, note: string): string {
+  const talents = { ...Object.fromEntries(Object.keys(parent.talents ?? {}).map((t) => [t, 0])), ...best.talents };
+  const pet = best.pet ?? {};
+  return [
+    `# ${note}`,
+    `extends = ${tomlString(relative(dirname(resolve(out)), resolve(parentPath)))}`,
+    `name = ${tomlString(`${parent.name ?? "unnamed"}, build search`)}`,
+    "",
+    "[talents]",
+    ...Object.entries(talents).map(([t, r]) => `${tomlString(t)} = ${r}`),
+    "",
+    "[pet]",
+    `active = ${pet.active ?? false}`,
+    ...(pet.active ? [`family = ${tomlString(pet.family ?? "Cat")}`] : []),
+    "",
+    "[rotation]",
+    `precombat = [${(best.rotation.precombat ?? []).map(tomlString).join(", ")}]`,
+    "",
+    actionsToml(best.rotation.actions),
+    "",
+  ].join("\n");
+}
+
 function actionsToml(actions: ActionConfig[]): string {
   return actions
     .map((a) => `[[rotation.actions]]\naction = "${a.action}"${a.if ? `\nif = "${a.if}"` : ""}`)
@@ -137,6 +174,9 @@ async function main(argv: string[]): Promise<void> {
       iterations: { type: "string" },
       seed: { type: "string" },
       budget: { type: "string" },
+      "rotation-budget": { type: "string" },
+      rounds: { type: "string" },
+      "keep-pet": { type: "boolean" },
       pool: { type: "string" },
       out: { type: "string" },
     },
@@ -215,6 +255,45 @@ async function main(argv: string[]): Promise<void> {
       const actionsAt = source.indexOf("[[rotation.actions]]");
       const head = (actionsAt < 0 ? source : source.slice(0, actionsAt)).trimEnd();
       await Bun.write(out, `${head}\n\n${toml}\n`);
+      console.log(`\nwrote ${out}`);
+    }
+  } else if (command === "pets" && paths.length === 1) {
+    const config = await loadConfig(paths[0]!, flags);
+    const rows = petSweep(game, config);
+    console.log(`\nPets for ${config.name ?? paths[0]}, against its own pet on the same fights\n`);
+    console.log(
+      table([
+        ["Pet", "DPS", "vs config", "± 95%"],
+        ...rows.map((r) => [r.pet ?? "none", fmt(r.dps), signed(r.delta), fmt(r.error95)]),
+      ]),
+    );
+  } else if (command === "build" && paths.length === 1) {
+    const config = await loadConfig(paths[0]!);
+    const iterations = Number(flags.iterations ?? 300);
+    const result = optimizeBuild(game, config, {
+      build: { iterations, budget: Number(flags.budget ?? 400), mutantsPerRound: 8, climbs: 3, pets: !flags["keep-pet"] },
+      rotation: { pool: DEFAULT_POOL, iterations, budget: Number(flags["rotation-budget"] ?? 150), mutantsPerRound: 8, confirmIterations: 3000 },
+      rounds: Number(flags.rounds ?? 2),
+      taught: TAUGHT,
+      confirmIterations: 5000,
+      seed: flags.seed ?? "build",
+      onProgress: (msg) => console.log(msg),
+    });
+    const c = result.confirm;
+    console.log(`\nBest build: ${describeBuild(game.data, result.build)}`);
+    const byTree = game.data.talents.filter((t) => result.build.talents[t.name]);
+    console.log(table(byTree.map((t) => [t.tree, t.name, `${result.build.talents[t.name]}/${t.maxRank}`]), 2));
+    console.log(`\nOn ${c.after.iterations} fresh fights: start ${fmt(c.before.dps.mean)} DPS, best ${fmt(c.after.dps.mean)} DPS, ${signed(c.delta)} ± ${fmt(c.error95)} (${signed(c.pct, 2)}%)`);
+    console.log(`\nBest rotation:\n\n${actionsToml(result.best.rotation.actions)}`);
+    print(c.after);
+    const out = flags.out;
+    if (out) {
+      const parent = await loadConfig(paths[0]!);
+      if (parent.pet?.abilities && result.best.pet?.family !== (parent.pet.family ?? "Cat")) {
+        console.log(`\nnote: ${paths[0]} sets pet.abilities for its own family; edit them in ${out}`);
+      }
+      const note = `Found by \`sim build ${paths[0]}\` (${new Date().toISOString().slice(0, 10)}): ${signed(c.pct, 2)}% DPS on ${c.after.iterations} fresh fights.`;
+      await Bun.write(out, buildToml(parent, paths[0]!, out, result.best, note));
       console.log(`\nwrote ${out}`);
     }
   } else {

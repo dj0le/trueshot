@@ -1,0 +1,287 @@
+// Searches for the talents and pet that do the most damage with a given gear set and rotation.
+//
+// A build is a talent allocation and a pet (a family, or none). The search starts from seeds: the
+// config's talents with every pet, then, for every pair of trees, a greedy build deep in one with
+// the rest in the other, with the best pet and with none. The best few seeds are then climbed by
+// moving points between talents and swapping the pet, keeping a move only when paired fights put
+// it ahead by more than the noise. Builds that break the talent rules are skipped without a fight.
+//
+// Talents and rotation depend on each other (a build short on mana wants a thriftier rotation), so
+// optimizeBuild alternates: the rotation for the config's build, then the build with that rotation
+// fixed, then the rotation for the new build, until the build stops changing.
+import type { HunterData, Talent } from "@hunter-sim/data";
+import { talentErrors, talentPoints } from "./character";
+import { SimConfig, type SimConfigInput } from "./config";
+import { optimize, type OptimizeOptions } from "./optimize";
+import { Stream } from "./rng";
+import { compareResults, simulate, type SimResult } from "./run";
+import type { GameData } from "./sim";
+
+// pet: a family name, or null for no pet.
+export type Build = { talents: Record<string, number>; pet: string | null };
+
+export type BuildSearchOptions = {
+  // Fights per candidate.
+  iterations: number;
+  // Builds to fight in total, seeds included.
+  budget: number;
+  mutantsPerRound: number;
+  // How many of the best seeds are climbed; the budget left after the seeds is split between them.
+  climbs: number;
+  // Start from the config's build alone, without the generated seeds.
+  configOnly: boolean;
+  // Whether the pet (any family, or none) is searched too.
+  pets: boolean;
+  seed: string;
+  onProgress?: (msg: string) => void;
+};
+
+export type BuildSearchResult = { best: Build; result: SimResult; evaluated: number };
+
+export function configBuild(config: SimConfigInput): Build {
+  const c = SimConfig.parse(config);
+  return {
+    talents: Object.fromEntries(Object.entries(c.talents).filter(([, rank]) => rank > 0)),
+    pet: c.pet.active ? c.pet.family : null,
+  };
+}
+
+// The config with a build in place. A different family drops the config's pet ability list, which
+// names the old family's abilities.
+export function withBuild(config: SimConfigInput, b: Build): SimConfigInput {
+  const pet = SimConfig.parse(config).pet;
+  if (!b.pet) return { ...config, talents: b.talents, pet: { ...config.pet, active: false } };
+  const abilities = b.pet === pet.family ? config.pet?.abilities : undefined;
+  return { ...config, talents: b.talents, pet: { ...config.pet, active: true, family: b.pet, abilities } };
+}
+
+// "Beast Mastery 31 / Marksmanship 20, Cat"
+export function describeBuild(data: HunterData, b: Build): string {
+  const trees = new Map<string, number>();
+  for (const t of data.talents) trees.set(t.tree, (trees.get(t.tree) ?? 0) + (b.talents[t.name] ?? 0));
+  const split = [...trees].map(([tree, n]) => `${tree} ${n}`).join(" / ");
+  return `${split}, ${b.pet ?? "no pet"}`;
+}
+
+// Spends points down a talent order, each talent to its max before the next, and comes back to
+// talents whose row or prerequisite was out of reach on the way.
+export function fillBuild(data: HunterData, level: number, order: Talent[]): Record<string, number> {
+  const talents: Record<string, number> = {};
+  const available = talentPoints(level);
+  let spent = 0;
+  for (let progress = true; progress && spent < available; ) {
+    progress = false;
+    for (const t of order) {
+      while (spent < available && (talents[t.name] ?? 0) < t.maxRank) {
+        talents[t.name] = (talents[t.name] ?? 0) + 1;
+        if (talentErrors(data, level, talents).errors.length === 0) {
+          spent++;
+          progress = true;
+          continue;
+        }
+        if (--talents[t.name]! === 0) delete talents[t.name];
+        break;
+      }
+    }
+  }
+  return talents;
+}
+
+// Deep in one tree, the rest in another, for every ordered pair of trees.
+function seedBuilds(data: HunterData, level: number, pet: string | null): { name: string; build: Build }[] {
+  const trees = [...new Set(data.talents.map((t) => t.tree))];
+  const inTree = (tree: string) => data.talents.filter((t) => t.tree === tree).sort((a, b) => a.row - b.row || a.col - b.col);
+  return trees.flatMap((a) =>
+    trees
+      .filter((b) => b !== a)
+      .map((b) => ({ name: `deep ${a}, then ${b}`, build: { talents: fillBuild(data, level, [...inTree(a), ...inTree(b)]), pet } })),
+  );
+}
+
+const keyOf = (b: Build) =>
+  JSON.stringify([
+    Object.entries(b.talents)
+      .filter(([, r]) => r > 0)
+      .sort(),
+    b.pet,
+  ]);
+
+function mutate(b: Build, rng: Stream, data: HunterData, level: number, families: string[] | null): Build {
+  if (families && rng.next() < 0.15) return { ...b, pet: rng.pick([null, ...families.filter((f) => f !== b.pet)]) };
+  const talents = { ...b.talents };
+  const rank = (name: string) => talents[name] ?? 0;
+  const spare = talentPoints(level) - Object.values(talents).reduce((s, r) => s + r, 0);
+  const to = rng.pick(data.talents.filter((t) => rank(t.name) < t.maxRank));
+  if (!to) return b;
+  const room = to.maxRank - rank(to.name);
+  const taken = Object.keys(talents).filter((n) => n !== to.name && rank(n) > 0);
+  if (spare > 0 && (taken.length === 0 || rng.next() < 0.5)) {
+    talents[to.name] = rank(to.name) + Math.min(spare, rng.pick([1, room]));
+    return { ...b, talents };
+  }
+  if (taken.length === 0) return b;
+  const from = rng.pick(taken);
+  // Mostly one point at a time, sometimes the whole talent.
+  const n = rng.pick([1, 1, Math.min(rank(from), room)]);
+  talents[from] = rank(from) - n;
+  if (talents[from] === 0) delete talents[from];
+  talents[to.name] = rank(to.name) + n;
+  return { ...b, talents };
+}
+
+export function searchBuilds(game: GameData, config: SimConfigInput, opts: BuildSearchOptions): BuildSearchResult {
+  const log = opts.onProgress ?? (() => {});
+  const data = game.data;
+  const level = SimConfig.parse(config).level;
+  const families = opts.pets ? data.petFamilies.map((f) => f.name) : null;
+  const searchSeed = `${opts.seed}/search`;
+  const seen = new Map<string, SimResult | null>();
+  let evaluated = 0;
+
+  // null: the build breaks the talent rules, or the setup cannot run with it.
+  const run = (b: Build): SimResult | null => {
+    const key = keyOf(b);
+    if (seen.has(key)) return seen.get(key)!;
+    let result: SimResult | null = null;
+    if (talentErrors(data, level, b.talents).errors.length === 0) {
+      try {
+        result = simulate(game, { ...withBuild(config, b), fight: { ...config.fight, iterations: opts.iterations, seed: searchSeed } });
+        evaluated++;
+      } catch {
+        result = null;
+      }
+    }
+    seen.set(key, result);
+    return result;
+  };
+
+  type Seed = { name: string; build: Build; result: SimResult };
+  const tryAll = (candidates: { name: string; build: Build }[]): Seed[] => {
+    const out: Seed[] = [];
+    const keys = new Set<string>();
+    for (const c of candidates) {
+      const key = keyOf(c.build);
+      if (keys.has(key)) continue;
+      keys.add(key);
+      const result = run(c.build);
+      if (result) out.push({ ...c, result });
+    }
+    return out;
+  };
+
+  // The pet mostly stands apart from the talents, so it is chosen once on the config's talents.
+  const start = configBuild(config);
+  const pets = families ? [start.pet, ...families, null] : [start.pet];
+  const withPets = tryAll(pets.map((pet) => ({ name: `config, ${pet ?? "no pet"}`, build: { ...start, pet } })));
+  const bestPet = withPets.filter((s) => s.build.pet).sort((a, b) => b.result.dps.mean - a.result.dps.mean)[0]?.build.pet ?? start.pet;
+  const generated = opts.configOnly ? [] : [...new Set([bestPet, ...(families ? [null] : [])])].flatMap((pet) => seedBuilds(data, level, pet));
+  const seeds = [...withPets, ...tryAll(generated)].sort((a, b) => b.result.dps.mean - a.result.dps.mean);
+  if (seeds.length === 0) throw new Error("build search: no seed build can run; check the config's talents");
+  for (const s of seeds.slice(0, 8)) log(`seed ${s.result.dps.mean.toFixed(1)} DPS: ${s.name} (${describeBuild(data, s.build)})`);
+
+  const rng = new Stream(`${opts.seed}/mutations`);
+  // One climb per talent build: the same talents with another pet are the same climb.
+  const climbs = seeds.filter((s, i) => seeds.findIndex((x) => keyOf({ ...x.build, pet: null }) === keyOf({ ...s.build, pet: null })) === i).slice(0, opts.climbs);
+  const perClimb = Math.max(0, Math.floor((opts.budget - evaluated) / climbs.length));
+  let best = { build: climbs[0]!.build, result: climbs[0]!.result };
+  for (const seed of climbs) {
+    let current = { build: seed.build, result: seed.result };
+    const stopAt = evaluated + perClimb;
+    log(`climbing from ${seed.name}`);
+    // Repeats and invalid builds cost no fights, so cap the attempts too.
+    for (let attempts = 0; evaluated < stopAt && attempts < perClimb * 50; ) {
+      let roundBest: { build: Build; result: SimResult; delta: number } | null = null;
+      for (let m = 0; m < opts.mutantsPerRound && evaluated < stopAt; m++, attempts++) {
+        let candidate = mutate(current.build, rng, data, level, families);
+        // Sometimes two moves at once, to step over a dip (a row requirement, a prerequisite).
+        if (rng.next() < 0.3) candidate = mutate(candidate, rng, data, level, families);
+        if (seen.has(keyOf(candidate))) continue;
+        const result = run(candidate);
+        if (!result) continue;
+        const c = compareResults(current.result, result);
+        if (c.delta > c.error95 && (!roundBest || c.delta > roundBest.delta)) roundBest = { build: candidate, result, delta: c.delta };
+      }
+      if (roundBest) {
+        current = roundBest;
+        log(`[${evaluated}] ${current.result.dps.mean.toFixed(1)} DPS (+${roundBest.delta.toFixed(1)}): ${describeBuild(data, current.build)}`);
+      }
+    }
+    if (current.result.dps.mean > best.result.dps.mean) best = current;
+  }
+  return { best: best.build, result: best.result, evaluated };
+}
+
+export type PetRow = { pet: string | null; dps: number; delta: number; error95: number };
+
+// Every pet family, and no pet, with the config's talents and rotation, on the same fights.
+// Families that cannot run the rotation (it sends an ability they lack) are left out.
+export function petSweep(game: GameData, config: SimConfigInput): PetRow[] {
+  const base = simulate(game, config);
+  const talents = configBuild(config).talents;
+  const rows: PetRow[] = [];
+  for (const pet of [null, ...game.data.petFamilies.map((f) => f.name)]) {
+    let r: SimResult;
+    try {
+      r = simulate(game, withBuild(config, { talents, pet }));
+    } catch {
+      continue;
+    }
+    const c = compareResults(base, r);
+    rows.push({ pet, dps: r.dps.mean, delta: c.delta, error95: c.error95 });
+  }
+  return rows.sort((a, b) => b.dps - a.dps);
+}
+
+// Abilities only some talents teach. A build search adds the missing ones to the rotation, so a
+// build that gains one gets to use it; the rotation search then moves or drops them.
+export type Taught = { precombat: string[]; actions: string[] };
+
+function withTaught(config: SimConfigInput, taught: Taught): SimConfigInput {
+  const r = config.rotation;
+  const precombat = r.precombat ?? [];
+  return {
+    ...config,
+    rotation: {
+      precombat: [...precombat, ...taught.precombat.filter((a) => !precombat.includes(a))],
+      actions: [...r.actions, ...taught.actions.filter((a) => !r.actions.some((x) => x.action === a)).map((action) => ({ action }))],
+    },
+  };
+}
+
+export type OptimizeBuildOptions = {
+  build: Omit<BuildSearchOptions, "configOnly" | "seed" | "onProgress">;
+  rotation: Omit<OptimizeOptions, "seed" | "onProgress">;
+  // Build-then-rotation rounds at most; it stops early once the build stops changing.
+  rounds: number;
+  taught: Taught;
+  // Fights for the final check on fresh seeds.
+  confirmIterations: number;
+  seed: string;
+  onProgress?: (msg: string) => void;
+};
+
+export type OptimizeBuildResult = {
+  best: SimConfigInput;
+  build: Build;
+  confirm: { before: SimResult; after: SimResult; delta: number; error95: number; pct: number };
+};
+
+export function optimizeBuild(game: GameData, config: SimConfigInput, opts: OptimizeBuildOptions): OptimizeBuildResult {
+  const log = opts.onProgress ?? (() => {});
+  const tuneRotation = (c: SimConfigInput, label: string): SimConfigInput => {
+    log(`\nrotation for ${describeBuild(game.data, configBuild(c))}`);
+    const r = optimize(game, c, { ...opts.rotation, seed: `${opts.seed}/rotation-${label}`, onProgress: log });
+    return r.confirm.delta > r.confirm.error95 ? { ...c, rotation: { ...c.rotation, actions: r.bestActions } } : c;
+  };
+  let current = tuneRotation(withTaught(config, opts.taught), "start");
+  for (let round = 0; round < opts.rounds; round++) {
+    log(`\nround ${round + 1}: talents and pet`);
+    const found = searchBuilds(game, current, { ...opts.build, configOnly: round > 0, seed: `${opts.seed}/build${round}`, onProgress: log });
+    if (keyOf(found.best) === keyOf(configBuild(current))) break;
+    current = tuneRotation(withBuild(current, found.best), String(round));
+  }
+  const fresh = { ...config.fight, iterations: opts.confirmIterations, seed: `${opts.seed}/confirm` };
+  const before = simulate(game, { ...config, fight: fresh });
+  const after = simulate(game, { ...current, fight: fresh });
+  return { best: current, build: configBuild(current), confirm: { before, after, ...compareResults(before, after) } };
+}

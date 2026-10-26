@@ -118,6 +118,9 @@ export class Rotation {
       // spell is null when the character does not know it (level or talents); the action is skipped.
       return { name: a.action, spell: ch.abilities.get(a.action) ?? null, cond, timed, pet: a.pet ?? null };
     });
+    for (const name of ch.config.rotation.precombat) {
+      if (!this.actionNames.has(name)) throw new Error(`precombat: unknown action "${name}"`);
+    }
   }
 
   private f(): Fight {
@@ -299,10 +302,10 @@ export class Fight implements PetHost {
 
   run(): FightResult {
     this.rotation.fight = this;
+    // Like rotation actions, precombat spells the character does not know (level, talents) are skipped.
     for (const name of this.ch.config.rotation.precombat) {
       const spell = this.ch.abilities.get(name);
-      if (!spell) throw new Error(`precombat: "${name}" is not known at level ${this.ch.level} with these talents`);
-      this.applyAuras(spell, null);
+      if (spell) this.applyAuras(spell, null);
     }
     // A hunter keeps tracking the target's creature type, which Improved Tracking turns into damage.
     const tracking = [...this.ch.abilities.values()].find((s) =>
