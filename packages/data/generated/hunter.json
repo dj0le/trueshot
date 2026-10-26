@@ -22046,7 +22046,7 @@
      "apCoefficient": 0,
      "spCoefficient": 1,
      "periodMs": 0,
-     "triggerSpell": 0,
+     "triggerSpell": 13797,
      "chainTargets": 0,
      "mechanic": 0,
      "miscValue": [
@@ -22059,6 +22059,93 @@
      ],
      "implicitTarget": [
       47,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "13797": {
+   "id": 13797,
+   "name": "Immolation Trap",
+   "school": 4,
+   "attributes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    512,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 15000,
+   "maxDurationMs": 15000,
+   "rangeMin": 0,
+   "rangeMax": 10,
+   "speed": 0,
+   "baseLevel": 16,
+   "spellLevel": 16,
+   "maxLevel": 22,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     4,
+     0,
+     131072,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 3,
+     "basePoints": 21,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 3000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      6,
       0
      ],
      "classMask": [
@@ -22164,6 +22251,125 @@
     }
    ]
   },
+  "13812": {
+   "id": 13812,
+   "name": "Explosive Trap Effect",
+   "school": 4,
+   "attributes": [
+    0,
+    136,
+    0,
+    64,
+    0,
+    0,
+    0,
+    0,
+    512,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 20000,
+   "maxDurationMs": 20000,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 34,
+   "spellLevel": 34,
+   "maxLevel": 40,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     4,
+     0,
+     16384,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 2,
+     "aura": 0,
+     "basePoints": 115,
+     "variance": 0.26087,
+     "pointsPerLevel": 0.8,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      13
+     ],
+     "implicitTarget": [
+      22,
+      15
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 27,
+     "aura": 3,
+     "basePoints": 15,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 2000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      13,
+      0
+     ],
+     "implicitTarget": [
+      28,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "13813": {
    "id": 13813,
    "name": "Explosive Trap",
@@ -22234,7 +22440,7 @@
      "apCoefficient": 0,
      "spCoefficient": 1,
      "periodMs": 0,
-     "triggerSpell": 0,
+     "triggerSpell": 13812,
      "chainTargets": 0,
      "mechanic": 0,
      "miscValue": [
@@ -26305,6 +26511,354 @@
     }
    ]
   },
+  "14298": {
+   "id": 14298,
+   "name": "Immolation Trap",
+   "school": 4,
+   "attributes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    512,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 15000,
+   "maxDurationMs": 15000,
+   "rangeMin": 0,
+   "rangeMax": 10,
+   "speed": 0,
+   "baseLevel": 26,
+   "spellLevel": 26,
+   "maxLevel": 32,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     4,
+     0,
+     131072,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 3,
+     "basePoints": 43,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 3000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      6,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "14299": {
+   "id": 14299,
+   "name": "Immolation Trap",
+   "school": 4,
+   "attributes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    512,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 15000,
+   "maxDurationMs": 15000,
+   "rangeMin": 0,
+   "rangeMax": 10,
+   "speed": 0,
+   "baseLevel": 36,
+   "spellLevel": 36,
+   "maxLevel": 42,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     4,
+     0,
+     131072,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 3,
+     "basePoints": 68,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 3000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      6,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "14300": {
+   "id": 14300,
+   "name": "Immolation Trap",
+   "school": 4,
+   "attributes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    512,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 15000,
+   "maxDurationMs": 15000,
+   "rangeMin": 0,
+   "rangeMax": 10,
+   "speed": 0,
+   "baseLevel": 46,
+   "spellLevel": 46,
+   "maxLevel": 52,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     4,
+     0,
+     131072,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 3,
+     "basePoints": 102,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 3000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      6,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "14301": {
+   "id": 14301,
+   "name": "Immolation Trap",
+   "school": 4,
+   "attributes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    512,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 15000,
+   "maxDurationMs": 15000,
+   "rangeMin": 0,
+   "rangeMax": 10,
+   "speed": 0,
+   "baseLevel": 56,
+   "spellLevel": 56,
+   "maxLevel": 62,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     4,
+     0,
+     131072,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 3,
+     "basePoints": 138,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 3000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      6,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "14302": {
    "id": 14302,
    "name": "Immolation Trap",
@@ -26375,7 +26929,7 @@
      "apCoefficient": 0,
      "spCoefficient": 1,
      "periodMs": 0,
-     "triggerSpell": 0,
+     "triggerSpell": 14298,
      "chainTargets": 0,
      "mechanic": 0,
      "miscValue": [
@@ -26469,7 +27023,7 @@
      "apCoefficient": 0,
      "spCoefficient": 1,
      "periodMs": 0,
-     "triggerSpell": 0,
+     "triggerSpell": 14299,
      "chainTargets": 0,
      "mechanic": 0,
      "miscValue": [
@@ -26563,7 +27117,7 @@
      "apCoefficient": 0,
      "spCoefficient": 1,
      "periodMs": 0,
-     "triggerSpell": 0,
+     "triggerSpell": 14300,
      "chainTargets": 0,
      "mechanic": 0,
      "miscValue": [
@@ -26657,7 +27211,7 @@
      "apCoefficient": 0,
      "spCoefficient": 1,
      "periodMs": 0,
-     "triggerSpell": 0,
+     "triggerSpell": 14301,
      "chainTargets": 0,
      "mechanic": 0,
      "miscValue": [
@@ -26869,6 +27423,244 @@
     }
    ]
   },
+  "14314": {
+   "id": 14314,
+   "name": "Explosive Trap Effect",
+   "school": 4,
+   "attributes": [
+    0,
+    136,
+    0,
+    64,
+    0,
+    0,
+    0,
+    0,
+    512,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 20000,
+   "maxDurationMs": 20000,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 44,
+   "spellLevel": 44,
+   "maxLevel": 50,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     4,
+     0,
+     16384,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 2,
+     "aura": 0,
+     "basePoints": 163,
+     "variance": 0.294479,
+     "pointsPerLevel": 1,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      13
+     ],
+     "implicitTarget": [
+      22,
+      15
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 27,
+     "aura": 3,
+     "basePoints": 24,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 2000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      13,
+      0
+     ],
+     "implicitTarget": [
+      28,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "14315": {
+   "id": 14315,
+   "name": "Explosive Trap Effect",
+   "school": 4,
+   "attributes": [
+    0,
+    136,
+    0,
+    576,
+    0,
+    0,
+    0,
+    0,
+    512,
+    0,
+    0,
+    0,
+    0,
+    128,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 20000,
+   "maxDurationMs": 20000,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 54,
+   "spellLevel": 54,
+   "maxLevel": 60,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 1,
+   "preventionType": 1,
+   "mechanic": 0,
+   "dispelType": 1,
+   "power": [],
+   "proc": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     4,
+     0,
+     16384,
+     0
+    ]
+   },
+   "effects": [
+    {
+     "index": 0,
+     "effect": 2,
+     "aura": 0,
+     "basePoints": 229,
+     "variance": 0.244541,
+     "pointsPerLevel": 1.2,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      13
+     ],
+     "implicitTarget": [
+      22,
+      7
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "index": 1,
+     "effect": 27,
+     "aura": 3,
+     "basePoints": 33,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 2000,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      13,
+      13
+     ],
+     "implicitTarget": [
+      28,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "14316": {
    "id": 14316,
    "name": "Explosive Trap",
@@ -26939,7 +27731,7 @@
      "apCoefficient": 0,
      "spCoefficient": 1,
      "periodMs": 0,
-     "triggerSpell": 0,
+     "triggerSpell": 14314,
      "chainTargets": 0,
      "mechanic": 0,
      "miscValue": [
@@ -27033,7 +27825,7 @@
      "apCoefficient": 0,
      "spCoefficient": 1,
      "periodMs": 0,
-     "triggerSpell": 0,
+     "triggerSpell": 14315,
      "chainTargets": 0,
      "mechanic": 0,
      "miscValue": [

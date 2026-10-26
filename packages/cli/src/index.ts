@@ -114,14 +114,17 @@ const DEFAULT_POOL = [
   "strider_kick",
   "lacerate",
   "wing_clip",
+  "immolation_trap",
+  "explosive_trap",
 ];
 
 // Abilities only some builds can use, which a build search adds to the rotation when missing: ones
-// talents teach, and the melee core for melee and weaving (out of range, so free, when shooting).
+// talents teach, and the melee core and fire traps for melee and weaving (out of range or never
+// springing, so left alone, when shooting).
 // Intimidation is left out: casting it costs DPS (PLAN.md findings).
 const TAUGHT = {
   precombat: ["trueshot_aura"],
-  actions: ["bestial_wrath", "sniper_shot", "summon_hawk", "mongoose_bite", "raptor_strike"],
+  actions: ["bestial_wrath", "sniper_shot", "summon_hawk", "mongoose_bite", "raptor_strike", "immolation_trap", "explosive_trap"],
 };
 
 // The default pool plus the on-use items the config wears (trinkets).

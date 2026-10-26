@@ -18,6 +18,17 @@ const LINKS: ({ from: number; effectIndex: number; to: number } & ({ tooltip: st
   { from: 14295, effectIndex: 2, to: 1279715, tooltip: "causing 112 Arcane damage" },
   // Judgement of Wisdom's proc is a dummy; the server then restores 59 mana to the attacker (rank 3).
   { from: 1826, effectIndex: 0, to: 20353, why: "Judgement of Wisdom rank 3 restores 59 mana per hit" },
+  // A trap places an object (effect 104); the server casts the damage spell when the trap springs.
+  ...[
+    [13795, 13797],
+    [14302, 14298],
+    [14303, 14299],
+    [14304, 14300],
+    [14305, 14301],
+    [13813, 13812],
+    [14316, 14314],
+    [14317, 14315],
+  ].map(([from, to]) => ({ from: from!, effectIndex: 0, to: to!, tooltip: "Fire trap" })),
 ];
 
 // Spells scripts in the engine apply directly, with why.

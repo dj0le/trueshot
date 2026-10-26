@@ -40,6 +40,8 @@ const KNOWN_EFFECTS = new Set<number>([
   Effect.ApplyAreaAuraParty,
   Effect.Energize,
   Effect.TriggerSpell,
+  Effect.PersistentAreaAura,
+  Effect.SummonObject,
   Effect.Dummy,
   ...IGNORED_EFFECTS,
 ]);
@@ -520,6 +522,8 @@ export class Fight implements PetHost {
   // Shots need distance and melee abilities need the target in reach; self buffs work anywhere.
   private inRange(spell: Spell): boolean {
     if (spell.rangeMin > 0) return this.at === "ranged";
+    // A trap springs only within reach of the target, so the hunter places it in melee.
+    if (spell.effects.some((e) => e.effect === Effect.SummonObject)) return this.at === "melee";
     if (spell.rangeMax > 0 && spell.rangeMax <= MELEE_RANGE) return this.at === "melee";
     return true;
   }
@@ -818,6 +822,11 @@ export class Fight implements PetHost {
 
   private roll(spell: Spell, isAuto: boolean, extraCritPct = 0): "miss" | "hit" | "crit" {
     if (spell.defenseType === DefenseType.None) return "hit";
+    // The hunter's magic (trap fire) misses on the spell table; hunter spell crit is not modelled.
+    if (spell.defenseType === DefenseType.Magic) {
+      const miss = Math.max(1, this.target.table.spellMissPct - this.mods(spell, SpellModOp.ResistMissChance).flat);
+      return this.rng.stream("spell").chance(miss) ? "miss" : "hit";
+    }
     // Melee specials can also be dodged.
     const miss = this.missPct() + (spell.defenseType === DefenseType.Melee ? this.target.table.dodgePct : 0);
     const crit = this.critPct(spell, extraCritPct);
@@ -857,8 +866,10 @@ export class Fight implements PetHost {
       if (weapon.length === 0) amount = this.weaponDamage(spell, false);
       amount *= percent.reduce((m, e) => (m * e.value) / 100, 1);
     }
+    // Percent modifiers on all effects raise a spell's direct damage too (Clever Traps).
     for (const e of damaging) {
-      if (e.effect === Effect.SchoolDamage) amount += this.rolled(e, "damage") + e.apCoefficient * this.attackPowerFor(spell);
+      if (e.effect !== Effect.SchoolDamage) continue;
+      amount += this.modded(this.rolled(e, "damage"), spell, SpellModOp.AllEffects) + e.apCoefficient * this.attackPowerFor(spell);
     }
     return amount;
   }
@@ -899,12 +910,14 @@ export class Fight implements PetHost {
       }
       s.damage += amount;
       dealt = amount;
-    } else {
+    } else if (!effects.some((e) => e.effect === Effect.SummonObject)) {
+      // Placing a trap is not a hit; its spell, under the same name, counts when it springs.
       s.hits++;
     }
 
     this.energize(spell, effects);
     this.triggerLinked(spell, effects);
+    this.placeTraps(spell, effects);
 
     // Charges go after the damage they applied to and before this spell's own auras land, so a
     // shot that grants charged buffs does not spend one itself.
@@ -920,6 +933,21 @@ export class Fight implements PetHost {
       if (!fromProc && melee && this.ch.mainHand) this.weaponProcs(this.ch.mainHand.procs, this.ch.mainHand.speed);
     }
     if (ranged) this.procs(this.targetAuras, isAuto ? ProcFlag.TakenRangedAutoAttack : ProcFlag.TakenRangedSpell, "target-proc");
+  }
+
+  // A trap lies where the hunter stands and springs on the target if that is within reach (in melee),
+  // once armed. Out of reach it never springs.
+  private placeTraps(spell: Spell, effects: ResolvedEffect[]): void {
+    for (const e of effects) {
+      if (e.effect !== Effect.SummonObject || !e.triggerSpell) continue;
+      const linked = this.game.data.spells[String(e.triggerSpell)];
+      if (!linked) {
+        this.unimplemented.add(`${spell.name}: trap spell ${e.triggerSpell} not in the data`);
+        continue;
+      }
+      if (this.at !== "melee") continue;
+      this.queue.push(this.now + this.game.overrides.formula.trapArmingMs.value, () => this.execute(linked));
+    }
   }
 
   // A bleed carrying damage already done (Lacerating Strikes): ticks of an equal share over the
@@ -986,16 +1014,24 @@ export class Fight implements PetHost {
     const all = effects ?? resolveEffects(spell);
     const auraEffects = this.moddedEffects(
       spell,
-      all.filter((e) => e.effect === Effect.ApplyAura || e.effect === Effect.ApplyAreaAuraRaid || e.effect === Effect.ApplyAreaAuraParty),
+      all.filter(
+        (e) =>
+          e.effect === Effect.ApplyAura ||
+          e.effect === Effect.ApplyAreaAuraRaid ||
+          e.effect === Effect.ApplyAreaAuraParty ||
+          e.effect === Effect.PersistentAreaAura,
+      ),
     );
     if (auraEffects.length === 0) return;
     for (const e of auraEffects) {
       if (!KNOWN_AURAS.has(e.aura as never)) this.unimplemented.add(`${spell.name} (${spell.id}): aura ${e.aura}`);
     }
 
-    const onTarget = auraEffects.filter((e) => TARGET_ENEMY.has(e.implicitTarget[0]));
+    // A ground area lies under the target.
+    const atTarget = (e: ResolvedEffect) => TARGET_ENEMY.has(e.implicitTarget[0]) || e.effect === Effect.PersistentAreaAura;
+    const onTarget = auraEffects.filter(atTarget);
     const onPet = auraEffects.filter((e) => e.implicitTarget[0] === TARGET_PET);
-    const onSelf = auraEffects.filter((e) => !TARGET_ENEMY.has(e.implicitTarget[0]) && e.implicitTarget[0] !== TARGET_PET);
+    const onSelf = auraEffects.filter((e) => !atTarget(e) && e.implicitTarget[0] !== TARGET_PET);
     const duration =
       durationOverride ?? (spell.durationMs < 0 ? Infinity : this.modded(spell.durationMs, spell, SpellModOp.Duration));
     if (onPet.length > 0) this.pet?.addAura(spell, onPet, duration);

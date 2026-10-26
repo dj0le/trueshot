@@ -75,6 +75,13 @@ value = 7
 confidence = "classic"
 source = "Base run speed 7 yd/sec; speed auras (Strider Kick, Minor Speed boots) do not stack, the highest counts (wowsims/forever PR 575)"
 
+# Forever lets traps be placed in combat. A trap lies where the hunter stands and springs on a target
+# within 5 yards (so in melee, or mid-weave) once armed. The client has no trap object data.
+[formula.trapArmingMs]
+value = 500
+confidence = "guess"
+source = "wowsims/forever sim/hunter/traps.go: arming delay 0.5 sec, 'in-game testing required'"
+
 [formula.offHandDamagePct]
 value = 50
 confidence = "classic"
@@ -372,3 +379,83 @@ spell = 26480
 procPpm = 10
 confidence = "guess"
 source = "Badge of the Swarmguard: 'a chance on melee or ranged attack'; client proc chance 101 (set by the server). 10 procs per minute is a placeholder"
+
+# Fire traps: 10% of ranged attack power over the trap's whole damage, split over the ticks; Explosive
+# Trap's initial hit takes another 10%. The client effects carry no coefficient.
+
+[[hotfix]]
+spell = 13797
+effectIndex = 0
+apCoefficient = 0.02
+confidence = "reported"
+source = "Immolation Trap rank 1: 10% over 5 ticks of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 14298
+effectIndex = 0
+apCoefficient = 0.02
+confidence = "reported"
+source = "Immolation Trap rank 2: 10% over 5 ticks of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 14299
+effectIndex = 0
+apCoefficient = 0.02
+confidence = "reported"
+source = "Immolation Trap rank 3: 10% over 5 ticks of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 14300
+effectIndex = 0
+apCoefficient = 0.02
+confidence = "reported"
+source = "Immolation Trap rank 4: 10% over 5 ticks of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 14301
+effectIndex = 0
+apCoefficient = 0.02
+confidence = "reported"
+source = "Immolation Trap rank 5: 10% over 5 ticks of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 13812
+effectIndex = 0
+apCoefficient = 0.1
+confidence = "reported"
+source = "Explosive Trap rank 1 hit: 10% on the hit of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 13812
+effectIndex = 1
+apCoefficient = 0.01
+confidence = "reported"
+source = "Explosive Trap rank 1 burn: 10% over 10 ticks of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 14314
+effectIndex = 0
+apCoefficient = 0.1
+confidence = "reported"
+source = "Explosive Trap rank 2 hit: 10% on the hit of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 14314
+effectIndex = 1
+apCoefficient = 0.01
+confidence = "reported"
+source = "Explosive Trap rank 2 burn: 10% over 10 ticks of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 14315
+effectIndex = 0
+apCoefficient = 0.1
+confidence = "reported"
+source = "Explosive Trap rank 3 hit: 10% on the hit of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"
+
+[[hotfix]]
+spell = 14315
+effectIndex = 1
+apCoefficient = 0.01
+confidence = "reported"
+source = "Explosive Trap rank 3 burn: 10% over 10 ticks of ranged attack power. wowsims/forever traps.go, from the Forever notes; in-game testing required"

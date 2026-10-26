@@ -8,6 +8,10 @@ export const Effect = {
   Energize: 30,
   // Casts a linked spell on the caster at once (Jom Gabbar's first stack).
   TriggerSpell: 64,
+  // A ground area with an aura on whoever stands in it (Explosive Trap's burn).
+  PersistentAreaAura: 27,
+  // Places an object (a trap); the server casts the linked spell when it springs.
+  SummonObject: 104,
   ApplyAreaAuraParty: 35,
   WeaponPercentDamage: 31,
   WeaponDamage: 58,
@@ -109,6 +113,8 @@ export const SpellModOp = {
   Effect2: 12,
   Cost: 14,
   CritDamageBonus: 15,
+  // Less chance for the spell to miss (Survival Tactics on traps).
+  ResistMissChance: 16,
   ProcChance: 18,
   PeriodicDamage: 22,
   Effect3: 23,

@@ -558,3 +558,30 @@ test("weaving walks in for one swing between Auto Shots, only when the Auto Shot
   // Minor Speed boots: 8% faster legs, so more weaves fit.
   expect(casts(run(1200, { feet: 911 }), "Melee weave")).toBeGreaterThanOrEqual(weaves);
 });
+
+test("fire traps spring only when placed in melee, and Clever Traps and Survival Tactics improve them", () => {
+  const sv = { "Improved Tracking": 5, "Savage Strikes": 2, Survivalist: 3, "Clever Traps": 2, Surefooted: 3 };
+  const run = (position: "melee" | "ranged", talents: Record<string, number>) =>
+    simulate(game, {
+      ...base,
+      position,
+      talents,
+      target: { preset: "boss" },
+      gear: { items: { mainHand: 18520, ranged: 18680 }, stats: { hitPct: 9, mp5: 10000 } },
+      fight: { durationSec: 300, iterations: 100 },
+      rotation: { actions: [{ action: "immolation_trap" }] },
+    }).abilities.find((a) => a.name === "Immolation Trap");
+  // Out of reach the trap is never placed.
+  expect(run("ranged", {})).toBeUndefined();
+  const plain = run("melee", {})!;
+  // Ten placements on a 30 sec cooldown; magic misses 17% against a boss.
+  expect(plain.castsPerFight).toBe(10);
+  expect(plain.missPct).toBeGreaterThan(14);
+  expect(plain.missPct).toBeLessThan(20);
+  // Clever Traps: 30% more per tick.
+  const clever = run("melee", sv)!;
+  expect(clever.avgHit / plain.avgHit).toBeCloseTo(1.3, 1);
+  // Survival Tactics: 10% less to miss.
+  const tactics = run("melee", { ...sv, "Survival Tactics": 2 })!;
+  expect(plain.missPct - tactics.missPct).toBeGreaterThan(7);
+});
