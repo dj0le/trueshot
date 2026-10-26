@@ -139,7 +139,7 @@ test("a DoT gets all its ticks, including the one landing on expiry", () => {
 });
 
 test("gear items add their stats, convert ratings, and supply the ranged weapon", () => {
-  const ch = buildCharacter(game.data, game.overrides, game.items, SimConfig.parse({
+  const ch = buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({
     ...base,
     gear: { items: { head: 252605, chest: 252483, ranged: 18680 } },
   }));
@@ -151,7 +151,7 @@ test("gear items add their stats, convert ratings, and supply the ranged weapon"
   expect(ch.rangedWeapon).toMatchObject({ min: 61, max: 114, speed: 2.8 });
   expect(ch.gearNotes.some((n) => n.startsWith("Ancient Bone Bow"))).toBe(true);
   expect(() =>
-    buildCharacter(game.data, game.overrides, game.items, SimConfig.parse({ ...base, gear: { items: { neck: 252605 } } })),
+    buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({ ...base, gear: { items: { neck: 252605 } } })),
   ).toThrow(/does not go in neck/);
 });
 
@@ -233,7 +233,7 @@ test("the attack table follows the level gap", () => {
 });
 
 test("a level 30 hunter knows level 30 ranks, has level 30 stats, and fights a level 30 target", () => {
-  const ch = buildCharacter(game.data, game.overrides, game.items, SimConfig.parse({ ...base, level: 30, gear: { rangedWeapon: { min: 20, max: 38, speed: 2.8 } } }));
+  const ch = buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({ ...base, level: 30, gear: { rangedWeapon: { min: 20, max: 38, speed: 2.8 } } }));
   expect(ch.primary.agility).toBe(game.overrides.levels.hunter.races.Orc!.stats[20]![1]);
   expect(ch.baseMana).toBe(775);
   // Aimed Shot's level 28 rank, not the level 60 one.
@@ -316,7 +316,7 @@ test("racials: Wind Blessed hastes Auto Shot, Berserking is cast, Savage adds cr
   const troll = simulate(game, { ...base, race: "Troll", fight, rotation: { actions: [{ action: "berserking" }] } });
   expect(troll.abilities.find((a) => a.name === "Berserking")!.castsPerFight).toBe(2);
 
-  const orc = buildCharacter(game.data, game.overrides, game.items, SimConfig.parse({ ...base, race: "Orc" }));
+  const orc = buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({ ...base, race: "Orc" }));
   expect(orc.passives.map((p) => p.source)).toContain("Savage");
   expect(orc.abilities.has("blood_fury")).toBe(true);
 });
@@ -377,4 +377,22 @@ test("pets autocast every damage ability they know, and magic ones miss on the s
   const breath = pet("Wind Serpent").find((a) => a.name === "Pet: Lightning Breath")!;
   expect(breath.missPct).toBeGreaterThan(14);
   expect(breath.missPct).toBeLessThan(20);
+});
+
+test("set bonuses turn on by pieces worn, and enchants add stats and scope damage", () => {
+  // Beaststalker Bindings, Gloves and Pants: three pieces, so +30 ranged attack power (and resistances).
+  const three = { wrist: 16681, hands: 16676, legs: 16678 };
+  const ch = (items: Record<string, number>, enchants: Record<string, number> = {}) =>
+    buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({ ...base, gear: { ...base.gear!, items, enchants } }));
+  const sources = (items: Record<string, number>) => ch(items).passives.map((p) => p.source);
+  expect(sources(three)).toEqual(expect.arrayContaining(["Beaststalker Armor (2)", "Beaststalker Armor (3)"]));
+  expect(sources({ wrist: 16681, hands: 16676 })).not.toContain("Beaststalker Armor (3)");
+
+  // +15 agility on the gloves, +3% hit on the bow's scope slot, and a +7 damage scope.
+  const plain = ch({ ranged: 18680 });
+  const enchanted = ch({ ranged: 18680 }, { hands: 2564, ranged: 664 });
+  expect(enchanted.primary.agility - plain.primary.agility).toBe(15);
+  expect(enchanted.rangedWeapon.min - plain.rangedWeapon.min).toBe(7);
+  expect(ch({}, { head: 2523 }).hitPct).toBe(base.gear!.stats!.hitPct! + 3);
+  expect(() => ch({}, { head: 999999 })).toThrow(/enchant 999999 on head/);
 });

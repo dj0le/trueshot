@@ -40,7 +40,7 @@ function summarize(xs: number[]): { mean: number; stdDev: number; error95: numbe
 
 export function simulate(game: GameData, input: SimConfigInput): SimResult {
   const config = SimConfig.parse(input);
-  const ch = buildCharacter(game.data, game.overrides, game.items, config);
+  const ch = buildCharacter(game.data, game.overrides, game.items, game.enchants, config);
   const rotation = new Rotation(ch, game);
   const unimplemented = new Set<string>();
   const { durationSec, durationVariancePct, iterations, seed } = config.fight;

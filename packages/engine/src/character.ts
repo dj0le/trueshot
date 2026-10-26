@@ -1,6 +1,6 @@
 // Turns a config into a character: validated talents, the spells it knows, and its stats before
 // any in-combat auras. Pure: everything comes in as arguments.
-import { atLevel, type HunterData, type Item, type Overrides, type Spell, type SpellEffect, type Talent } from "@hunter-sim/data";
+import { atLevel, type Enchant, type HunterData, type Item, type Overrides, type Spell, type SpellEffect, type Talent } from "@hunter-sim/data";
 import { Aura, Stat } from "./enums";
 import type { GEAR_SLOTS, SimConfig, StatBlock } from "./config";
 
@@ -56,21 +56,17 @@ const SLOT_TYPES: Record<(typeof GEAR_SLOTS)[number], number[]> = {
   ranged: [15, 25, 26],
 };
 
-// Item stats summed, ratings turned into percentages, on top of the config's own stat block.
+// Item and enchant stats summed, ratings turned into percentages, on top of the config's own stat block.
 function gearStats(
   items: Map<number, Item>,
+  enchants: Map<number, Enchant>,
   overrides: Overrides,
   config: SimConfig,
 ): { stats: StatBlock; rangedWeapon: Character["rangedWeapon"] | undefined; notes: string[] } {
   const stats = { ...config.gear.stats };
   const notes: string[] = [];
   let rangedWeapon: Character["rangedWeapon"] | undefined;
-  for (const [slot, id] of Object.entries(config.gear.items) as [keyof typeof SLOT_TYPES, number][]) {
-    const item = items.get(id);
-    if (!item) throw new Error(`gear: item ${id} in ${slot} is not in items.json (hunter-usable, uncommon or better)`);
-    if (item.requiredLevel > config.level) throw new Error(`gear: ${item.name} needs level ${item.requiredLevel}`);
-    if (!SLOT_TYPES[slot].includes(item.inventoryType)) throw new Error(`gear: ${item.name} does not go in ${slot}`);
-    const s = item.stats;
+  const add = (s: Item["stats"]) => {
     stats.strength += s.strength ?? 0;
     stats.agility += s.agility ?? 0;
     stats.stamina += s.stamina ?? 0;
@@ -80,11 +76,32 @@ function gearStats(
     stats.rangedAttackPower += s.rangedAttackPower ?? 0;
     stats.critPct += (s.critPct ?? 0) + (s.critRating ?? 0) / overrides.formula.critRatingPerPct.value;
     stats.hitPct += (s.hitPct ?? 0) + (s.hitRating ?? 0) / overrides.formula.hitRatingPerPct.value;
+    stats.hastePct += s.hastePct ?? 0;
     stats.mp5 += s.mp5 ?? 0;
-    if (slot === "ranged" && item.weapon) rangedWeapon = item.weapon;
+  };
+  for (const [slot, id] of Object.entries(config.gear.items) as [keyof typeof SLOT_TYPES, number][]) {
+    const item = items.get(id);
+    if (!item) throw new Error(`gear: item ${id} in ${slot} is not in items.json (hunter-usable, uncommon or better)`);
+    if (item.requiredLevel > config.level) throw new Error(`gear: ${item.name} needs level ${item.requiredLevel}`);
+    if (!SLOT_TYPES[slot].includes(item.inventoryType)) throw new Error(`gear: ${item.name} does not go in ${slot}`);
+    add(item.stats);
+    if (slot === "ranged" && item.weapon) rangedWeapon = { ...item.weapon };
     if (item.source === "classic") notes.push(`${item.name}: not in the Forever client, Classic Era stats used`);
     if (item.procSpells.length) notes.push(`${item.name}: chance-on-hit effect not simulated`);
     for (const e of item.unparsedEquip) notes.push(`${item.name}: equip effect "${e}" not simulated`);
+  }
+  for (const [slot, id] of Object.entries(config.gear.enchants) as [keyof typeof SLOT_TYPES, number][]) {
+    const enchant = enchants.get(id);
+    if (!enchant) throw new Error(`gear: enchant ${id} on ${slot} is not in enchants.json (stat and scope enchants)`);
+    add(enchant.stats);
+    if (enchant.weaponDamage) {
+      // A scope adds its damage to every shot of the weapon it is on; melee weapons are not simulated.
+      if (slot === "ranged" && rangedWeapon) {
+        rangedWeapon.min += enchant.weaponDamage;
+        rangedWeapon.max += enchant.weaponDamage;
+      } else notes.push(`${enchant.name} on ${slot}: weapon damage outside the ranged slot not simulated`);
+    }
+    for (const u of enchant.unparsed) notes.push(`${enchant.name} on ${slot}: "${u}" not simulated`);
   }
   return { stats, rangedWeapon, notes };
 }
@@ -177,7 +194,27 @@ export function actionNames(data: HunterData): Set<string> {
   ]);
 }
 
-export function buildCharacter(data: HunterData, overrides: Overrides, items: Map<number, Item>, config: SimConfig): Character {
+// Set bonuses the worn items turn on, as passives. A piece counts once however many slots hold it.
+function setBonuses(data: HunterData, config: SimConfig): ActiveSpell[] {
+  const worn = new Set(Object.values(config.gear.items));
+  return data.itemSets.flatMap((set) => {
+    const pieces = set.items.filter((id) => worn.has(id)).length;
+    return set.bonuses
+      .filter((b) => b.threshold <= pieces)
+      .map((b) => {
+        const spell = data.spells[String(b.spellId)]!;
+        return { spell, effects: resolveEffects(spell), source: `${set.name} (${b.threshold})` };
+      });
+  });
+}
+
+export function buildCharacter(
+  data: HunterData,
+  overrides: Overrides,
+  items: Map<number, Item>,
+  enchants: Map<number, Enchant>,
+  config: SimConfig,
+): Character {
   const f = overrides.formula;
   const lv = overrides.levels;
   const raceKey = Object.keys(lv.hunter.races).find((r) => config.race.startsWith(r));
@@ -225,17 +262,26 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     });
   }
 
-  const worn = gearStats(items, overrides, config);
+  passives.push(...setBonuses(data, config));
+
+  const worn = gearStats(items, enchants, overrides, config);
   const gear = worn.stats;
   const buffs = config.buffs;
   const rangedWeapon = worn.rangedWeapon ?? config.gear.rangedWeapon;
   if (!rangedWeapon) throw new Error("gear: no ranged weapon; add gear.items.ranged or gear.rangedWeapon");
   const sum = (key: keyof StatBlock) => gear[key] + buffs[key];
 
-  // Percentage stat bonuses (Lightning Reflexes) from passive auras.
+  // Flat (set bonuses) and percentage (Lightning Reflexes) stat bonuses from passive auras, and mana
+  // regen.
+  const statFlat = [0, 0, 0, 0, 0];
   const statPct = [0, 0, 0, 0, 0];
+  let passiveMp5 = 0;
   for (const p of passives) {
     for (const e of p.effects) {
+      if (e.aura === Aura.ModStat) {
+        for (let s = 0; s < 5; s++) if (e.miscValue[0] === -1 || e.miscValue[0] === s) statFlat[s]! += e.value;
+      }
+      if (e.aura === Aura.ModPowerRegen && e.miscValue[0] === 0) passiveMp5 += e.value;
       if (e.aura !== Aura.ModTotalStatPercentage) continue;
       // The stat is a bit mask in the second misc value, or an index (-1 = all) in the first.
       const mask = e.miscValue[1];
@@ -245,7 +291,7 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
       }
     }
   }
-  const stat = (i: number, key: keyof StatBlock) => Math.floor((raceStats[i]! + sum(key)) * (1 + statPct[i]! / 100));
+  const stat = (i: number, key: keyof StatBlock) => Math.floor((raceStats[i]! + sum(key) + statFlat[i]!) * (1 + statPct[i]! / 100));
   const primary = {
     strength: stat(Stat.Strength, "strength"),
     agility: stat(Stat.Agility, "agility"),
@@ -280,7 +326,7 @@ export function buildCharacter(data: HunterData, overrides: Overrides, items: Ma
     agilityCritPct,
     hitPct: sum("hitPct"),
     hastePct: sum("hastePct"),
-    mp5: sum("mp5"),
+    mp5: sum("mp5") + passiveMp5,
     rangedWeapon,
     gearNotes: worn.notes,
   };

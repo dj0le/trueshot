@@ -89,6 +89,7 @@ const USAGE = [
   "  bun run sim weights <config.toml> [--iterations N]",
   "  bun run sim optimize <config.toml> [--budget N] [--iterations N] [--pool a,b] [--out file.toml]",
   "  bun run sim pets <config.toml> [--iterations N]       every pet family, and none, with these talents",
+  "  bun run sim enchants <text>                           enchant ids for gear.enchants, by name",
   "  bun run sim build <config.toml> [--budget N] [--rotation-budget N] [--rounds N] [--iterations N] [--keep-pet] [--out file.toml]",
   "                                                        talents, pet and rotation searched together",
 ].join("\n");
@@ -257,6 +258,20 @@ async function main(argv: string[]): Promise<void> {
       await Bun.write(out, `${head}\n\n${toml}\n`);
       console.log(`\nwrote ${out}`);
     }
+  } else if (command === "enchants" && paths.length >= 1) {
+    const text = paths.join(" ").toLowerCase();
+    const rows = [...game.enchants.values()].filter((e) => e.name.toLowerCase().includes(text));
+    console.log(
+      table([
+        ["Id", "Name", "Stats", "Not simulated"],
+        ...rows.map((e) => [
+          String(e.id),
+          e.name,
+          [...Object.entries(e.stats).map(([k, v]) => `${k} ${v}`), ...(e.weaponDamage ? [`weapon damage ${e.weaponDamage}`] : [])].join(", "),
+          e.unparsed.join(", "),
+        ]),
+      ], 4),
+    );
   } else if (command === "pets" && paths.length === 1) {
     const config = await loadConfig(paths[0]!, flags);
     const rows = petSweep(game, config);

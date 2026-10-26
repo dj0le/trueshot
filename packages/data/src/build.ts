@@ -4,9 +4,9 @@
 import { join } from "node:path";
 import type { Row } from "./csv";
 import { GENERATED_PATH } from "./index";
-import type { Ability, Consumable, HunterData, PetFamily, Racial, Spell, SpellEffect, Talent, TalentRankEffect } from "./schema";
+import type { Ability, Consumable, HunterData, ItemSet, PetFamily, Racial, Spell, SpellEffect, Talent, TalentRankEffect } from "./schema";
 import { HUNTER_TRAIT_TREE_ID, TALENTSFOREVER_HUNTER_URL, WOWF_BUILD } from "./sources";
-import { RAW_DIR, byId, bySpell, effectsByItem, groupBy, num, tables } from "./tables";
+import { RAW_DIR, byId, bySpell, effectsByItem, groupBy, hunterCanUse, num, tables } from "./tables";
 
 // Spells the server triggers by script, so the client tables do not link them. Each link is
 // written onto the source effect's triggerSpell and, for hunter spells, checked against the
@@ -82,6 +82,9 @@ const db = await tables([
   "ItemEffect",
   "ItemXItemEffect",
   "ItemSparse",
+  "Item",
+  "ItemSet",
+  "ItemSetSpell",
 ]);
 
 const names = new Map(db.SpellName.map((r) => [r.ID!, r.Name_lang!]));
@@ -384,6 +387,32 @@ for (const r of Object.values(tf.racials).flat()) {
   }
 }
 
+// Item sets ====================================================================
+// Forever's own set table, which also covers items only the server sends (it carries a reworked
+// Beaststalker Armor, for one). Only sets with a mail, leather or non-armor piece (cloth sets are
+// casters'), and only bonuses that are not another class's spell modifiers.
+
+const itemRows = byId(db.Item);
+const setSpells = groupBy(db.ItemSetSpell, (r) => r.ItemSetID!);
+const HUNTER_CLASS_SET = 9;
+const hunterArmor = (id: number) => {
+  const item = itemRows.get(String(id));
+  return !!item && hunterCanUse(item) && !(item.ClassID === "4" && item.SubclassID === "1");
+};
+const forHunters = (spellId: number) => {
+  const co = classOptions.get(String(spellId))?.[0];
+  return !co || num(co.SpellClassSet) === 0 || num(co.SpellClassSet) === HUNTER_CLASS_SET;
+};
+const itemSets: ItemSet[] = db.ItemSet.flatMap((r) => {
+  const items = Array.from({ length: 17 }, (_, i) => num(r[`ItemID_${i}`])).filter((id) => id > 0);
+  if (!items.some(hunterArmor)) return [];
+  const bonuses = (setSpells.get(r.ID!) ?? [])
+    .map((s) => ({ threshold: num(s.Threshold), spellId: num(s.SpellID) }))
+    .filter((b) => names.has(String(b.spellId)) && forHunters(b.spellId))
+    .sort((a, b) => a.threshold - b.threshold);
+  return bonuses.length ? [{ id: num(r.ID), name: r.Name_lang!, items, bonuses }] : [];
+});
+
 // Spell closure ==============================================================
 
 const wanted = new Set<string>([
@@ -395,6 +424,7 @@ const wanted = new Set<string>([
   ...RACIALS.map((r) => String(r.spellId)),
   ...(petPassives ?? []),
   ...petFamilies.map((p) => String(p.passiveSpellId)),
+  ...itemSets.flatMap((s) => s.bonuses.map((b) => String(b.spellId))),
 ]);
 let frontier = [...wanted];
 for (let depth = 0; depth < TRIGGER_DEPTH && frontier.length > 0; depth++) {
@@ -444,12 +474,13 @@ const data: HunterData = {
   petPassives: (petPassives ?? []).map(num),
   consumables,
   racials,
+  itemSets,
 };
 
 await Bun.write(GENERATED_PATH, JSON.stringify(data, null, 1) + "\n");
 console.log(
   `${Object.keys(spells).length} spells, ${abilities.length} abilities, ${talents.length} talents, ` +
-    `${petFamilies.length} pet families -> ${GENERATED_PATH}`,
+    `${petFamilies.length} pet families, ${itemSets.length} item sets -> ${GENERATED_PATH}`,
 );
 if (problems.length > 0) {
   console.error(`\n${problems.length} problems:\n  ${problems.join("\n  ")}`);

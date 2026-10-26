@@ -115,6 +115,8 @@ export type HunterData = {
   petPassives: number[];
   consumables: Consumable[];
   racials: Racial[];
+  // Sets with a piece a hunter can wear. Their bonus spells are in `spells`.
+  itemSets: ItemSet[];
 };
 
 export type ItemStats = Partial<
@@ -132,10 +134,18 @@ export type ItemStats = Partial<
     | "critPct"
     | "mp5"
     | "spellDamage"
-    | "healing",
+    | "healing"
+    | "hastePct",
     number
   >
 >;
+
+// A set of items, and the spell each piece count turns on.
+export type ItemSet = { id: number; name: string; items: number[]; bonuses: { threshold: number; spellId: number }[] };
+
+// One entry of generated/enchants.json. weaponDamage is a scope's flat damage per shot. unparsed:
+// parts the build could not turn into stats (procs, threat, odd auras).
+export type Enchant = { id: number; name: string; stats: ItemStats; weaponDamage: number; unparsed: string[] };
 
 // One entry of generated/items.json.
 export type Item = {

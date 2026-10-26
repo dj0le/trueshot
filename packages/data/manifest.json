@@ -9,6 +9,13 @@
       "fetchedAt": "2026-10-25T14:17:38.302Z"
     },
     {
+      "file": "Spell.csv",
+      "url": "https://wago.tools/db2/Spell/csv?build=1.60.1.70532",
+      "bytes": 2209387,
+      "sha256": "fd16c218c830f504bb69707acee4fc6fa3168ea04a1180d7348bfae503a2bbdf",
+      "fetchedAt": "2026-10-26T09:42:20.803Z"
+    },
+    {
       "file": "SpellEffect.csv",
       "url": "https://wago.tools/db2/SpellEffect/csv?build=1.60.1.70532",
       "bytes": 3854002,
@@ -261,6 +268,20 @@
       "fetchedAt": "2026-10-25T15:18:44.706Z"
     },
     {
+      "file": "ItemSet.csv",
+      "url": "https://wago.tools/db2/ItemSet/csv?build=1.60.1.70532",
+      "bytes": 51623,
+      "sha256": "9180aa9bd764bdeb08defd2c66358c23ee71c776c1552bf501c376c63e230979",
+      "fetchedAt": "2026-10-26T09:39:28.333Z"
+    },
+    {
+      "file": "ItemSetSpell.csv",
+      "url": "https://wago.tools/db2/ItemSetSpell/csv?build=1.60.1.70532",
+      "bytes": 32921,
+      "sha256": "adbb74f770e08199e42b4b95f7e43d804d511c3dd925b11fbf18db641c849524",
+      "fetchedAt": "2026-10-26T09:39:28.780Z"
+    },
+    {
       "file": "talentsforever-hunter.json",
       "url": "https://talentsforever.com/export/hunter.json",
       "bytes": 247968,
@@ -280,6 +301,20 @@
       "bytes": 645103,
       "sha256": "613f2474479fab68b342b60d818f9b0a2d4d60c156026ee8b1830fdc2d2d77f1",
       "fetchedAt": "2026-10-25T15:20:58.874Z"
+    },
+    {
+      "file": "classic-era/ItemSet.csv",
+      "url": "https://wago.tools/db2/ItemSet/csv?build=1.15.9.70003",
+      "bytes": 46056,
+      "sha256": "7e1164cc35e83c1899846b1f80b03ef97f0a837e3cc6f427b38d1d2a3f40c42a",
+      "fetchedAt": "2026-10-26T09:39:29.747Z"
+    },
+    {
+      "file": "classic-era/ItemSetSpell.csv",
+      "url": "https://wago.tools/db2/ItemSetSpell/csv?build=1.15.9.70003",
+      "bytes": 28183,
+      "sha256": "d1b424dc7cf7249b1d5b0035ca0d843ddc9cac117554fbc15e58c2fe979dd512",
+      "fetchedAt": "2026-10-26T09:39:30.093Z"
     }
   ]
 }

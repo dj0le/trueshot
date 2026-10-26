@@ -18,6 +18,19 @@ export const num = (s: string | undefined) => {
   return Number.isInteger(n) ? n : Math.round(n * 1e6) / 1e6;
 };
 
+// Armor a hunter can wear and weapons a hunter can use, as Item ClassID / SubclassID.
+const ARMOR_OK = new Set([0, 1, 2, 3]); // misc, cloth, leather, mail
+const WEAPON_OK = new Set([0, 1, 2, 3, 6, 7, 8, 10, 13, 15, 16, 18]);
+
+// Whether a hunter can equip an Item table row.
+export function hunterCanUse(item: Row): boolean {
+  const classId = num(item.ClassID);
+  const subclass = num(item.SubclassID);
+  if (classId === 4) return ARMOR_OK.has(subclass);
+  if (classId === 2) return WEAPON_OK.has(subclass);
+  return false;
+}
+
 export const byId = (rows: Row[]) => new Map(rows.map((r) => [r.ID!, r]));
 
 export function groupBy<T>(rows: T[], key: (r: T) => string): Map<string, T[]> {

@@ -2,9 +2,9 @@
 // way the Forever client stores them. Cross-checks the formulas against Classic Era's explicit
 // values for items both clients share, and fails if they drift.
 import type { Row } from "./csv";
-import { ITEMS_PATH } from "./index";
-import type { Item, ItemStats } from "./schema";
-import { ERA_DIR, byId, bySpell, effectsByItem, groupBy, num, tables } from "./tables";
+import { ENCHANTS_PATH, ITEMS_PATH } from "./index";
+import type { Enchant, Item, ItemStats } from "./schema";
+import { ERA_DIR, byId, bySpell, effectsByItem, groupBy, hunterCanUse, num, tables } from "./tables";
 
 const db = await tables([
   "ItemSparse",
@@ -18,6 +18,7 @@ const db = await tables([
   "ItemDamageTwoHand",
   "SpellEffect",
   "SpellName",
+  "SpellItemEnchantment",
 ]);
 const era = await tables(["ItemSparse", "ItemEffect"], ERA_DIR);
 
@@ -70,9 +71,6 @@ function addModStat(stats: ItemStats, type: number, amount: number): boolean {
   return true;
 }
 
-// Armor a hunter can wear and weapons a hunter can use, as Item ClassID / SubclassID.
-const ARMOR_OK = new Set([0, 1, 2, 3]); // misc, cloth, leather, mail
-const WEAPON_OK = new Set([0, 1, 2, 3, 6, 7, 8, 10, 13, 15, 16, 18]);
 
 // Weapon inventory types: what kind of weapon each is, and the table holding its DPS by item level.
 const ranged = byId(db.ItemDamageRanged);
@@ -108,6 +106,9 @@ function allocatedStats(r: Row): { stats: ItemStats; unparsed: number[] } {
   return { stats, unparsed };
 }
 
+// Flat stat auras (ModStat) by misc value; -1 is all five.
+const PRIMARY_BY_INDEX: (keyof ItemStats)[] = ["strength", "agility", "stamina", "intellect", "spirit"];
+
 // Simple equip spells become plain stats; anything else is listed on the item.
 function equipStats(spellId: string, stats: ItemStats): boolean {
   const effects = effectsBySpell.get(spellId) ?? [];
@@ -117,7 +118,14 @@ function equipStats(spellId: string, stats: ItemStats): boolean {
     const bp = num(e.EffectBasePointsF);
     const aura = num(e.EffectAura);
     const add = (k: keyof ItemStats, v: number) => addStat(stats, k, v);
-    if (aura === 99) add("attackPower", bp);
+    if (aura === 29) {
+      const stat = num(e.EffectMiscValue_0);
+      for (const key of stat === -1 ? PRIMARY_BY_INDEX : [PRIMARY_BY_INDEX[stat]]) {
+        if (key) add(key, bp);
+        else all = false;
+      }
+    } else if (aura === 140) add("hastePct", bp);
+    else if (aura === 99) add("attackPower", bp);
     else if (aura === 124) add("rangedAttackPower", bp);
     else if (aura === 52 || aura === 290) add("critPct", bp);
     else if (aura === 54) add("hitPct", bp);
@@ -156,9 +164,7 @@ function buildItem(r: Row, source: "forever" | "classic"): Item | null {
   const subclass = num(base.SubclassID);
   const inv = num(r.InventoryType);
   if (inv === 0 || num(r.OverallQualityID) < 2) return null;
-  if (classId === 4 && !ARMOR_OK.has(subclass)) return null;
-  if (classId === 2 && !WEAPON_OK.has(subclass)) return null;
-  if (classId !== 2 && classId !== 4) return null;
+  if (!hunterCanUse(base)) return null;
 
   const { stats, unparsed } = source === "forever" ? allocatedStats(r) : explicitStats(r);
   const equipSpells: number[] = [];
@@ -254,6 +260,32 @@ for (const item of out) {
     if (item.weapon.speed !== eraWeapon.speed) retunedSpeeds++;
   }
 }
+
+// Enchants ===================================================================
+// Stat enchants: an equip spell (type 3), a stat (5, an ItemModType) or a scope's flat damage (2).
+// Procs (type 1) and on-use effects (7) are listed as unparsed.
+const enchants: Enchant[] = [];
+for (const r of db.SpellItemEnchantment) {
+  const stats: ItemStats = {};
+  const unparsed: string[] = [];
+  let weaponDamage = 0;
+  for (let i = 0; i < 3; i++) {
+    const type = num(r[`Effect_${i}`]);
+    const arg = r[`EffectArg_${i}`]!;
+    const points = num(r[`EffectPointsMin_${i}`]);
+    if (type === 0) continue;
+    if (type === 2) weaponDamage += points;
+    else if (type === 3) {
+      if (!equipStats(arg, stats)) unparsed.push(names.get(arg) ?? `spell ${arg}`);
+    } else if (type === 5) {
+      if (!addModStat(stats, num(arg), points)) unparsed.push(`stat type ${arg}`);
+    } else unparsed.push(type === 1 ? `proc: ${names.get(arg) ?? arg}` : `effect type ${type}`);
+  }
+  if (Object.keys(stats).length === 0 && weaponDamage === 0) continue;
+  enchants.push({ id: num(r.ID), name: r.Name_lang!, stats, weaponDamage, unparsed });
+}
+await Bun.write(ENCHANTS_PATH, JSON.stringify(enchants) + "\n");
+console.log(`${enchants.length} enchants -> ${ENCHANTS_PATH}`);
 
 await Bun.write(ITEMS_PATH, JSON.stringify(out) + "\n");
 console.log(`${out.length} items -> ${ITEMS_PATH}`);

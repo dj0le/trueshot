@@ -6,6 +6,8 @@ export const WOWF_BUILD = "1.60.1.70532";
 export const DB2_TABLES = [
   // Spells
   "SpellName",
+  // Tooltips (Description_lang), for spells talentsforever does not cover: set bonuses, item effects.
+  "Spell",
   "SpellEffect",
   "SpellMisc",
   "SpellLevels",
@@ -47,12 +49,15 @@ export const DB2_TABLES = [
   "ItemDamageThrown",
   "ItemDamageOneHand",
   "ItemDamageTwoHand",
+  // Set bonuses: the items in each set, and the spells its piece counts turn on.
+  "ItemSet",
+  "ItemSetSpell",
 ] as const;
 
 // Classic Era client: cross-checks the item formulas, and supplies stats for Forever items the
 // client does not ship (the server sends those), on the assumption they are unchanged.
 export const CLASSIC_ERA_BUILD = "1.15.9.70003";
-export const CLASSIC_ERA_TABLES = ["ItemSparse", "ItemEffect"] as const;
+export const CLASSIC_ERA_TABLES = ["ItemSparse", "ItemEffect", "ItemSet", "ItemSetSpell"] as const;
 
 // The one trait tree holding all three hunter talent trees, laid out side by side.
 export const HUNTER_TRAIT_TREE_ID = "1091";

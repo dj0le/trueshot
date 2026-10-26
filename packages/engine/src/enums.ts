@@ -37,6 +37,10 @@ export const Aura = {
   PeriodicDummy: 226,
   ModCritPct: 290,
   ModHitChance: 54,
+  // Flat primary stat; miscValue is the stat, -1 for all (set bonuses).
+  ModStat: 29,
+  // Mana per 5 sec (set bonuses); miscValue 0 is mana.
+  ModPowerRegen: 85,
   // Melee haste: Rapid Fire's melee half, the pet's Frenzy and Trickster's Dance.
   ModMeleeHaste: 319,
   // Melee and ranged haste together (Wind Blessed).
@@ -50,6 +54,7 @@ export const Aura = {
 // Present in spells the sim uses but with no effect on single-target ranged damage.
 export const IGNORED_AURAS = new Set<number>([
   61, // Bestial Wrath: pet size
+  22, // resistances (set bonuses)
   44, // Track spells: creatures on the minimap
   45, // Track Beasts: resources on the minimap
   68, // Hunter's Mark: makes the target visible

@@ -52,6 +52,9 @@ export const SimConfig = z.object({
     // Equipped items by slot (head = 252605). Their stats add to `stats`, which then covers
     // whatever items cannot express yet: enchants, set bonuses.
     items: z.record(z.enum(GEAR_SLOTS), z.number().int()).default({}),
+    // Enchants by slot, as SpellItemEnchantment ids (generated/enchants.json). A scope's damage
+    // goes on the ranged weapon.
+    enchants: z.record(z.enum(GEAR_SLOTS), z.number().int()).default({}),
     stats: Stats,
     // Needed when no ranged item is listed.
     rangedWeapon: z.object({ min: z.number(), max: z.number(), speed: z.number() }).optional(),
