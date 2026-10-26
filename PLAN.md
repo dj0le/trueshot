@@ -174,6 +174,11 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
 - With the new pet, `sim build --spec` on the MythicSim gear finds the same talents as before:
   BM 31/16/4 at 358.1 DPS, MM 7/37/7 at 327.9 and SV 7/10/34 at 366.1, all weaving with a Wind Serpent
   (ranged BM 327.2, MM 298.4 on configs/*.build.toml). The pet is a third of BM's damage now.
+- Race at level 60, ranged, raid buffs, 3 min boss (2026-10-26, current model): all races within about 2%,
+  Human on top (Ruthless). Skyborne leads Troll by about 1% on most bosses, Troll leads by 2.3-2.9% on
+  beasts (Beast Slaying), Skyborne by 4-5% on elementals (Elemental Insight). At level 30 against
+  Jargba (35 sec, weaving), Night Elf leads by 3% (Elune's Light covers 43% of the fight) and haste
+  costs DPS, since faster Auto Shots leave fewer weave windows. Skyborne's base stats are still Human's.
 - Lone Wolf beats keeping the pet once the pet attacks less than about 84% of the fight in wowsims
   (93% here, where the pet is weaker).
 
