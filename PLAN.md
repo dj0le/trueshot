@@ -99,12 +99,15 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
   (+7.6% over bm-cat.optimized) and MM 8/38/5 with a Wind Serpent at 269.3 (+10.1% over
   mm-lone-wolf.optimized), configs/bm.build.toml and configs/mm.build.toml. Both take Improved
   Tracking and Trueshot Aura; MM drops Lone Wolf for a pet. These assume the pet attacks all fight.
-- Weaving wins for all three specs once the build search can choose it (5000 fresh fights, same gear):
-  SV 31/13/7 weaving 303.0 DPS, BM 31/18/2 weaving 296.2, MM 39/7/5 weaving 292.2, all with a Wind
-  Serpent (configs/*.build.toml). Pure melee SV is 239.0 and ranged BM 276.7. The best Auto Shot delay
-  is 0.9 sec for BM and 1.2 sec for MM and SV; with a 15% quiver no weave fits without delaying the
-  shot at all. BM and MM weave with white swings only: the rotation search drops Raptor Strike, whose
-  mana is worth more on shots.
+- Current best builds on the shared MythicSim gear (5000 fresh fights; configs/*.build.toml): SV
+  34/10/7 weaving with fire traps 323.6 DPS, BM 31/17/3 ranged 276.2, MM 39/7/5 ranged 271.7, all with
+  a Wind Serpent. BM and MM are kept ranged on purpose: weaving adds about 2% to them on the same build
+  and about 7% after re-tuning around it, but that rests on the uncalibrated movement model (1 sec
+  legs, a boss standing still), and players do not weave on those specs.
+- Immolation Trap is Survival's biggest gain: 15% of its damage, placed on 9 of its 40 weaves
+  (Survivalist's Discipline: 18 sec cooldown; Clever Traps; Survival Tactics against the 17% spell
+  miss). It rests on two guesses from wowsims/forever: 0.5 sec arming and a 5 yd trigger reach from
+  where the hunter stands mid-weave. Explosive Trap loses to it on one target.
 - Survival in melee does 239.0 DPS after the build search (SV 31 / MM 13 / BM 7, Wind Serpent,
   configs/sv.build.toml), against 276.7 for BM and 271.8 for MM on the same gear. That gear is
   MythicSim's ranged set with Barbarous Blade as the only melee weapon, so melee gear could close
