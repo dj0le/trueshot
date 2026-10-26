@@ -396,3 +396,66 @@ test("set bonuses turn on by pieces worn, and enchants add stats and scope damag
   expect(ch({}, { head: 2523 }).hitPct).toBe(base.gear!.stats!.hitPct! + 3);
   expect(() => ch({}, { head: 999999 })).toThrow(/enchant 999999 on head/);
 });
+
+test("on-use trinkets keep their own cooldowns and lock each other out for 20 sec", () => {
+  const run = (durationSec: number) =>
+    simulate(game, {
+      ...base,
+      gear: { ...base.gear!, items: { trinket1: 21180 } },
+      fight: { durationSec, iterations: 1 },
+      rotation: { actions: [{ action: "earthstrike" }] },
+    });
+  expect(run(130).abilities.find((a) => a.name === "Earthstrike")!.castsPerFight).toBe(2);
+  const both = (durationSec: number) =>
+    simulate(game, {
+      ...base,
+      gear: { ...base.gear!, items: { trinket1: 21180, trinket2: 23041 } },
+      fight: { durationSec, iterations: 1 },
+      rotation: { actions: [{ action: "earthstrike" }, { action: "slayers_crest" }] },
+    }).abilities;
+  const casts = (r: ReturnType<typeof both>, name: string) => r.find((a) => a.name === name)?.castsPerFight ?? 0;
+  // Earthstrike at 0, Slayer's Crest only once the 20 sec lockout is over, Earthstrike again at 120.
+  expect(casts(both(19), "Slayer's Crest")).toBe(0);
+  expect(casts(both(21), "Slayer's Crest")).toBe(1);
+  expect(casts(both(130), "Earthstrike")).toBe(2);
+});
+
+test("stacking trinket buffs end with the buff that grants them", () => {
+  const run = (trinket: number, action: string | null, durationSec: number) =>
+    simulate(game, {
+      ...base,
+      gear: { ...base.gear!, items: trinket ? { trinket1: trinket } : {} },
+      fight: { durationSec, iterations: 200 },
+      rotation: { actions: action ? [{ action, if: "casts." + action + " < 1" }] : [] },
+    });
+  // Jom Gabbar: +65 attack power and 65 more every 2 sec for 20 sec, then nothing. Over 120 sec the
+  // gain is a sixth of what 20 sec of it gives.
+  const plain20 = run(0, null, 20).dps.mean;
+  const plain120 = run(0, null, 120).dps.mean;
+  const gain20 = run(23570, "jom_gabbar", 20).dps.mean - plain20;
+  const gain120 = run(23570, "jom_gabbar", 120).dps.mean - plain120;
+  expect(gain20).toBeGreaterThan(0);
+  expect(gain120).toBeLessThan(gain20 / 4);
+  expect(run(23570, "jom_gabbar", 20).unimplemented).toEqual([]);
+  // Badge of the Swarmguard's armor penetration likewise ends after its 30 sec.
+  const badge30 = run(21670, "badge_of_the_swarmguard", 30).dps.mean - run(0, null, 30).dps.mean;
+  const badge180 = run(21670, "badge_of_the_swarmguard", 180).dps.mean - run(0, null, 180).dps.mean;
+  expect(badge30).toBeGreaterThan(0);
+  expect(badge180).toBeLessThan(badge30 / 3);
+});
+
+test("attack power against a creature type counts only against that type", () => {
+  const run = (creatureType: "undead" | "humanoid", items: Record<string, number>) =>
+    simulate(game, { ...base, gear: { ...base.gear!, items }, target: { preset: "boss", creatureType }, fight: { durationSec: 60, iterations: 20 } }).dps.mean;
+  // Seal of the Dawn: +78 attack power against undead.
+  expect(run("undead", { trinket1: 13209 })).toBeGreaterThan(run("undead", {}));
+  expect(run("humanoid", { trinket1: 13209 })).toBe(run("humanoid", {}));
+});
+
+test("a ranged weapon's chance-on-hit effect procs from ranged hits", () => {
+  // Dark Iron Rifle: Shadow Shot.
+  const r = simulate(game, { ...base, gear: { items: { ranged: 16004 }, stats: { hitPct: 9 } }, fight: { durationSec: 600, iterations: 20 } });
+  const shot = r.abilities.find((a) => a.name === "Shadow Shot")!;
+  expect(shot.dps).toBeGreaterThan(0);
+  expect(r.unimplemented.some((u) => u.includes("chance-on-hit"))).toBe(false);
+});

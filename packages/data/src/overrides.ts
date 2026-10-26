@@ -41,6 +41,7 @@ const Overrides = z.object({
     critRatingPerPct: Value,
     hitRatingPerPct: Value,
     autoShotStandStillMs: Value,
+    weaponProcPpm: Value,
     rangedHasteAffectsCastTime: Value,
     manaPerTickBase: Value,
     spiritPerManaPerTick: Value,
@@ -75,13 +76,16 @@ const Overrides = z.object({
         miscValue: z.number().optional(),
         // Which of the class's spells a modifier aura reaches (all four words).
         classMask: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(),
-        // Which hits the spell's proc listens for (ProcFlag bits).
+        // Which hits the spell's proc listens for (ProcFlag bits), and how often it fires: a chance
+        // in percent, or procs per minute (scaled by weapon speed).
         procTypeMask: z.number().optional(),
+        procChance: z.number().optional(),
+        procPpm: z.number().optional(),
         ...provenance,
       })
       .refine(
-        (h) => [h.basePoints, h.apCoefficient, h.miscValue, h.classMask, h.procTypeMask].some((v) => v !== undefined),
-        "a hotfix needs basePoints, apCoefficient, miscValue, classMask or procTypeMask",
+        (h) => [h.basePoints, h.apCoefficient, h.miscValue, h.classMask, h.procTypeMask, h.procChance, h.procPpm].some((v) => v !== undefined),
+        "a hotfix needs basePoints, apCoefficient, miscValue, classMask or a proc field",
       )
       .refine(
         (h) => h.effectIndex !== undefined || [h.basePoints, h.apCoefficient, h.miscValue, h.classMask].every((v) => v === undefined),
@@ -132,6 +136,13 @@ export function applyHotfixes(data: HunterData, o: Overrides): HunterData {
       if (!spell.proc) throw new Error(`hotfix: spell ${h.spell} has no proc`);
       if (spell.proc.typeMask[0] === h.procTypeMask) stale(" proc typeMask", h.procTypeMask);
       spell.proc = { ...spell.proc, typeMask: [h.procTypeMask, spell.proc.typeMask[1]!] };
+    }
+    for (const [key, field] of [["procChance", "chance"], ["procPpm", "ppm"]] as const) {
+      const value = h[key];
+      if (value === undefined) continue;
+      if (!spell.proc) throw new Error(`hotfix: spell ${h.spell} has no proc`);
+      if (spell.proc[field] === value) stale(` proc ${field}`, value);
+      spell.proc = { ...spell.proc, [field]: value };
     }
     if (h.effectIndex === undefined) continue;
     const effect = spell.effects.find((e) => e.index === h.effectIndex);

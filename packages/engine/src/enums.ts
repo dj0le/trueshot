@@ -6,6 +6,8 @@ export const Effect = {
   Dummy: 3,
   ApplyAura: 6,
   Energize: 30,
+  // Casts a linked spell on the caster at once (Jom Gabbar's first stack).
+  TriggerSpell: 64,
   ApplyAreaAuraParty: 35,
   WeaponPercentDamage: 31,
   WeaponDamage: 58,
@@ -27,6 +29,8 @@ export const Aura = {
   AddFlatModifier: 107,
   AddPctModifier: 108,
   ModRangedAttackPower: 124,
+  // Ranged attack power against some creature types; the mask is in miscValue.
+  ModRangedAttackPowerVersus: 131,
   ModCritDamageBonus: 163,
   ModRangedAttackPowerPct: 167,
   RangedAttackPowerAttackerBonus: 127,
@@ -37,6 +41,11 @@ export const Aura = {
   PeriodicDummy: 226,
   ModCritPct: 290,
   ModHitChance: 54,
+  // Fires a linked spell every period (Jom Gabbar).
+  PeriodicTriggerSpell: 23,
+  // Lowers the target's resistance (armor, miscValue 1) to the hunter's own attacks (Badge of the
+  // Swarmguard). The value is negative.
+  ModTargetResistance: 123,
   // Flat primary stat; miscValue is the stat, -1 for all (set bonuses).
   ModStat: 29,
   // Mana per 5 sec (set bonuses); miscValue 0 is mana.
@@ -55,6 +64,7 @@ export const Aura = {
 export const IGNORED_AURAS = new Set<number>([
   61, // Bestial Wrath: pet size
   22, // resistances (set bonuses)
+  102, // melee attack power against creature types
   44, // Track spells: creatures on the minimap
   45, // Track Beasts: resources on the minimap
   68, // Hunter's Mark: makes the target visible

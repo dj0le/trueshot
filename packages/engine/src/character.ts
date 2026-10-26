@@ -31,6 +31,8 @@ export type Character = {
   rangedWeapon: { min: number; max: number; speed: number };
   // What the equipped items do that the sim does not model (procs, set bonuses, odd equip effects).
   gearNotes: string[];
+  // The ranged weapon's chance-on-hit spells.
+  weaponProcs: Spell[];
 };
 
 const ITEM_CATEGORY_OFFSET = 1_000_000;
@@ -87,8 +89,11 @@ function gearStats(
     add(item.stats);
     if (slot === "ranged" && item.weapon) rangedWeapon = { ...item.weapon };
     if (item.source === "classic") notes.push(`${item.name}: not in the Forever client, Classic Era stats used`);
-    if (item.procSpells.length) notes.push(`${item.name}: chance-on-hit effect not simulated`);
-    for (const e of item.unparsedEquip) notes.push(`${item.name}: equip effect "${e}" not simulated`);
+    if (item.procSpells.length && slot !== "ranged") notes.push(`${item.name}: chance-on-hit effect not simulated (melee)`);
+    // Equip spells with effects run as passives (their unknown auras are reported then); the rest
+    // have nothing to run.
+    const unrun = item.unparsedEquip.length - item.passiveSpells.length;
+    if (unrun > 0) notes.push(`${item.name}: ${unrun} equip effect(s) with no client effects, not simulated`);
   }
   for (const [slot, id] of Object.entries(config.gear.enchants) as [keyof typeof SLOT_TYPES, number][]) {
     const enchant = enchants.get(id);
@@ -186,11 +191,12 @@ function scriptedEffects(talent: Talent, effects: ResolvedEffect[]): ResolvedEff
 
 // Every action a rotation can name, whether or not this character knows it. Keep in step with the
 // ability sources buildCharacter assembles below.
-export function actionNames(data: HunterData): Set<string> {
+export function actionNames(data: HunterData, items: Map<number, Item>): Set<string> {
   return new Set([
     ...data.abilities.filter((a) => a.tab !== "Pets").map((a) => snake(a.name)),
     ...data.consumables.map((c) => snake(c.name)),
     ...data.racials.filter((r) => r.active).map((r) => snake(r.name)),
+    ...[...items.values()].filter((i) => i.useSpells.length).map((i) => snake(i.name)),
   ]);
 }
 
@@ -264,6 +270,28 @@ export function buildCharacter(
 
   passives.push(...setBonuses(data, config));
 
+  // Worn items: equip spells that are not plain stats run as passives, and on-use effects become
+  // off-GCD actions named after the item, with its cooldown and its category's shared lockout.
+  for (const id of new Set(Object.values(config.gear.items))) {
+    const item = items.get(id);
+    if (!item) continue;
+    for (const spellId of item.passiveSpells) {
+      const spell = data.spells[String(spellId)]!;
+      passives.push({ spell, effects: resolveEffects(spell), source: item.name });
+    }
+    for (const u of item.useSpells) {
+      const spell = data.spells[String(u.spellId)]!;
+      abilities.set(snake(item.name), {
+        ...spell,
+        name: item.name,
+        gcdMs: 0,
+        cooldownMs: u.cooldownMs,
+        category: u.categoryId ? ITEM_CATEGORY_OFFSET + u.categoryId : 0,
+        categoryCooldownMs: u.categoryId ? u.categoryCooldownMs : 0,
+      });
+    }
+  }
+
   const worn = gearStats(items, enchants, overrides, config);
   const gear = worn.stats;
   const buffs = config.buffs;
@@ -329,6 +357,7 @@ export function buildCharacter(
     mp5: sum("mp5") + passiveMp5,
     rangedWeapon,
     gearNotes: worn.notes,
+    weaponProcs: (items.get(config.gear.items.ranged ?? 0)?.procSpells ?? []).flatMap((id) => data.spells[String(id)] ?? []),
   };
 }
 

@@ -1,10 +1,10 @@
 // Joins the raw client tables and the talentsforever export into generated/hunter.json.
-// Run `bun run fetch` first. Problems found while joining are printed and fail the build,
+// Run `bun run fetch` and build-items.ts first (item effects come from items.json). Problems found while joining are printed and fail the build,
 // so a new client build that moves things around cannot slip through silently.
 import { join } from "node:path";
 import type { Row } from "./csv";
-import { GENERATED_PATH } from "./index";
-import type { Ability, Consumable, HunterData, ItemSet, PetFamily, Racial, Spell, SpellEffect, Talent, TalentRankEffect } from "./schema";
+import { GENERATED_PATH, ITEMS_PATH } from "./index";
+import type { Ability, Consumable, HunterData, Item, ItemSet, PetFamily, Racial, Spell, SpellEffect, Talent, TalentRankEffect } from "./schema";
 import { HUNTER_TRAIT_TREE_ID, TALENTSFOREVER_HUNTER_URL, WOWF_BUILD } from "./sources";
 import { RAW_DIR, byId, bySpell, effectsByItem, groupBy, hunterCanUse, num, tables } from "./tables";
 
@@ -425,6 +425,10 @@ const wanted = new Set<string>([
   ...(petPassives ?? []),
   ...petFamilies.map((p) => String(p.passiveSpellId)),
   ...itemSets.flatMap((s) => s.bonuses.map((b) => String(b.spellId))),
+  // Item effects the engine runs: on-use spells, procs, and equip spells that are not plain stats.
+  ...((await Bun.file(ITEMS_PATH).json()) as Item[]).flatMap((i) =>
+    [...i.useSpells.map((u) => u.spellId), ...i.procSpells, ...i.passiveSpells].map(String),
+  ),
 ]);
 let frontier = [...wanted];
 for (let depth = 0; depth < TRIGGER_DEPTH && frontier.length > 0; depth++) {

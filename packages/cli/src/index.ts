@@ -13,6 +13,7 @@ import {
   optimizeBuild,
   petSweep,
   simulate,
+  snake,
   statWeights,
   type ActionConfig,
   type SimConfigInput,
@@ -112,6 +113,12 @@ const DEFAULT_POOL = [
 // Abilities talents teach, which a build search adds to the rotation when missing. Intimidation is
 // left out: casting it costs DPS (PLAN.md findings).
 const TAUGHT = { precombat: ["trueshot_aura"], actions: ["bestial_wrath", "sniper_shot", "summon_hawk"] };
+
+// The default pool plus the on-use items the config wears (trinkets).
+function poolFor(game: Awaited<ReturnType<typeof loadGameData>>, config: SimConfigInput): string[] {
+  const worn = Object.values(config.gear.items ?? {}).flatMap((id) => game.items.get(id) ?? []);
+  return [...DEFAULT_POOL, ...worn.filter((i) => i.useSpells.length).map((i) => snake(i.name))];
+}
 
 // Where a variant's damage moved, ability by ability.
 function printDiff(base: SimResult, other: SimResult): void {
@@ -232,7 +239,7 @@ async function main(argv: string[]): Promise<void> {
   } else if (command === "optimize" && paths.length === 1) {
     const config = await loadConfig(paths[0]!);
     const result = optimize(game, config, {
-      pool: flags.pool?.split(",") ?? DEFAULT_POOL,
+      pool: flags.pool?.split(",") ?? poolFor(game, config),
       iterations: Number(flags.iterations ?? 300),
       budget: Number(flags.budget ?? 200),
       mutantsPerRound: 8,
@@ -287,7 +294,7 @@ async function main(argv: string[]): Promise<void> {
     const iterations = Number(flags.iterations ?? 300);
     const result = optimizeBuild(game, config, {
       build: { iterations, budget: Number(flags.budget ?? 400), mutantsPerRound: 8, climbs: 3, pets: !flags["keep-pet"] },
-      rotation: { pool: DEFAULT_POOL, iterations, budget: Number(flags["rotation-budget"] ?? 150), mutantsPerRound: 8, confirmIterations: 3000 },
+      rotation: { pool: poolFor(game, config), iterations, budget: Number(flags["rotation-budget"] ?? 150), mutantsPerRound: 8, confirmIterations: 3000 },
       rounds: Number(flags.rounds ?? 2),
       taught: TAUGHT,
       confirmIterations: 5000,

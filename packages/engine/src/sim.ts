@@ -39,6 +39,7 @@ const KNOWN_EFFECTS = new Set<number>([
   Effect.ApplyAreaAuraRaid,
   Effect.ApplyAreaAuraParty,
   Effect.Energize,
+  Effect.TriggerSpell,
   Effect.Dummy,
   ...IGNORED_EFFECTS,
 ]);
@@ -105,7 +106,7 @@ export class Rotation {
       const key = snake(s.name);
       this.spellIds.set(key, [...(this.spellIds.get(key) ?? []), s.id]);
     }
-    this.actionNames = actionNames(game.data);
+    this.actionNames = actionNames(game.data, game.items);
     this.actions = ch.config.rotation.actions.map((a) => {
       if (!this.actionNames.has(a.action)) throw new Error(`rotation: unknown action "${a.action}"`);
       let timed = false;
@@ -220,10 +221,10 @@ export class Fight implements PetHost {
   lastManaSpendAt = -Infinity;
   gcdReadyAt = 0;
   casting: { spell: Spell; endsAt: number } | null = null;
-  // Ready times by spell id, and by category for spells sharing a category cooldown.
+  // Each spell's own ready time, and each category's lockout on the other spells in it (Summon Hawk
+  // after Arcane Shot, a trinket after another).
   private readonly spellCooldowns = new Map<number, number>();
-  // A shared cooldown: when the category comes back, and when the spell that started it does.
-  private readonly categoryCooldowns = new Map<number, { readyAt: number; by: number; ownReadyAt: number }>();
+  private readonly categoryCooldowns = new Map<number, { readyAt: number; by: number }>();
   readonly selfAuras: AuraSet;
   readonly targetAuras: AuraSet;
   readonly auto = { cooldownEnd: 0, windup: false, firesAt: Infinity, token: 0 };
@@ -291,6 +292,15 @@ export class Fight implements PetHost {
         const effects = resolveEffects(spell).map((e) => ({ ...e, value: values?.[e.index] ?? e.value }));
         this.applyAuras(spell, effects);
       },
+      resetCooldowns: (actions) => {
+        for (const name of actions) {
+          const spell = ch.abilities.get(name);
+          if (!spell) continue;
+          this.spellCooldowns.delete(spell.id);
+          const c = this.categoryCooldowns.get(spell.category);
+          if (c?.by === spell.id) this.categoryCooldowns.delete(spell.category);
+        }
+      },
       summonHawk: () => {
         if (this.pet) this.pet.summonHawk();
         else this.report("Summon Hawk without a pet out: the hawk's attacks are not simulated");
@@ -353,10 +363,15 @@ export class Fight implements PetHost {
     return flat * this.selfAuras.product([Aura.ModRangedAttackPowerPct]);
   }
 
-  // The target's bonus to ranged attackers (Hunter's Mark) is added after the hunter's percent
-  // modifiers and only to the hunter's own shots.
+  // The target's bonus to ranged attackers (Hunter's Mark) and attack power against the target's
+  // creature type (Seal of the Dawn) are added after the hunter's percent modifiers and only to the
+  // hunter's own shots.
   rangedAttackPower(): number {
-    return this.ownRangedAttackPower() + this.targetAuras.sum(Aura.RangedAttackPowerAttackerBonus);
+    let versus = 0;
+    for (const e of this.selfAuras.effects()) {
+      if (e.aura === Aura.ModRangedAttackPowerVersus && (e.miscValue[0] & this.target.creatureMask) !== 0) versus += e.value;
+    }
+    return this.ownRangedAttackPower() + versus + this.targetAuras.sum(Aura.RangedAttackPowerAttackerBonus);
   }
 
   rangedHaste(): number {
@@ -435,7 +450,10 @@ export class Fight implements PetHost {
 
   armorMultiplier(): number {
     const f = this.game.overrides.formula;
-    const armor = Math.max(0, this.target.armor - this.ch.config.target.armorReduction);
+    // Armor penetration on the hunter (negative values) counts for the hunter's attacks only; the
+    // pet calls this too, but the pet's damage is too uncertain for the difference to matter yet.
+    const penetration = this.selfAuras.sum(Aura.ModTargetResistance, School.Physical);
+    const armor = Math.max(0, this.target.armor - this.ch.config.target.armorReduction + penetration);
     const k = f.armorConstantBase.value + f.armorConstantPerLevel.value * this.ch.level;
     return 1 - armor / (armor + k);
   }
@@ -456,7 +474,7 @@ export class Fight implements PetHost {
 
   cooldownReadyAt(spell: Spell): number {
     const c = this.categoryCooldowns.get(spell.category);
-    const shared = c ? (c.by === spell.id ? c.ownReadyAt : c.readyAt) : 0;
+    const shared = c && c.by !== spell.id ? c.readyAt : 0;
     return Math.max(this.spellCooldowns.get(spell.id) ?? 0, shared);
   }
 
@@ -551,13 +569,11 @@ export class Fight implements PetHost {
       this.lastManaSpendAt = this.now;
     }
     const cd = Math.max(spell.cooldownMs, spell.categoryCooldownMs);
-    if (cd > 0) {
-      const readyAt = this.now + Math.max(0, this.modded(cd, spell, SpellModOp.Cooldown));
-      // Cooldown modifiers shorten the spell's own cooldown, not the one its category shares
-      // (Improved Arcane Shot: "shared cooldowns are not affected").
-      if (spell.category && spell.categoryCooldownMs) {
-        this.categoryCooldowns.set(spell.category, { readyAt: this.now + cd, by: spell.id, ownReadyAt: readyAt });
-      } else this.spellCooldowns.set(spell.id, readyAt);
+    if (cd > 0) this.spellCooldowns.set(spell.id, this.now + Math.max(0, this.modded(cd, spell, SpellModOp.Cooldown)));
+    // Cooldown modifiers shorten the spell's own cooldown, not the lockout its category shares
+    // (Improved Arcane Shot: "shared cooldowns are not affected").
+    if (spell.category && spell.categoryCooldownMs) {
+      this.categoryCooldowns.set(spell.category, { readyAt: this.now + spell.categoryCooldownMs, by: spell.id });
     }
   }
 
@@ -658,7 +674,8 @@ export class Fight implements PetHost {
     return 0;
   }
 
-  private execute(spell: Spell, isAuto = false): void {
+  // fromProc: a weapon proc's own spell, which cannot set off another.
+  private execute(spell: Spell, isAuto = false, fromProc = false): void {
     const effects = resolveEffects(spell);
     for (const e of effects) {
       if (!KNOWN_EFFECTS.has(e.effect)) this.unimplemented.add(`${spell.name} (${spell.id}): effect ${e.effect}`);
@@ -696,6 +713,7 @@ export class Fight implements PetHost {
     }
 
     this.energize(spell, effects);
+    this.triggerLinked(spell, effects);
 
     // Charges go after the damage they applied to and before this spell's own auras land, so a
     // shot that grants charged buffs does not spend one itself.
@@ -705,6 +723,7 @@ export class Fight implements PetHost {
     ON_LAND[spell.name]?.(this.scriptContext);
     if (spell.defenseType === DefenseType.Ranged) {
       this.procs(this.selfAuras, flag, "proc");
+      if (!fromProc) this.weaponProcs();
       this.procs(this.targetAuras, isAuto ? ProcFlag.TakenRangedAutoAttack : ProcFlag.TakenRangedSpell, "target-proc");
     }
   }
@@ -727,17 +746,25 @@ export class Fight implements PetHost {
     }
   }
 
-  // A proc's triggered spell: its mana, its auras, and any server-side link it hands on to.
-  private trigger(spell: Spell): void {
+  // A proc's triggered spell: its mana, its auras, and any link it hands on to. `parentMs`: how long
+  // the aura that set it off has left; a buff the client marks as lasting until cancelled ends with it
+  // (Jom Gabbar's stacks end with Jom Gabbar).
+  private trigger(spell: Spell, parentMs?: number): void {
     const effects = resolveEffects(spell);
     this.energize(spell, effects);
+    this.triggerLinked(spell, effects);
+    this.applyAuras(spell, effects, spell.durationMs < 0 && parentMs !== undefined ? parentMs : undefined);
+  }
+
+  // Spells a spell sets off on the hunter at once: a trigger effect (Jom Gabbar), or a server-side
+  // link on a dummy (Judgement of Wisdom).
+  private triggerLinked(spell: Spell, effects: ResolvedEffect[]): void {
     for (const e of effects) {
-      if (e.effect !== Effect.Dummy || !e.triggerSpell) continue;
+      if (!e.triggerSpell || (e.effect !== Effect.Dummy && e.effect !== Effect.TriggerSpell)) continue;
       const linked = this.game.data.spells[String(e.triggerSpell)];
-      if (linked) this.trigger(linked);
+      if (linked) this.trigger(linked, spell.durationMs > 0 ? spell.durationMs : undefined);
       else this.unimplemented.add(`${spell.name}: linked spell ${e.triggerSpell} not in the data`);
     }
-    this.applyAuras(spell, effects);
   }
 
   // Auras =====================================================================
@@ -783,6 +810,16 @@ export class Fight implements PetHost {
           });
         }
       }
+      // Periodic triggers apply a linked spell each tick (Jom Gabbar's stacks).
+      for (const e of effects.filter((x) => x.aura === Aura.PeriodicTriggerSpell && x.triggerSpell)) {
+        const triggered = this.game.data.spells[String(e.triggerSpell)]!;
+        const endsAt = this.now + duration;
+        for (let t = e.periodMs; t <= tickUntil; t += e.periodMs) {
+          this.queue.push(this.now + t, () => {
+            if (isLive()) this.trigger(triggered, endsAt - this.now);
+          });
+        }
+      }
       // Periodic damage snapshots its tick when applied.
       for (const e of effects.filter((x) => x.aura === Aura.PeriodicDamage)) {
         const tick =
@@ -800,6 +837,16 @@ export class Fight implements PetHost {
     });
   }
 
+  // The ranged weapon's chance-on-hit effects (Dark Iron Rifle's Shadow Shot), at a rate per minute
+  // the client does not carry (overrides.toml formula.weaponProcPpm).
+  private weaponProcs(): void {
+    if (this.ch.weaponProcs.length === 0) return;
+    const chance = (this.game.overrides.formula.weaponProcPpm.value * this.ch.rangedWeapon.speed * 100) / 60;
+    for (const spell of this.ch.weaponProcs) {
+      if (this.rng.stream(`weapon-proc:${spell.id}`).chance(chance)) this.execute(spell, false, true);
+    }
+  }
+
   // Self auras that answer the hunter's own hits, and debuffs on the target that answer being hit
   // (Judgement of Wisdom).
   private procs(auras: AuraSet, flag: number, stream: string): void {
@@ -808,14 +855,18 @@ export class Fight implements PetHost {
       if (!proc || (proc.typeMask[0] & flag) === 0) continue;
       for (const e of src.effects) {
         if (e.aura !== Aura.ProcTriggerSpell || !e.triggerSpell) continue;
-        const chance = this.modded(proc.chance, src.spell, SpellModOp.ProcChance);
+        // Procs per minute become a chance per hit at the ranged weapon's speed.
+        const base = proc.ppm > 0 ? (proc.ppm * this.ch.rangedWeapon.speed * 100) / 60 : proc.chance;
+        if (base > 100 && proc.ppm === 0) this.report(`${src.spell.name}: proc chance is set by the server, simulated as every hit`);
+        const chance = this.modded(base, src.spell, SpellModOp.ProcChance);
         if (!this.rng.stream(`${stream}:${src.spell.id}`).chance(chance)) continue;
         const triggered = this.game.data.spells[String(e.triggerSpell)];
         if (!triggered) {
           this.unimplemented.add(`${src.spell.name}: proc spell ${e.triggerSpell} not in the data`);
           continue;
         }
-        this.trigger(triggered);
+        // A buff the proc grants ends with the aura that procs it (Badge of the Swarmguard's stacks).
+        this.trigger(triggered, "expiresAt" in src && src.expiresAt !== Infinity ? (src.expiresAt as number) - this.now : undefined);
       }
     }
   }

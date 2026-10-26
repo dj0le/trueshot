@@ -73,6 +73,11 @@ value = 500
 confidence = "confirmed"
 source = "Blizzard 15 Oct beta notes, build 70425: stand still 0.5 sec before Auto Shot fires (via talentsforever.com)"
 
+[formula.weaponProcPpm]
+value = 1
+confidence = "guess"
+source = "Chance-on-hit weapons (Dark Iron Rifle, Blunderflame Bone Bow): the rate is server-side and not in the client. 1 proc per minute, as Classic weapon procs commonly ran"
+
 [formula.rangedHasteAffectsCastTime]
 value = 1
 confidence = "guess"
@@ -307,3 +312,11 @@ effectIndex = 0
 classMask = [522818, -2146955264, 0, 8388608]
 confidence = "reported"
 source = "Efficiency tooltip: Shots, Stings and melee abilities. Client mask [522818, -2146955264, 8192, 8388608] also cuts Summon Hawk's cost"
+
+# Badge of the Swarmguard's armor penetration proc. The client chance is 101, so the server sets the
+# rate; no source gives it.
+[[hotfix]]
+spell = 26480
+procPpm = 10
+confidence = "guess"
+source = "Badge of the Swarmguard: 'a chance on melee or ranged attack'; client proc chance 101 (set by the server). 10 procs per minute is a placeholder"

@@ -6,7 +6,8 @@ import type { EventQueue } from "./queue";
 import type { Spell } from "@hunter-sim/data";
 
 // charges: attacks left before the aura is used up (Intimidation's one guaranteed crit); 0 = no limit.
-export type AuraInstance = ActiveSpell & { expiresAt: number; token: number; charges: number };
+// stacks: applications so far, for auras that stack (their effects are the base values times this).
+export type AuraInstance = ActiveSpell & { expiresAt: number; token: number; charges: number; stacks: number };
 
 export class AuraSet {
   private readonly active = new Map<number, AuraInstance>();
@@ -60,9 +61,10 @@ export class AuraSet {
     return m;
   }
 
-  // Applies or refreshes an aura. `schedule` gets a check that stays true while this application is
-  // the live one, for periodic effects; it runs before the expiry is queued, so a tick landing
-  // exactly on expiry still happens.
+  // Applies or refreshes an aura; one that stacks (the client's cumulative count) gains a stack, up to
+  // its limit, and refreshes. `schedule` gets a check that stays true while this application is the
+  // live one, for periodic effects; it runs before the expiry is queued, so a tick landing exactly on
+  // expiry still happens.
   add(
     spell: Spell,
     effects: ResolvedEffect[],
@@ -73,7 +75,10 @@ export class AuraSet {
     const token = ++this.token;
     const expiresAt = now + duration;
     const isLive = () => this.active.get(spell.id)?.token === token;
-    this.active.set(spell.id, { spell, effects, expiresAt, token, source: spell.name, charges: spell.proc?.charges ?? 0 });
+    const maxStacks = spell.proc?.cumulative ?? 0;
+    const stacks = maxStacks > 1 ? Math.min(maxStacks, (this.active.get(spell.id)?.stacks ?? 0) + 1) : 1;
+    const stacked = stacks > 1 ? effects.map((e) => ({ ...e, value: e.value * stacks })) : effects;
+    this.active.set(spell.id, { spell, effects: stacked, expiresAt, token, source: spell.name, charges: spell.proc?.charges ?? 0, stacks });
     this.changed();
     schedule?.(isLive);
     if (duration !== Infinity) {

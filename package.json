@@ -5,7 +5,7 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "fetch": "bun packages/data/src/fetch.ts",
-    "build:data": "bun packages/data/src/build.ts && bun packages/data/src/build-items.ts",
+    "build:data": "bun packages/data/src/build-items.ts && bun packages/data/src/build.ts",
     "sim": "bun packages/cli/src/index.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit -p ."

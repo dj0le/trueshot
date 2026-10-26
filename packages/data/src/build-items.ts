@@ -169,14 +169,27 @@ function buildItem(r: Row, source: "forever" | "classic"): Item | null {
   const { stats, unparsed } = source === "forever" ? allocatedStats(r) : explicitStats(r);
   const equipSpells: number[] = [];
   const procSpells: number[] = [];
+  const passiveSpells: number[] = [];
+  const useSpells: Item["useSpells"] = [];
   const unparsedEquip: string[] = [];
   for (const e of (source === "forever" ? foreverEffects : classicEffects).get(r.ID!) ?? []) {
     const spell = e.SpellID!;
     if (e.TriggerType === "1") {
       equipSpells.push(num(spell));
-      if (!equipStats(spell, stats)) unparsedEquip.push(names.get(spell) ?? spell);
+      if (!equipStats(spell, stats)) {
+        unparsedEquip.push(names.get(spell) ?? spell);
+        if (effectsBySpell.has(spell)) passiveSpells.push(num(spell));
+      }
     } else if (e.TriggerType === "2") {
       procSpells.push(num(spell));
+    } else if (e.TriggerType === "0" && effectsBySpell.has(spell)) {
+      // -1 means none.
+      useSpells.push({
+        spellId: num(spell),
+        cooldownMs: Math.max(0, num(e.CoolDownMSec)),
+        categoryId: num(e.SpellCategoryID),
+        categoryCooldownMs: Math.max(0, num(e.CategoryCoolDownMSec)),
+      });
     }
   }
 
@@ -209,6 +222,8 @@ function buildItem(r: Row, source: "forever" | "classic"): Item | null {
     ...(weapon ? { weapon } : {}),
     equipSpells,
     procSpells,
+    passiveSpells,
+    useSpells,
     unparsedStats: unparsed,
     unparsedEquip,
   };

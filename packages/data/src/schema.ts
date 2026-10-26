@@ -165,6 +165,11 @@ export type Item = {
   // On-equip spells (already folded into stats where they are plain stat bonuses) and chance-on-hit spells.
   equipSpells: number[];
   procSpells: number[];
+  // Equip spells that are not plain stats (procs, odd auras): the engine runs them as passives.
+  passiveSpells: number[];
+  // On-use effects (trinkets): the spell, the item's own cooldown, and the lockout it shares with
+  // others of its category (20 sec between trinkets).
+  useSpells: { spellId: number; cooldownMs: number; categoryId: number; categoryCooldownMs: number }[];
   // Stat types and equip spells the build could not turn into stats.
   unparsedStats: number[];
   unparsedEquip: string[];

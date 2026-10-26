@@ -10,9 +10,14 @@ export type ScriptContext = {
   // Applies a spell's auras, optionally replacing effect values by index.
   applySpell(id: number, values?: Record<number, number>): void;
   summonHawk(): void;
+  // Makes the named actions ready again.
+  resetCooldowns(actions: string[]): void;
 };
 
 export const ON_LAND: Record<string, (ctx: ScriptContext) => void> = {
+  // Refocus, the trinket's dummy: "Instantly clears the cooldowns of Aimed Shot, Multishot, Volley,
+  // and Arcane Shot." Keyed by the item's name, which on-use actions carry.
+  "Renataki's Charm of Beasts": (ctx) => ctx.resetCooldowns(["aimed_shot", "multi_shot", "volley", "arcane_shot"]),
   // The dive is the spell's damage effect; the hawk it leaves behind is server-side.
   "Summon Hawk": (ctx) => ctx.summonHawk(),
   // "Afflicting a target with Serpent Sting allows 50% of your Mana Regeneration to continue
