@@ -1,0 +1,25 @@
+# Start for a wowsims-scored search on configs/wowsims/tuned.wowsims.json: his build with the Raptor,
+# and Sniper Shot and Summon Hawk switched on, as the tuner left them.
+extends = "base.toml"
+name = "his build, tuned for wowsims"
+
+[pet]
+family = "Raptor"
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
+
+[[rotation.actions]]
+action = "aimed_shot"
+
+[[rotation.actions]]
+action = "serpent_sting"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "arcane_shot"

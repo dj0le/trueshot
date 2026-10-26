@@ -1,0 +1,109 @@
+# Found by `sim build configs/wowsims/ours-bm.toml` (2026-10-26): +40.55% DPS on 5000 fresh fights.
+extends = "ours-bm.toml"
+name = "our bm.build on his gear, build search"
+position = "weave"
+
+[weave]
+maxAutoShotDelayMs = 1500
+
+[talents]
+"Deadly Aspects" = 5
+"Focused Fire" = 0
+"Lethal Attacks" = 5
+"Improved Stings" = 3
+"Efficiency" = 0
+"Careful Aim" = 5
+"Rapid Killing" = 2
+"Improved Arcane Shot" = 5
+"Trueshot Aura" = 1
+"Mortal Shots" = 5
+"Rapid Recuperation" = 0
+"Barrage" = 3
+"Ranged Weapon Specialization" = 5
+"Sniper Shot" = 1
+"Improved Tracking" = 5
+"Endurance Training" = 0
+"Improved Aspect of the Monkey" = 0
+"Bestial Swiftness" = 0
+"Unleashed Fury" = 0
+"Ferocity" = 0
+"Summon Hawk" = 0
+"Bestial Discipline" = 0
+"Intimidation" = 0
+"Frenzy" = 0
+"Bestial Wrath" = 0
+"Improved Concussive Shot" = 5
+"Lone Wolf" = 1
+
+[pet]
+active = false
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "hunters_mark", "trueshot_aura"]
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "kiss_of_the_spider"
+
+[[rotation.actions]]
+action = "major_mana_potion"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "slayers_crest"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "berserking"
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "mana.pct > 25"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "explosive_trap"
+
+[[rotation.actions]]
+action = "multi_shot"
+if = "mana.pct > 40"
+
+[[rotation.actions]]
+action = "immolation_trap"
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "elunes_light"
+
+[[rotation.actions]]
+action = "intimidation"
+
+[[rotation.actions]]
+action = "arcane_shot"
+
+[[rotation.actions]]
+action = "lacerate"

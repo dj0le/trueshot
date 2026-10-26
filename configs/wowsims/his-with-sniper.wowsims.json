@@ -1,0 +1,727 @@
+{
+  "apiVersion": 2,
+  "raidBuffs": {
+    "arcaneBrilliance": true,
+    "prayerOfSpirit": true,
+    "giftOfTheWild": true,
+    "strengthOfEarthTotem": true,
+    "graceOfAirTotem": true,
+    "windfuryTotem": true,
+    "battleShout": "TristateEffectRegular",
+    "trueshotAura": true,
+    "leaderOfThePack": true
+  },
+  "debuffs": {
+    "judgementOfLight": true,
+    "judgementOfWisdom": true,
+    "curseOfElements": true,
+    "curseOfRecklessness": true,
+    "faerieFire": true,
+    "exposeArmor": true,
+    "sunderArmor": true,
+    "giftOfArthas": true,
+    "insectSwarm": true
+  },
+  "partyBuffs": {},
+  "player": {
+    "apiVersion": 2,
+    "name": "Player",
+    "race": "RaceHuman",
+    "class": "ClassHunter",
+    "equipment": {
+      "items": [
+        {
+          "id": 22438
+        },
+        {
+          "id": 23053
+        },
+        {
+          "id": 22439
+        },
+        {
+          "id": 21710
+        },
+        {
+          "id": 22436
+        },
+        {
+          "id": 21584
+        },
+        {
+          "id": 22441
+        },
+        {
+          "id": 22442
+        },
+        {
+          "id": 22437
+        },
+        {
+          "id": 22440
+        },
+        {
+          "id": 19140
+        },
+        {
+          "id": 275981
+        },
+        {
+          "id": 23041
+        },
+        {
+          "id": 22954
+        },
+        {
+          "id": 16345
+        },
+        {
+          "id": 16345
+        },
+        {
+          "id": 18833
+        }
+      ]
+    },
+    "consumables": {
+      "foodId": 250072,
+      "conjuredId": 12662,
+      "explosiveId": 18588,
+      "extraIds": [
+        10646,
+        10310
+      ],
+      "elixirIds": [
+        13452,
+        250341
+      ],
+      "resourcePotId": 13444
+    },
+    "bonusStats": {
+      "apiVersion": 2,
+      "stats": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pseudoStats": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "itemSwap": {
+      "items": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ],
+      "prepullBonusStats": {
+        "apiVersion": 2,
+        "stats": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "pseudoStats": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "buffs": {
+      "greaterBlessingOfKings": true,
+      "greaterBlessingOfMight": true
+    },
+    "hunter": {
+      "options": {
+        "classOptions": {
+          "quiverBonus": "AncientSinewWrappedLamina",
+          "ammo": "ThoriumHeadedArrow",
+          "petType": "Cat",
+          "petUptime": 1,
+          "cobraReflexes": true,
+          "petAggression": 5,
+          "petAttackSpeed": "FasterAttackII"
+        }
+      }
+    },
+    "talentsString": "502-0053252501523051-5",
+    "profession1": "Engineering",
+    "profession2": "Blacksmithing",
+    "cooldowns": {},
+    "rotation": {
+      "type": "TypeAPL",
+      "prepullActions": [
+        {
+          "action": {
+            "castSpell": {
+              "spellId": {
+                "spellId": 14325
+              }
+            }
+          },
+          "doAtValue": {
+            "const": {
+              "val": "-22s"
+            }
+          }
+        },
+        {
+          "action": {
+            "castSpell": {
+              "spellId": {
+                "spellId": 25296
+              }
+            }
+          },
+          "doAtValue": {
+            "const": {
+              "val": "-20s"
+            }
+          }
+        }
+      ],
+      "priorityList": [
+        {
+          "action": {
+            "condition": {
+              "cmp": {
+                "op": "OpGe",
+                "lhs": {
+                  "currentTime": {}
+                },
+                "rhs": {
+                  "const": {
+                    "val": "5s"
+                  }
+                }
+              }
+            },
+            "autocastOtherCooldowns": {}
+          }
+        },
+        {
+          "action": {
+            "condition": {
+              "not": {
+                "val": {
+                  "auraIsActive": {
+                    "sourceUnit": {
+                      "type": "CurrentTarget"
+                    },
+                    "auraId": {
+                      "spellId": 14325
+                    }
+                  }
+                }
+              }
+            },
+            "castSpell": {
+              "spellId": {
+                "spellId": 14325
+              }
+            }
+          }
+        },
+        {
+          "action": {
+            "condition": {
+              "variableRef": {
+                "name": "Use Aimed Shot"
+              }
+            },
+            "castSpell": {
+              "spellId": {
+                "spellId": 20904
+              }
+            }
+          }
+        },
+        {
+          "action": {
+            "condition": {
+              "not": {
+                "val": {
+                  "dotIsActive": {
+                    "spellId": {
+                      "spellId": 25295
+                    }
+                  }
+                }
+              }
+            },
+            "castSpell": {
+              "spellId": {
+                "spellId": 25295
+              }
+            }
+          }
+        },
+        {
+          "action": {
+            "condition": {
+              "and": {
+                "vals": [
+                  {
+                    "variableRef": {
+                      "name": "Use Sniper Shot"
+                    }
+                  },
+                  {
+                    "or": {
+                      "vals": [
+                        {
+                          "auraIsActive": {
+                            "auraId": {
+                              "spellId": 3045
+                            }
+                          }
+                        },
+                        {
+                          "auraIsActive": {
+                            "auraId": {
+                              "spellId": 6150
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "castSpell": {
+              "spellId": {
+                "spellId": 1310786
+              }
+            }
+          }
+        },
+        {
+          "action": {
+            "condition": {
+              "and": {
+                "vals": [
+                  {
+                    "and": {
+                      "vals": [
+                        {
+                          "variableRef": {
+                            "name": "Use Summon Hawk"
+                          }
+                        },
+                        {
+                          "variableRef": {
+                            "name": "Use Arcane Shot"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "sequenceIsComplete": {
+                      "sequenceName": "HHA"
+                    }
+                  }
+                ]
+              }
+            },
+            "resetSequence": {
+              "sequenceName": "HHA"
+            }
+          }
+        },
+        {
+          "action": {
+            "condition": {
+              "and": {
+                "vals": [
+                  {
+                    "variableRef": {
+                      "name": "Use Summon Hawk"
+                    }
+                  },
+                  {
+                    "variableRef": {
+                      "name": "Use Arcane Shot"
+                    }
+                  }
+                ]
+              }
+            },
+            "sequence": {
+              "name": "HHA",
+              "actions": [
+                {
+                  "castSpell": {
+                    "spellId": {
+                      "spellId": 1293527
+                    }
+                  }
+                },
+                {
+                  "castSpell": {
+                    "spellId": {
+                      "spellId": 1293527
+                    }
+                  }
+                },
+                {
+                  "castSpell": {
+                    "spellId": {
+                      "spellId": 14287
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "action": {
+            "condition": {
+              "and": {
+                "vals": [
+                  {
+                    "variableRef": {
+                      "name": "Use Summon Hawk"
+                    }
+                  },
+                  {
+                    "not": {
+                      "val": {
+                        "variableRef": {
+                          "name": "Use Arcane Shot"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "castSpell": {
+              "spellId": {
+                "spellId": 1293527
+              }
+            }
+          }
+        },
+        {
+          "action": {
+            "condition": {
+              "and": {
+                "vals": [
+                  {
+                    "variableRef": {
+                      "name": "Use Arcane Shot"
+                    }
+                  },
+                  {
+                    "not": {
+                      "val": {
+                        "variableRef": {
+                          "name": "Use Summon Hawk"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "castSpell": {
+              "spellId": {
+                "spellId": 14287
+              }
+            }
+          }
+        },
+        {
+          "action": {
+            "condition": {
+              "variableRef": {
+                "name": "Use Multi-Shot"
+              }
+            },
+            "castSpell": {
+              "spellId": {
+                "spellId": 2643
+              }
+            }
+          }
+        }
+      ],
+      "valueVariables": [
+        {
+          "name": "Use Aimed Shot",
+          "value": {
+            "const": {
+              "val": "true"
+            }
+          }
+        },
+        {
+          "name": "Use Multi-Shot",
+          "value": {
+            "const": {
+              "val": "false"
+            }
+          }
+        },
+        {
+          "name": "Use Arcane Shot",
+          "value": {
+            "const": {
+              "val": "true"
+            }
+          }
+        },
+        {
+          "name": "Use Sniper Shot",
+          "value": {
+            "const": {
+              "val": "true"
+            }
+          }
+        },
+        {
+          "name": "Use Summon Hawk",
+          "value": {
+            "const": {
+              "val": "false"
+            }
+          }
+        }
+      ]
+    },
+    "reactionTimeMs": 100,
+    "distanceFromTarget": 12,
+    "healingModel": {}
+  },
+  "encounter": {
+    "apiVersion": 2,
+    "duration": 180,
+    "durationVariation": 5,
+    "executeProportion20": 0.2,
+    "executeProportion35": 0.35,
+    "targets": [
+      {
+        "id": 31146,
+        "name": "Raid Target",
+        "level": 63,
+        "mobType": "MobTypeMechanical",
+        "stats": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          320,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          54,
+          0,
+          0,
+          3731,
+          0,
+          1428900,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "minBaseDamage": 2601,
+        "damageSpread": 0.5,
+        "swingSpeed": 2,
+        "parryHaste": true,
+        "canCrush": true
+      }
+    ]
+  }
+}

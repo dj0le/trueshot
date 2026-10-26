@@ -1,0 +1,94 @@
+# Found by `sim build configs/wowsims/ours-mm.toml` (2026-10-26): +31.80% DPS on 5000 fresh fights.
+extends = "ours-mm.toml"
+name = "our mm.build on his gear, build search"
+position = "weave"
+
+[weave]
+maxAutoShotDelayMs = 1500
+
+[talents]
+"Deadly Aspects" = 5
+"Focused Fire" = 0
+"Lethal Attacks" = 5
+"Improved Stings" = 3
+"Efficiency" = 4
+"Careful Aim" = 5
+"Rapid Killing" = 2
+"Improved Arcane Shot" = 2
+"Trueshot Aura" = 1
+"Mortal Shots" = 5
+"Rapid Recuperation" = 0
+"Barrage" = 3
+"Ranged Weapon Specialization" = 5
+"Sniper Shot" = 1
+"Improved Tracking" = 5
+"Improved Concussive Shot" = 3
+"Lone Wolf" = 1
+"Savage Strikes" = 1
+
+[pet]
+active = false
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "kiss_of_the_spider"
+
+[[rotation.actions]]
+action = "slayers_crest"
+
+[[rotation.actions]]
+action = "demonic_rune"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "berserking"
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "mana.pct > 15"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "major_mana_potion"
+if = "mana.pct > 30"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "explosive_trap"
+
+[[rotation.actions]]
+action = "arcane_shot"
+
+[[rotation.actions]]
+action = "lacerate"
+
+[[rotation.actions]]
+action = "elunes_light"

@@ -1,0 +1,84 @@
+# Our solo bm.build.toml (pre-raid gear, Orc) with his raid buffs, debuffs, Judgement of Wisdom and mana consumables.
+extends = "../bm.build.toml"
+name = "our bm.build, his raid buffs"
+support = "jow"
+
+# His raid buffs and consumables, as in base.toml.
+[buffs]
+agility = 114
+strength = 89
+stamina = 12
+intellect = 43
+spirit = 52
+critPct = 5
+attackPower = 417
+mp5 = 20
+
+# His boss with his armor debuffs, as in base.toml.
+[target]
+level = 63
+armor = 3731
+armorReduction = 3395
+creatureType = "humanoid"
+
+[fight]
+durationSec = 180
+durationVariancePct = 3
+iterations = 2000
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "hunters_mark", "trueshot_aura"]
+
+[[rotation.actions]]
+action = "major_mana_potion"
+if = "mana.deficit > 2250"
+
+[[rotation.actions]]
+action = "demonic_rune"
+if = "mana.deficit > 1500"
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "explosive_trap"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "berserking"
+
+[[rotation.actions]]
+action = "elunes_light"
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "mana.pct > 25"
+
+[[rotation.actions]]
+action = "multi_shot"
+if = "mana.pct > 40"
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "immolation_trap"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up"

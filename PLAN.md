@@ -141,6 +141,17 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
   and it adds nothing, which is why our searches dropped it. Of the gap to our ~300 DPS, armor
   debuffs are 31%, raid buffs about 9% more, and gear the rest: every build search so far answers
   the solo, pre-raid, full-armor case only.
+- wowsims itself (`bun run wowsims`) gives his exact export 906 DPS against our 739. The gap is the pet
+  (+90 on their side: more swings, his crit inherited), Arcane Shot (+72) and Serpent Sting (+51), where
+  wowsims adds 10% and 2% a tick of ranged attack power (flagged "in-game testing required", from the
+  Forever notes); our Auto Shot and Aimed Shot hit about 10% harder (not traced). Nothing changed here.
+- Scored by wowsims on his gear, buffs and boss, our search finds SV 0/19/32 weaving (Auto Shot up to
+  2 sec late) with a Raptor on Slower Attack III, Cobra Reflexes and Pet Aggression 5, Human, Arcane
+  Shot and Multi-Shot on: 1065.9 DPS, +17.5% over his build and above wowsims' own SV Weave preset
+  (1004.6). On his MM talents the best wowsims change is Sniper Shot in Rapid Fire or Quick Shots
+  (+3.7%). configs/wowsims holds every step as a config and an importable export.
+- Lone Wolf beats keeping the pet once the pet attacks less than about 84% of the fight in wowsims
+  (93% here, where the pet is weaker).
 
 ## Data sources
 

@@ -1,0 +1,62 @@
+# Start for a wowsims-scored climb from the long search's best: SV 0/20/31 weaving with a Raptor
+# (configs/wowsims/long-search-best.wowsims.json).
+extends = "base.toml"
+name = "SV weave, wowsims long search best"
+position = "weave"
+
+[weave]
+maxAutoShotDelayMs = 600
+
+[talents]
+"Hawk Eye" = 3
+"Lethal Attacks" = 5
+"Improved Stings" = 1
+"Careful Aim" = 5
+"Improved Arcane Shot" = 5
+"Mortal Shots" = 1
+"Improved Tracking" = 5
+"Deflection" = 1
+"Entrapment" = 2
+"Savage Strikes" = 2
+"Clever Traps" = 2
+"Surefooted" = 3
+"Deterrence" = 1
+"Predator's Edge" = 4
+"Expose Prey" = 2
+"Survivalist's Discipline" = 2
+"Strider Kick" = 1
+"Lightning Reflexes" = 5
+"Lacerating Strikes" = 1
+"Barrage" = 0
+"Deadly Aspects" = 0
+"Efficiency" = 0
+"Focused Fire" = 0
+"Ranged Weapon Specialization" = 0
+"Rapid Killing" = 0
+"Rapid Recuperation" = 0
+"Sniper Shot" = 0
+"Trueshot Aura" = 0
+
+[pet]
+family = "Raptor"
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
+
+[[rotation.actions]]
+action = "aimed_shot"
+
+[[rotation.actions]]
+action = "serpent_sting"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "arcane_shot"
+
+[[rotation.actions]]
+action = "multi_shot"

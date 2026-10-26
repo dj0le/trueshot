@@ -1,0 +1,84 @@
+# Found by `sim build configs/wowsims/base.toml` (2026-10-26): +22.42% DPS on 5000 fresh fights.
+extends = "base.toml"
+name = "wowsims compare: 7/39/5 MM, Naxx gear, build search"
+position = "weave"
+
+[weave]
+maxAutoShotDelayMs = 1500
+
+[talents]
+"Deadly Aspects" = 5
+"Focused Fire" = 0
+"Lethal Attacks" = 5
+"Improved Stings" = 3
+"Efficiency" = 0
+"Careful Aim" = 5
+"Rapid Killing" = 2
+"Improved Arcane Shot" = 5
+"Trueshot Aura" = 1
+"Mortal Shots" = 5
+"Rapid Recuperation" = 1
+"Barrage" = 3
+"Ranged Weapon Specialization" = 5
+"Sniper Shot" = 1
+"Improved Tracking" = 5
+"Improved Concussive Shot" = 4
+"Lone Wolf" = 1
+
+[pet]
+active = false
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "demonic_rune"
+
+[[rotation.actions]]
+action = "kiss_of_the_spider"
+if = "mana.pct > 30"
+
+[[rotation.actions]]
+action = "major_mana_potion"
+
+[[rotation.actions]]
+action = "slayers_crest"
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "aimed_shot"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up & fight.remains > 6"
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "arcane_shot"
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "explosive_trap"
+
+[[rotation.actions]]
+action = "lacerate"
+if = "!debuff.lacerate.up"
