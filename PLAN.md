@@ -133,6 +133,14 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
 - Forever retuned many weapon speeds while keeping their DPS.
 - About 12,000 of Forever's 32,000 items are not shipped in the client; the server sends them. Those use
   Classic Era stats and are flagged in every run.
+- Another hunter's best wowsims/forever setup (wowsims-compare.json: 7/39/5 MM, Naxx gear, full raid
+  buffs and armor debuffs, Human, Cat) runs at 739 DPS here (configs/wowsims). On his gear our sim
+  agrees with him: his build beats our searched MM by 8.2%, SV weaving by 9.6% and BM by 13.6%, and
+  Sniper Shot adds 5.3% in Rapid Fire or Quick Shots (4.3% on cooldown). Sniper Shot pays there
+  because mana never runs short (98% left); in our pre-raid solo setup mana is the limit (4% left)
+  and it adds nothing, which is why our searches dropped it. Of the gap to our ~300 DPS, armor
+  debuffs are 31%, raid buffs about 9% more, and gear the rest: every build search so far answers
+  the solo, pre-raid, full-armor case only.
 
 ## Data sources
 

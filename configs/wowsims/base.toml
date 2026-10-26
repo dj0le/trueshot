@@ -1,0 +1,120 @@
+# Another hunter's best wowsims/forever setup (wowsims-compare.json), as close as this sim can
+# express it. Raid buffs and consumables are flattened to stats. Left out: Blessing of Kings (+10%
+# stats), Windfury and Battle Shout's melee-only parts beyond attack power, Curse of the Elements,
+# Gift of Arthas, the sapper and dynamite, and Swiftstrike Steak (its Well Fed value is server-side).
+name = "wowsims compare: 7/39/5 MM, Naxx gear"
+level = 60
+race = "Human"
+position = "ranged"
+support = "jow"
+
+[talents]
+"Deadly Aspects" = 5
+"Focused Fire" = 2
+"Lethal Attacks" = 5
+"Improved Stings" = 3
+"Efficiency" = 2
+"Careful Aim" = 5
+"Rapid Killing" = 2
+"Improved Arcane Shot" = 5
+"Trueshot Aura" = 1
+"Mortal Shots" = 5
+"Rapid Recuperation" = 2
+"Barrage" = 3
+"Ranged Weapon Specialization" = 5
+"Sniper Shot" = 1
+"Improved Tracking" = 5
+
+[gear]
+ammoDps = 17.5      # Thorium Headed Arrow
+quiverHastePct = 15 # Ancient Sinew Wrapped Lamina
+
+[gear.items]
+head = 22438      # Cryptstalker Headpiece
+neck = 23053      # Stormrage's Talisman of Seething
+shoulder = 22439  # Cryptstalker Spaulders
+back = 21710      # Cloak of the Fallen God
+chest = 22436     # Cryptstalker Tunic
+wrist = 21584     # Bracers of Eternal Reckoning
+hands = 22441     # Cryptstalker Handguards
+waist = 22442     # Cryptstalker Girdle
+legs = 22437      # Cryptstalker Legguards
+feet = 22440      # Cryptstalker Boots
+finger1 = 19140   # Cauterizing Band
+finger2 = 275981  # Ferocious Watcher's Signet
+trinket1 = 23041  # Slayer's Crest
+trinket2 = 22954  # Kiss of the Spider
+mainHand = 16345  # High Warlord's Blade
+offHand = 16345   # High Warlord's Blade
+ranged = 18833    # Grand Marshal's Bullseye
+
+# Gift of the Wild (12 all stats), Grace of Air (77 agi), Strength of Earth (77 str), Arcane
+# Brilliance (31 int), Prayer of Spirit (40 spi), Elixir of the Mongoose (25 agi, 2% crit), Leader
+# of the Pack (3% crit), Greater Blessing of Might (185) and Battle Shout (232) as melee attack power,
+# Greater Mageblood Elixir (20 mp5).
+[buffs]
+agility = 114
+strength = 89
+stamina = 12
+intellect = 43
+spirit = 52
+critPct = 5
+attackPower = 417
+mp5 = 20
+
+[pet]
+active = true
+family = "Cat"
+
+# Level 63 mechanical, 3731 armor. Sunder Armor and Expose Armor do not stack, so 2250 + Faerie
+# Fire 505 + Curse of Recklessness 640. wowsims gives Improved Tracking on every target, which
+# needs a trackable type here.
+[target]
+level = 63
+armor = 3731
+armorReduction = 3395
+creatureType = "humanoid"
+
+[fight]
+durationSec = 180
+durationVariancePct = 3
+iterations = 2000
+
+# His APL: cooldowns from 5 sec, Hunter's Mark, Aimed Shot, Serpent Sting, Arcane Shot. Sniper Shot
+# and Multi-Shot are switched off in the export.
+[rotation]
+precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
+
+[[rotation.actions]]
+action = "rapid_fire"
+if = "time > 5"
+
+[[rotation.actions]]
+action = "slayers_crest"
+if = "time > 5"
+
+[[rotation.actions]]
+action = "kiss_of_the_spider"
+if = "time > 5"
+
+[[rotation.actions]]
+action = "major_mana_potion"
+if = "mana.deficit > 2250"
+
+[[rotation.actions]]
+action = "demonic_rune"
+if = "mana.deficit > 1500"
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "aimed_shot"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!dot.serpent_sting.ticking"
+
+[[rotation.actions]]
+action = "arcane_shot"

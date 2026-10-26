@@ -272,6 +272,11 @@ spells = [25290, 10494, 20355]
 confidence = "guess"
 source = "A raid: Blessing of Wisdom, Mana Spring Totem (10 mana per 2 sec), Judgement of Wisdom on the target (59 mana per hit)"
 
+[support.jow]
+spells = [20355]
+confidence = "guess"
+source = "A raid with Blessing of Might instead of Wisdom and no shaman: Judgement of Wisdom alone (wowsims-compare.json)"
+
 # Server-side changes the client tables do not have. Each one replaces one spell effect's base points.
 
 # Summon Hawk's dive: the tooltip adds 5% of ranged attack power; the client effect has no coefficient.

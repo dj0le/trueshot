@@ -1,0 +1,44 @@
+# His APL with its Use Sniper Shot switch on: only while Rapid Fire or Quick Shots is up.
+extends = "base.toml"
+name = "his build, Sniper Shot in Rapid Fire or Quick Shots"
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
+
+[[rotation.actions]]
+action = "rapid_fire"
+if = "time > 5"
+
+[[rotation.actions]]
+action = "slayers_crest"
+if = "time > 5"
+
+[[rotation.actions]]
+action = "kiss_of_the_spider"
+if = "time > 5"
+
+[[rotation.actions]]
+action = "major_mana_potion"
+if = "mana.deficit > 2250"
+
+[[rotation.actions]]
+action = "demonic_rune"
+if = "mana.deficit > 1500"
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "sniper_shot"
+if = "buff.rapid_fire.up | buff.quick_shots.up"
+
+[[rotation.actions]]
+action = "aimed_shot"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!dot.serpent_sting.ticking"
+
+[[rotation.actions]]
+action = "arcane_shot"

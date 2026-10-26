@@ -1,0 +1,102 @@
+# Our sv.build.toml talents, pet, style and rotation on his gear and buffs.
+extends = "base.toml"
+name = "our sv.build on his gear"
+position = "weave"
+
+[weave]
+maxAutoShotDelayMs = 1200
+
+[talents]
+"Deadly Aspects" = 5
+"Focused Fire" = 2
+"Lethal Attacks" = 5
+"Improved Stings" = 0
+"Efficiency" = 0
+"Careful Aim" = 5
+"Rapid Killing" = 0
+"Improved Arcane Shot" = 0
+"Trueshot Aura" = 0
+"Mortal Shots" = 0
+"Rapid Recuperation" = 0
+"Barrage" = 0
+"Ranged Weapon Specialization" = 0
+"Sniper Shot" = 0
+"Improved Tracking" = 5
+"Savage Strikes" = 2
+"Survivalist" = 4
+"Surefooted" = 3
+"Clever Traps" = 2
+"Predator's Edge" = 2
+"Expose Prey" = 2
+"Resourcefulness" = 2
+"Strider Kick" = 1
+"Lightning Reflexes" = 5
+"Lacerating Strikes" = 1
+"Survival Tactics" = 2
+"Survivalist's Discipline" = 2
+"Entrapment" = 1
+
+[pet]
+active = true
+family = "Wind Serpent"
+
+[rotation]
+precombat = ["aspect_of_the_beast", "hunters_mark", "trueshot_aura"]
+
+[[rotation.actions]]
+action = "slayers_crest"
+if = "time > 5"
+
+[[rotation.actions]]
+action = "kiss_of_the_spider"
+if = "time > 5"
+
+[[rotation.actions]]
+action = "major_mana_potion"
+if = "mana.deficit > 2250"
+
+[[rotation.actions]]
+action = "demonic_rune"
+if = "mana.deficit > 1500"
+
+[[rotation.actions]]
+action = "immolation_trap"
+if = "fight.remains > 5"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "strider_kick"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "explosive_trap"
+
+[[rotation.actions]]
+action = "lacerate"
+if = "fight.remains > 6"
+
+[[rotation.actions]]
+action = "wing_clip"
