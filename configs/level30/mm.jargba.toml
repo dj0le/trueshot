@@ -1,0 +1,12 @@
+# The level 30 mm build against Death Speaker Jargba (Razorfen Kraul): level 30, 1004 armor, and the
+# 35 sec kill in the beta stream (packages/data/calibration/beta-level30.toml).
+extends = "mm.build.toml"
+name = "Level 30 mm vs Death Speaker Jargba"
+
+[target]
+level = 30
+armor = 1004
+
+[fight]
+durationSec = 35
+durationVariancePct = 0
