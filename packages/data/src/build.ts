@@ -53,6 +53,9 @@ const RACIALS: { name: string; spellId: number; tooltip: string }[] = [
   { name: "Endurance", spellId: 20550, tooltip: "critical strike bonus to damage and healing increased by 2%" },
   { name: "Earth Fury", spellId: 1259719, tooltip: "critical strike bonus to damage and healing by 2%" },
   { name: "Elune's Light", spellId: 1259799, tooltip: "critical strike chance with all spells and attacks by 10% for 15 sec" },
+  { name: "Beast Slaying", spellId: 20557, tooltip: "Damage dealt versus Beasts increased by 5%" },
+  { name: "Big Game Hunter", spellId: 1259721, tooltip: "Damage dealt versus Beasts increased by 5%" },
+  { name: "Elemental Insight", spellId: 1259707, tooltip: "Damage dealt versus Elementals increased by 5%" },
 ];
 
 // Consumables a hunter can use in a fight, by item id. Their spell and cooldown come from the

@@ -59736,6 +59736,86 @@
     }
    ]
   },
+  "20557": {
+   "id": 20557,
+   "name": "Beast Slaying",
+   "school": 1,
+   "attributes": [
+    80,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "casterAuraState": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 168,
+     "basePoints": 5,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      1,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "20572": {
    "id": 20572,
    "name": "Blood Fury",
@@ -109687,6 +109767,86 @@
     }
    ]
   },
+  "1259707": {
+   "id": 1259707,
+   "name": "Elemental Insight",
+   "school": 1,
+   "attributes": [
+    80,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "casterAuraState": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 168,
+     "basePoints": 5,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      8,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "1259710": {
    "id": 1259710,
    "name": "Wind Blessed",
@@ -109892,6 +110052,86 @@
      "mechanic": 0,
      "miscValue": [
       0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "1259721": {
+   "id": 1259721,
+   "name": "Big Game Hunter",
+   "school": 1,
+   "attributes": [
+    80,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "casterAuraState": 0,
+   "power": [],
+   "proc": null,
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 168,
+     "basePoints": 5,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      1,
       0
      ],
      "radiusIndex": [
@@ -135064,6 +135304,18 @@
    "active": true
   },
   {
+   "race": "Troll",
+   "name": "Beast Slaying",
+   "spellId": 20557,
+   "active": false
+  },
+  {
+   "race": "Skyborne (Windshaper)",
+   "name": "Elemental Insight",
+   "spellId": 1259707,
+   "active": false
+  },
+  {
    "race": "Skyborne (Windshaper)",
    "name": "Wind Blessed",
    "spellId": 1259710,
@@ -135088,10 +135340,22 @@
    "active": false
   },
   {
+   "race": "Dwarf",
+   "name": "Big Game Hunter",
+   "spellId": 1259721,
+   "active": false
+  },
+  {
    "race": "Night Elf",
    "name": "Elune's Light",
    "spellId": 1259799,
    "active": true
+  },
+  {
+   "race": "Skyborne (High Order)",
+   "name": "Elemental Insight",
+   "spellId": 1259707,
+   "active": false
   },
   {
    "race": "Skyborne (High Order)",

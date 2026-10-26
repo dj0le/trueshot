@@ -718,3 +718,11 @@ test("Multi-Shot has a 0.5 sec cast, and Auto Shot keeps firing through it", () 
     simulate(game, { ...base, gear: { ...base.gear!, stats: { hitPct: 9, mp5: 10000 } }, fight: { durationSec: 120, iterations: 20 }, rotation: { actions } }).abilities.find((a) => a.name === "Auto Shot")!.castsPerFight;
   expect(auto([{ action: "multi_shot" }])).toBe(auto([]));
 });
+
+test("creature-type racials add 5% only against their type", () => {
+  const dps = (race: string, creatureType: "beast" | "humanoid" | "elemental") =>
+    simulate(game, { ...base, race, target: { preset: "boss", creatureType }, fight: { durationSec: 60, iterations: 20 } }).dps.mean;
+  for (const [race, type] of [["Troll", "beast"], ["Dwarf", "beast"], ["Skyborne (Windshaper)", "elemental"]] as const) {
+    expect(dps(race, type) / dps(race, "humanoid")).toBeCloseTo(1.05, 2);
+  }
+});
