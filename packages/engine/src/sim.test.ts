@@ -711,3 +711,10 @@ test("the pet inherits the hunter's crit and hit, and swings a creature's weapon
   expect(before).toBeGreaterThan(55);
   expect(before).toBeLessThan(70);
 });
+
+test("Multi-Shot has a 0.5 sec cast, and Auto Shot keeps firing through it", () => {
+  expect(game.data.spells["2643"]!.castTimeMs).toBe(500);
+  const auto = (actions: { action: string }[]) =>
+    simulate(game, { ...base, gear: { ...base.gear!, stats: { hitPct: 9, mp5: 10000 } }, fight: { durationSec: 120, iterations: 20 }, rotation: { actions } }).abilities.find((a) => a.name === "Auto Shot")!.castsPerFight;
+  expect(auto([{ action: "multi_shot" }])).toBe(auto([]));
+});

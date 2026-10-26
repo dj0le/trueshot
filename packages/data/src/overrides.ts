@@ -27,9 +27,10 @@ const Levels = z.object({
 });
 export type Levels = z.infer<typeof Levels>;
 
-// Hotfix fields that change one effect, and ones that change the spell's proc.
+// Hotfix fields that change one effect, ones that change the spell's proc, and ones on the spell.
 const EFFECT_FIELDS = ["basePoints", "apCoefficient", "miscValue", "classMask"] as const;
 const PROC_FIELDS = ["procTypeMask", "procChance", "procPpm"] as const;
+const SPELL_FIELDS = ["castTimeMs"] as const;
 
 const Overrides = z.object({
   formula: z.object({
@@ -105,11 +106,13 @@ const Overrides = z.object({
         procTypeMask: z.number().optional(),
         procChance: z.number().optional(),
         procPpm: z.number().optional(),
+        // The spell's base cast time.
+        castTimeMs: z.number().min(0).optional(),
         ...provenance,
       })
       .refine(
-        (h) => [...EFFECT_FIELDS, ...PROC_FIELDS].some((k) => h[k] !== undefined),
-        `a hotfix needs one of ${[...EFFECT_FIELDS, ...PROC_FIELDS].join(", ")}`,
+        (h) => [...EFFECT_FIELDS, ...PROC_FIELDS, ...SPELL_FIELDS].some((k) => h[k] !== undefined),
+        `a hotfix needs one of ${[...EFFECT_FIELDS, ...PROC_FIELDS, ...SPELL_FIELDS].join(", ")}`,
       )
       .refine(
         (h) => h.effectIndex !== undefined || EFFECT_FIELDS.every((k) => h[k] === undefined),
@@ -167,6 +170,10 @@ export function applyHotfixes(data: HunterData, o: Overrides): HunterData {
       if (!spell.proc) throw new Error(`hotfix: spell ${h.spell} has no proc`);
       if (spell.proc[field] === value) stale(` proc ${field}`, value);
       spell.proc = { ...spell.proc, [field]: value };
+    }
+    if (h.castTimeMs !== undefined) {
+      if (spell.castTimeMs === h.castTimeMs) stale(" castTimeMs", h.castTimeMs);
+      spell.castTimeMs = h.castTimeMs;
     }
     if (h.effectIndex === undefined) continue;
     const effect = spell.effects.find((e) => e.index === h.effectIndex);

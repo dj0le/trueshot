@@ -337,6 +337,13 @@ basePoints = 143
 confidence = "reported"
 source = "foreverchanges.pro patch notes: Hunter's Mark rank 4 gives 143 ranged AP instead of 71. Not in Blizzard's notes"
 
+# Multi-Shot has a 0.5 sec cast that ranged haste shortens, like Aimed Shot; the client row has none.
+[[hotfix]]
+spell = 2643
+castTimeMs = 500
+confidence = "reported"
+source = "wowsims/forever PR 661: every Multi-Shot in three beta logs has a cast start, median 0.44-0.45 sec with a 10% quiver (0.32 under Rapid Fire). A public beta log (ArcSim's gist) also shows a Multi-Shot cast start"
+
 # Talents whose client data does more than their tooltip says. The tooltip wins (PLAN.md, task 16).
 
 # Ranged Weapon Specialization: "+5% damage with ranged weapons". The client aura covers every school,
