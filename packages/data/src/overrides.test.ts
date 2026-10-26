@@ -27,6 +27,9 @@ test("talent hotfixes follow the tooltip: weapon-only damage, Auto Shot-only pro
   expect(patched.spells["19507"]!.effects[0]!.miscValue[0]).toBe(1);
   expect(patched.spells["25296"]!.proc!.typeMask[0]).toBe(0x40);
   expect(patched.spells["1293241"]!.effects[0]!.apCoefficient).toBe(0.05);
+  // Efficiency no longer reaches Summon Hawk, and still reaches the shots.
+  expect(patched.spells["19416"]!.effects[0]!.classMask[2]).toBe(0);
+  expect(patched.spells["19416"]!.effects[0]!.classMask[0]).toBe(522818);
 });
 
 test("a hotfix the client already has is rejected as stale", async () => {

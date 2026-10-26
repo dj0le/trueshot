@@ -81,6 +81,11 @@ export const SimConfig = z.object({
       // warrior-class creature's at that level).
       level: z.number().int().min(1).max(63).optional(),
       armor: z.number().min(0).optional(),
+      // Decides which Track spell the hunter keeps up (Improved Tracking). Mechanical and critter
+      // targets cannot be tracked. Any trackable type gives the same result.
+      creatureType: z
+        .enum(["beast", "dragonkin", "demon", "elemental", "giant", "undead", "humanoid", "critter", "mechanical"])
+        .default("humanoid"),
       // Sunder Armor, Faerie Fire, Curse of Recklessness and friends, summed.
       armorReduction: z.number().default(0),
     })

@@ -298,3 +298,12 @@ effectIndex = 0
 apCoefficient = 0.05
 confidence = "confirmed"
 source = "Summon Hawk (level 48) tooltip: plus 5% of your Ranged Attack Power, as rank 4; the client effect has no coefficient"
+
+# Efficiency: "Reduces the Mana cost of your Shots, Stings, and melee abilities". Summon Hawk is none
+# of those, but the client mask reaches it (word 3, bit 8192). Summon Hawk's bit removed.
+[[hotfix]]
+spell = 19416
+effectIndex = 0
+classMask = [522818, -2146955264, 0, 8388608]
+confidence = "reported"
+source = "Efficiency tooltip: Shots, Stings and melee abilities. Client mask [522818, -2146955264, 8192, 8388608] also cuts Summon Hawk's cost"

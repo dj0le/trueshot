@@ -20,6 +20,8 @@ export const Aura = {
   Dummy: 4,
   ProcTriggerSpell: 42,
   ModDamagePercentDone: 79,
+  // Damage done to some creature types (Improved Tracking on a Track spell); the mask is in miscValue.
+  ModDamageDoneVersusCreature: 168,
   ModAttackPower: 99,
   ModPowerRegenPercent: 110,
   AddFlatModifier: 107,
@@ -48,6 +50,8 @@ export const Aura = {
 // Present in spells the sim uses but with no effect on single-target ranged damage.
 export const IGNORED_AURAS = new Set<number>([
   61, // Bestial Wrath: pet size
+  44, // Track spells: creatures on the minimap
+  45, // Track Beasts: resources on the minimap
   68, // Hunter's Mark: makes the target visible
   77, // Bestial Wrath: pet immunities
   50, // Endurance, Earth Fury: critical healing
@@ -110,6 +114,19 @@ export const ProcFlag = {
   TakenRangedAutoAttack: 0x80,
   DoneRangedSpell: 0x100,
   TakenRangedSpell: 0x200,
+} as const;
+
+// Creature types as the client numbers them; a creature-type mask has bit (type - 1) set.
+export const CreatureType = {
+  beast: 1,
+  dragonkin: 2,
+  demon: 3,
+  elemental: 4,
+  giant: 5,
+  undead: 6,
+  humanoid: 7,
+  critter: 8,
+  mechanical: 9,
 } as const;
 
 export const Stat = { Strength: 0, Agility: 1, Stamina: 2, Intellect: 3, Spirit: 4 } as const;

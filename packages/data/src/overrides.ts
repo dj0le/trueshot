@@ -66,22 +66,25 @@ const Overrides = z.object({
     z
       .object({
         spell: z.number(),
-        // Effect fields (basePoints, apCoefficient, miscValue) need the effect; procTypeMask is the spell's.
+        // Effect fields (basePoints, apCoefficient, miscValue, classMask) need the effect; procTypeMask
+        // is the spell's.
         effectIndex: z.number().optional(),
         basePoints: z.number().optional(),
         apCoefficient: z.number().optional(),
         // The effect's first misc value, such as a damage aura's school mask.
         miscValue: z.number().optional(),
+        // Which of the class's spells a modifier aura reaches (all four words).
+        classMask: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(),
         // Which hits the spell's proc listens for (ProcFlag bits).
         procTypeMask: z.number().optional(),
         ...provenance,
       })
       .refine(
-        (h) => [h.basePoints, h.apCoefficient, h.miscValue, h.procTypeMask].some((v) => v !== undefined),
-        "a hotfix needs basePoints, apCoefficient, miscValue or procTypeMask",
+        (h) => [h.basePoints, h.apCoefficient, h.miscValue, h.classMask, h.procTypeMask].some((v) => v !== undefined),
+        "a hotfix needs basePoints, apCoefficient, miscValue, classMask or procTypeMask",
       )
       .refine(
-        (h) => h.effectIndex !== undefined || [h.basePoints, h.apCoefficient, h.miscValue].every((v) => v === undefined),
+        (h) => h.effectIndex !== undefined || [h.basePoints, h.apCoefficient, h.miscValue, h.classMask].every((v) => v === undefined),
         "an effect hotfix needs effectIndex",
       ),
   ),
@@ -142,6 +145,10 @@ export function applyHotfixes(data: HunterData, o: Overrides): HunterData {
     if (h.miscValue !== undefined) {
       if (effect.miscValue[0] === h.miscValue) stale(` effect ${h.effectIndex} miscValue`, h.miscValue);
       effect.miscValue = [h.miscValue, effect.miscValue[1]!];
+    }
+    if (h.classMask !== undefined) {
+      if (h.classMask.every((m, i) => effect.classMask[i] === m)) stale(` effect ${h.effectIndex} classMask`, h.classMask[0]);
+      effect.classMask = [...h.classMask];
     }
   }
   return { ...data, spells };

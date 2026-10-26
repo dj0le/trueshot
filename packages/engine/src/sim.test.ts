@@ -320,3 +320,49 @@ test("racials: Wind Blessed hastes Auto Shot, Berserking is cast, Savage adds cr
   expect(orc.passives.map((p) => p.source)).toContain("Savage");
   expect(orc.abilities.has("blood_fury")).toBe(true);
 });
+
+test("Improved Tracking adds 5% to all the hunter's damage against a type it can track", () => {
+  const run = (creatureType: "humanoid" | "mechanical", rank: number) =>
+    simulate(game, {
+      ...base,
+      talents: { "Improved Tracking": rank },
+      target: { preset: "boss", creatureType },
+      fight: { durationSec: 60, iterations: 20 },
+      rotation: { actions: [{ action: "serpent_sting", if: "!dot.serpent_sting.ticking" }] },
+    }).dps.mean;
+  expect(run("humanoid", 5) / run("humanoid", 0)).toBeCloseTo(1.05, 6);
+  expect(run("mechanical", 5)).toBe(run("mechanical", 0));
+});
+
+test("hawks and the dive get Unleashed Fury and Ferocity, but not Bestial Wrath", () => {
+  const bm = { "Deadly Aspects": 5, "Endurance Training": 5, "Bestial Swiftness": 1, "Unleashed Fury": 5, "Summon Hawk": 1 };
+  const run = (talents: Record<string, number>, precombat: string[] = [], preset: "boss" | "normal" = "boss") =>
+    simulate(game, {
+      ...base,
+      talents,
+      gear: { ...base.gear!, stats: { hitPct: 9, mp5: 10000 } },
+      pet: { active: true, family: "Cat", abilities: [] },
+      target: { preset },
+      fight: { durationSec: 15, iterations: 200 },
+      rotation: { precombat, actions: [{ action: "summon_hawk" }] },
+    }).abilities;
+  const dps = (r: ReturnType<typeof run>, name: string) => r.find((a) => a.name === name)!.dps;
+
+  const withUf = run(bm);
+  // The points go to talents that do nothing here, to keep Summon Hawk reachable.
+  const withoutUf = run({ ...bm, "Unleashed Fury": 0, Pathfinding: 2, "Improved Revive Pet": 2, "Improved Aspect of the Monkey": 1 });
+  expect(dps(withUf, "Summon Hawk") / dps(withoutUf, "Summon Hawk")).toBeCloseTo(1.15, 6);
+  expect(dps(withUf, "Hawk: Attack") / dps(withoutUf, "Hawk: Attack")).toBeCloseTo(1.15, 6);
+
+  const wrath = { ...bm, Ferocity: 5, "Bestial Discipline": 2, Intimidation: 1, Frenzy: 5, "Spirit Bond": 2, "Bestial Wrath": 1, "Improved Aspect of the Monkey": 3, "Focused Fire": 2 };
+  const calm = run(wrath);
+  const raging = run(wrath, ["bestial_wrath"]);
+  expect(dps(raging, "Hawk: Attack")).toBe(dps(calm, "Hawk: Attack"));
+  expect(dps(raging, "Pet: Melee") / dps(calm, "Pet: Melee")).toBeGreaterThan(1.3);
+
+  // Against a same-level target nothing suppresses crit, so Ferocity's 10% shows in full.
+  const ferocity = run({ ...bm, Ferocity: 5 }, [], "normal").find((a) => a.name === "Summon Hawk")!.critPct;
+  const none = run(bm, [], "normal").find((a) => a.name === "Summon Hawk")!.critPct;
+  expect(ferocity - none).toBeGreaterThan(7);
+  expect(ferocity - none).toBeLessThan(13);
+});

@@ -43,16 +43,6 @@ export class AuraSet {
     return s;
   }
 
-  // The part of sum() that comes from auras with charges left.
-  chargedSum(aura: number): number {
-    let s = 0;
-    for (const a of this.active.values()) {
-      if (a.charges === 0) continue;
-      for (const e of a.effects) if (e.aura === aura) s += e.value;
-    }
-    return s;
-  }
-
   // Percentage auras that multiply together onto a base, such as haste.
   product(auras: readonly number[], base = 1): number {
     let m = base;
@@ -60,10 +50,12 @@ export class AuraSet {
     return m;
   }
 
-  damageMultiplier(school: number): number {
+  // creatureMask: the target's creature type as a mask, for damage done versus creature types.
+  damageMultiplier(school: number, creatureMask = 0): number {
     let m = 1;
     for (const e of this.effects()) {
       if (e.aura === Aura.ModDamagePercentDone && (e.miscValue[0] & school) !== 0) m *= 1 + e.value / 100;
+      if (e.aura === Aura.ModDamageDoneVersusCreature && (e.miscValue[0] & creatureMask) !== 0) m *= 1 + e.value / 100;
     }
     return m;
   }

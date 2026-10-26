@@ -19,6 +19,8 @@ export type PetHost = {
   modded(base: number, spell: Spell, op: number): number;
   moddedEffects(spell: Spell, effects: ResolvedEffect[]): ResolvedEffect[];
   ownRangedAttackPower(): number;
+  // The pet passives hawks share (Unleashed Fury, Ferocity), which the pet builds on.
+  readonly hawkAuras: AuraSet;
   armorMultiplier(): number;
   // Damage-done bonuses the pet shares with the hunter (Focused Fire).
   sharedDamagePct(): number;
@@ -73,11 +75,13 @@ export class Pet {
     private readonly attackingUntil: number,
   ) {
     // Passive values settle once, with the hunter's talents applied through spell modifiers.
-    const passives: ActiveSpell[] = [...data.petPassives, family.passiveSpellId].map((id) => {
-      const spell = data.spells[String(id)]!;
-      return { spell, effects: host.moddedEffects(spell, resolveEffects(spell)), source: spell.name };
-    });
-    this.auras = new AuraSet(host.queue, passives);
+    const familySpell = data.spells[String(family.passiveSpellId)]!;
+    const familyPassive: ActiveSpell = {
+      spell: familySpell,
+      effects: host.moddedEffects(familySpell, resolveEffects(familySpell)),
+      source: familySpell.name,
+    };
+    this.auras = new AuraSet(host.queue, [...host.hawkAuras.passives, familyPassive]);
     this.dots = new AuraSet(host.queue);
 
     const known = this.known;
@@ -100,18 +104,22 @@ export class Pet {
 
   // Effects and stats ==========================================================
 
-  attackPower(): number {
-    return this.stats.baseAttackPower + (this.host.ownRangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100 + this.auras.sum(Aura.ModAttackPower);
+  // own: the pet itself; otherwise a hawk, which has only the auras hawks share.
+  attackPower(own = true): number {
+    const inherited = (this.host.ownRangedAttackPower() * this.o.inheritRangedAttackPowerPct.value) / 100;
+    return this.stats.baseAttackPower + inherited + (own ? this.auras.sum(Aura.ModAttackPower) : 0);
   }
 
-  private damageMultiplier(school: number): number {
-    const shared = (1 + this.o.happinessDamagePct.value / 100) * (1 + this.host.sharedDamagePct() / 100);
-    return shared * this.auras.damageMultiplier(school);
+  // A hawk's hit is measured as a share of a happy pet's (pet.hawk), so happiness stays in; Focused
+  // Fire ("you and your pet") does not reach hawks.
+  private damageMultiplier(school: number, own = true): number {
+    const happy = 1 + this.o.happinessDamagePct.value / 100;
+    if (!own) return happy * this.host.hawkAuras.damageMultiplier(school);
+    return happy * (1 + this.host.sharedDamagePct() / 100) * this.auras.damageMultiplier(school);
   }
 
-  // Crit buffs with charges (Intimidation) are spent by the pet's own next hit; hawks do not share them.
   private critPct(own: boolean): number {
-    const auraCrit = this.auras.sum(Aura.ModCritPct) - (own ? 0 : this.auras.chargedSum(Aura.ModCritPct));
+    const auraCrit = (own ? this.auras : this.host.hawkAuras).sum(Aura.ModCritPct);
     const t = this.stats.table;
     return this.o.baseCritPct.value + auraCrit - t.critSuppressionPct - Math.min(auraCrit, t.auraCritSuppressionPct);
   }
@@ -153,8 +161,8 @@ export class Pet {
     const base = this.host.rng.stream(`${streams}-damage`).range(perLevel.min, perLevel.max) * this.stats.level * speedScale;
     let amount =
       base *
-      (0.7 + (0.3 * this.attackPower()) / this.stats.baseAttackPower) *
-      this.damageMultiplier(School.Physical) *
+      (0.7 + (0.3 * this.attackPower(own)) / this.stats.baseAttackPower) *
+      this.damageMultiplier(School.Physical, own) *
       this.host.armorMultiplier() *
       scale;
     if (rng < glance) {

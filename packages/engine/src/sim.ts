@@ -2,10 +2,11 @@
 // regen, ticks, aura expiry) runs off the event queue.
 import { atLevel, type GameData, type Overrides, type Spell } from "@hunter-sim/data";
 import { AuraSet } from "./auras";
-import { actionNames, type Character, type ResolvedEffect, resolveEffects, snake } from "./character";
+import { type ActiveSpell, actionNames, type Character, type ResolvedEffect, resolveEffects, snake } from "./character";
 import {
   Aura,
   CHANNELED_FLAGS,
+  CreatureType,
   DefenseType,
   EFFECT_VALUE_OPS,
   Effect,
@@ -58,6 +59,9 @@ const REACTION_MS = 100;
 
 const isChanneled = (spell: Spell) => (spell.attributes[1]! & CHANNELED_FLAGS) !== 0;
 
+// The hawk's dive is the hunter's spell, but the hawk deals it, so "pets and hawks" talents reach it.
+const HAWK_DIVE = "Summon Hawk";
+
 export type AbilityStats = {
   name: string;
   casts: number;
@@ -79,7 +83,7 @@ export type FightResult = {
   oomMs: number;
 };
 
-type Target = { level: number; armor: number; table: AttackTable };
+type Target = { level: number; armor: number; table: AttackTable; creatureMask: number };
 
 export type { GameData };
 
@@ -230,6 +234,9 @@ export class Fight implements PetHost {
   private readonly support: number[];
   private readonly scriptContext: ScriptContext;
   readonly pet: Pet | null = null;
+  // What reaches hawks: the pet passives the "pets and hawks" talents modify (Unleashed Fury,
+  // Ferocity), without the pet's family bonus or its own buffs (Bestial Wrath).
+  readonly hawkAuras: AuraSet;
 
   constructor(
     private ch: Character,
@@ -250,6 +257,7 @@ export class Fight implements PetHost {
       level: targetLevel,
       armor: t.armor ?? atLevel(lv, lv.creatureArmor.values, targetLevel),
       table: attackTable(game.overrides.formula, ch.level, targetLevel),
+      creatureMask: 1 << (CreatureType[t.creatureType] - 1),
     };
     this.autoShot = game.data.spells["75"]!;
     this.attackPowerPerDps = game.overrides.formula.attackPowerPerDps.value;
@@ -257,6 +265,11 @@ export class Fight implements PetHost {
     const support = preset === "solo" ? [] : game.overrides.support[preset]?.spells;
     if (!support) throw new Error(`support: unknown preset "${preset}"`);
     this.support = support;
+    const shared: ActiveSpell[] = game.data.petPassives.map((id) => {
+      const spell = game.data.spells[String(id)]!;
+      return { spell, effects: this.moddedEffects(spell, resolveEffects(spell)), source: spell.name };
+    });
+    this.hawkAuras = new AuraSet(this.queue, shared);
     if (ch.config.pet.active) {
       const family = game.data.petFamilies.find((p) => p.name === ch.config.pet.family);
       if (!family) throw new Error(`pet: unknown family "${ch.config.pet.family}"`);
@@ -291,6 +304,11 @@ export class Fight implements PetHost {
       if (!spell) throw new Error(`precombat: "${name}" is not known at level ${this.ch.level} with these talents`);
       this.applyAuras(spell, null);
     }
+    // A hunter keeps tracking the target's creature type, which Improved Tracking turns into damage.
+    const tracking = [...this.ch.abilities.values()].find((s) =>
+      s.effects.some((e) => e.aura === Aura.ModDamageDoneVersusCreature && (e.miscValue[0] & this.target.creatureMask) !== 0),
+    );
+    if (tracking) this.applyAuras(tracking, null);
     // Other players keep these up all fight.
     for (const id of this.support) this.applyAuras(this.game.data.spells[String(id)]!, null, Infinity);
     for (let t = 2000; t < this.durationMs; t += 2000) this.queue.push(t, () => this.manaTick());
@@ -372,6 +390,11 @@ export class Fight implements PetHost {
   sharedDamagePct(): number {
     const ff = this.ch.passives.find((p) => p.source === "Focused Fire");
     return ff ? ff.effects.reduce((s, e) => s + (e.aura === Aura.ModDamagePercentDone ? e.value : 0), 0) : 0;
+  }
+
+  // The hunter's damage-done auras for a school against this target.
+  private damageDone(school: number): number {
+    return this.selfAuras.damageMultiplier(school, this.target.creatureMask);
   }
 
   record(name: string, outcome: "hit" | "crit" | "miss" | "glance" | "tick" | "cast", amount = 0): void {
@@ -596,12 +619,12 @@ export class Fight implements PetHost {
 
   // Resolving a spell =========================================================
 
-  private roll(spell: Spell, isAuto: boolean): "miss" | "hit" | "crit" {
+  private roll(spell: Spell, isAuto: boolean, extraCritPct = 0): "miss" | "hit" | "crit" {
     if (spell.defenseType === DefenseType.None) return "hit";
     const t = this.target.table;
     const hit = this.ch.hitPct + this.selfAuras.sum(Aura.ModHitChance);
     const miss = Math.max(0, t.missPct - Math.max(0, hit - t.hitPenaltyPct));
-    const total = this.ch.critPct + this.selfAuras.sum(Aura.ModCritPct) + this.mods(spell, SpellModOp.CritChance).flat;
+    const total = this.ch.critPct + this.selfAuras.sum(Aura.ModCritPct) + this.mods(spell, SpellModOp.CritChance).flat + extraCritPct;
     const auraCrit = total - this.ch.agilityCritPct;
     const crit = Math.max(0, total - t.critSuppressionPct - Math.min(Math.max(0, auraCrit), t.auraCritSuppressionPct));
     const r = this.rng.stream(isAuto ? "auto" : "special").next() * 100;
@@ -641,7 +664,8 @@ export class Fight implements PetHost {
     const damaging = effects.filter((e) => DAMAGE_EFFECTS.has(e.effect) && e.implicitTarget[0] !== TARGET_CASTER);
     // Spells that deal no damage and put nothing on the enemy (Intimidation, Bestial Wrath) cannot miss.
     const canMiss = damaging.length > 0 || effects.some((e) => TARGET_ENEMY.has(e.implicitTarget[0]));
-    const outcome = isChanneled(spell) || !canMiss ? "hit" : this.roll(spell, isAuto);
+    const hawk = spell.name === HAWK_DIVE;
+    const outcome = isChanneled(spell) || !canMiss ? "hit" : this.roll(spell, isAuto, hawk ? this.hawkAuras.sum(Aura.ModCritPct) : 0);
     const s = this.stat(spell.name);
     if (outcome === "miss") {
       s.misses++;
@@ -650,7 +674,8 @@ export class Fight implements PetHost {
 
     if (damaging.length > 0) {
       let amount = damaging.reduce((sum, e) => sum + this.effectDamage(spell, e), 0);
-      amount = this.modded(amount, spell, SpellModOp.Damage) * this.selfAuras.damageMultiplier(spell.school);
+      amount = this.modded(amount, spell, SpellModOp.Damage) * this.damageDone(spell.school);
+      if (hawk) amount *= this.hawkAuras.damageMultiplier(spell.school);
       if (spell.school === School.Physical) amount *= this.armorMultiplier();
       if (outcome === "crit") {
         const bonus = this.game.overrides.formula.critDamageBonusPct.value / 100;
@@ -759,7 +784,7 @@ export class Fight implements PetHost {
       for (const e of effects.filter((x) => x.aura === Aura.PeriodicDamage)) {
         const tick =
           this.modded(e.value + e.apCoefficient * this.rangedAttackPower(), spell, SpellModOp.PeriodicDamage) *
-          this.selfAuras.damageMultiplier(spell.school);
+          this.damageDone(spell.school);
         for (let t = e.periodMs; t <= tickUntil; t += e.periodMs) {
           this.queue.push(this.now + t, () => {
             if (!isLive()) return;
