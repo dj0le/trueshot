@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: Trueshot
+## Notes: Saves your character sheet whenever it changes and keeps combat logging on, for Trueshot's claims and benchmarks.
+## Author: dj0le
+## IconTexture: Interface\Icons\Ability_TrueShot
+## X-Website: https://github.com/dj0le/trueshot
+## Version: 0.1.0
+## SavedVariables: TrueshotDB
+
+Trueshot.lua

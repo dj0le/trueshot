@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { ingestSheets, openStore, parseSavedVariables, parseTime, readSheets, sheetsAt } from "../index";
 
 // What the addon saved under a stubbed WoW API (a login, then Rapid Fire), in WoW's own format.
-const SAVED = `HunterSimRecorderDB = {
+const SAVED = `TrueshotDB = {
 ["sessions"] = {
 {
 ["rows"] = {
@@ -41,7 +41,7 @@ test("the recorder's rows become sheets on the combat log's clock", () => {
 
 test("sheets are stored once and looked up as they stood at a time", async () => {
   const db = openStore(":memory:");
-  const path = join(mkdtempSync(join(tmpdir(), "hunter-sim-")), "HunterSimRecorder.lua");
+  const path = join(mkdtempSync(join(tmpdir(), "trueshot-")), "Trueshot.lua");
   writeFileSync(path, SAVED);
   expect(await ingestSheets(db, path)).toBe(2);
   expect(await ingestSheets(db, path)).toBe(0);

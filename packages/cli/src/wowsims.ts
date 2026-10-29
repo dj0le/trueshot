@@ -28,8 +28,8 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { loadGameData } from "@hunter-sim/data";
-import { configBuild, describeBuild, searchBuilds, SimConfig, type SimConfigInput, type SimResult, specTree, withBuild } from "@hunter-sim/engine";
+import { loadGameData } from "@trueshot/data";
+import { configBuild, describeBuild, searchBuilds, SimConfig, type SimConfigInput, type SimResult, specTree, withBuild } from "@trueshot/engine";
 import { loadConfig } from "./toml";
 
 const REPO = "https://github.com/wowsims/forever.git";

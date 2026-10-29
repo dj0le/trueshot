@@ -1,7 +1,7 @@
 // The hunter's pet: white swings, focus, an ability priority, and its own auras. Hunter talents
 // reach it by modifying the shared pet passives (Unleashed Fury, Ferocity, Frenzy, Bestial
 // Discipline), exactly as the client wires them.
-import type { HunterData, Overrides, PetFamily, Spell } from "@hunter-sim/data";
+import type { HunterData, Overrides, PetFamily, Spell } from "@trueshot/data";
 import { AuraSet } from "./auras";
 import type { AttackTable } from "./levels";
 import { type ActiveSpell, knownRank, type ResolvedEffect, resolveEffects, snake } from "./character";

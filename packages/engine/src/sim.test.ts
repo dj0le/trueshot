@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { loadGameData } from "@hunter-sim/data";
+import { loadGameData } from "@trueshot/data";
 import { buildCharacter, fightLength, SimConfig, simulate, type SimConfigInput } from "./index";
 import { attackTable } from "./levels";
 

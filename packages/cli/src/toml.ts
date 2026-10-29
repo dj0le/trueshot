@@ -2,7 +2,7 @@
 // what differs. Tables merge key by key; anything else, rotation.actions included, replaces the
 // parent's value.
 import { dirname, relative, resolve } from "node:path";
-import type { ActionConfig, Build, SimConfigInput } from "@hunter-sim/engine";
+import type { ActionConfig, Build, SimConfigInput } from "@trueshot/engine";
 
 type Table = Record<string, unknown>;
 const isTable = (v: unknown): v is Table => typeof v === "object" && v !== null && !Array.isArray(v);

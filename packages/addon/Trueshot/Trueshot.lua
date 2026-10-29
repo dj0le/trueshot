@@ -1,10 +1,10 @@
--- Hunter Sim Recorder: saves the hunter's character sheet (level, ranged attack power, bow speed and
--- damage, crit, hit, stats, buffs, gear, talents, pet) whenever any of it changes, for hunter-sim's
+-- Trueshot: saves the hunter's character sheet (level, ranged attack power, bow speed and damage,
+-- crit, hit, stats, buffs, gear, talents, pet) whenever any of it changes, for Trueshot's
 -- `sim ingest` to line up with the combat log by time. The combat log lacks these: it logs a
 -- player's item level, not level, and an attack power that is not ranged attack power.
 --
 -- Also turns combat logging (with advanced logging) on at every login and zone change, since the
--- game turns it off at logout. `/hsr autolog off` stops that.
+-- game turns it off at logout. `/ts autolog off` stops that.
 --
 -- Saved per login session: the local wall clock at a whole second, the GetTime() at that second, and
 -- rows of "key=value;..." with t, milliseconds since that second. Rows are written only when a value
@@ -131,7 +131,7 @@ end
 -- Anchor the session at the moment the wall clock ticks over a second, so rows convert to the
 -- combat log's millisecond timestamps.
 local function startSession()
-  local db = HunterSimRecorderDB
+  local db = TrueshotDB
   local second = time()
   local ticker
   ticker = C_Timer.NewTicker(0.001, function()
@@ -152,19 +152,19 @@ local function startSession()
 end
 
 local function autolog()
-  if not HunterSimRecorderDB.autolog then return end
+  if not TrueshotDB.autolog then return end
   if GetCVar("advancedCombatLogging") ~= "1" then SetCVar("advancedCombatLogging", "1") end
   if not LoggingCombat() then
     LoggingCombat(true)
-    print("|cffabd473Hunter Sim Recorder|r: combat logging on")
+    print("|cffabd473Trueshot|r: combat logging on")
   end
 end
 
 frame:SetScript("OnEvent", function(_, event, unit)
   if event == "PLAYER_LOGIN" then
-    HunterSimRecorderDB = HunterSimRecorderDB or {}
-    HunterSimRecorderDB.sessions = HunterSimRecorderDB.sessions or {}
-    if HunterSimRecorderDB.autolog == nil then HunterSimRecorderDB.autolog = true end
+    TrueshotDB = TrueshotDB or {}
+    TrueshotDB.sessions = TrueshotDB.sessions or {}
+    if TrueshotDB.autolog == nil then TrueshotDB.autolog = true end
     if select(2, UnitClass("player")) ~= "HUNTER" then return end
     for _, e in ipairs(EVENTS) do pcall(frame.RegisterEvent, frame, e) end
     startSession()
@@ -178,15 +178,16 @@ end)
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-SLASH_HUNTERSIMRECORDER1 = "/hsr"
-SlashCmdList.HUNTERSIMRECORDER = function(msg)
-  local db = HunterSimRecorderDB
+SLASH_TRUESHOT1 = "/trueshot"
+SLASH_TRUESHOT2 = "/ts"
+SlashCmdList.TRUESHOT = function(msg)
+  local db = TrueshotDB
   if msg == "autolog off" or msg == "autolog on" then
     db.autolog = msg == "autolog on"
     if db.autolog then autolog() end
   end
   print(string.format(
-    "|cffabd473Hunter Sim Recorder|r: %d rows this session, %d sessions saved, combat logging %s, autolog %s",
+    "|cffabd473Trueshot|r: %d rows this session, %d sessions saved, combat logging %s, autolog %s",
     session and #session.rows or 0, #db.sessions, LoggingCombat() and "on" or "off", db.autolog and "on" or "off"
   ))
 end

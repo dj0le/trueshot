@@ -13,7 +13,7 @@ type ManifestEntry = { file: string; url: string; bytes: number; sha256: string;
 async function download(url: string, file: string, dir = RAW_DIR): Promise<ManifestEntry> {
   const path = join(dir, file);
   if (force || !(await exists(path))) {
-    const res = await fetch(url, { headers: { "User-Agent": "hunter-sim data fetcher" } });
+    const res = await fetch(url, { headers: { "User-Agent": "trueshot data fetcher" } });
     if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
     await Bun.write(path, await res.arrayBuffer());
     console.log(`fetched ${file}`);

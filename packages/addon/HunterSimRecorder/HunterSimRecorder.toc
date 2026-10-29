@@ -1,8 +1,0 @@
-## Interface: 16001
-## Title: Hunter Sim Recorder
-## Notes: Saves your character sheet whenever it changes and keeps combat logging on, for hunter-sim's sim ingest.
-## Author: dj0le
-## Version: 0.1.0
-## SavedVariables: HunterSimRecorderDB
-
-HunterSimRecorder.lua

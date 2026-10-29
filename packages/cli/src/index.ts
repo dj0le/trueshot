@@ -1,4 +1,4 @@
-// hunter-sim command line; USAGE below lists the commands.
+// Trueshot command line; USAGE below lists the commands.
 import { parseArgs } from "node:util";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -17,7 +17,7 @@ import {
   openStore,
   parseLog,
   unconfirmed,
-} from "@hunter-sim/data";
+} from "@trueshot/data";
 import {
   actionValues,
   compareResults,
@@ -37,7 +37,7 @@ import {
   statWeights,
   type SimConfigInput,
   type SimResult,
-} from "@hunter-sim/engine";
+} from "@trueshot/engine";
 import { claims } from "./claims";
 import { actionsToml, buildToml, loadConfig } from "./toml";
 
@@ -91,7 +91,7 @@ const USAGE = [
   "  bun run sim pets <config.toml> [--iterations N]       every pet family, and none, with these talents",
   "  bun run sim calibrate <calibration.toml> <config.toml>  damage shares against recorded fights",
   "  bun run sim log <WoWCombatLog.txt> [--actor name]     hunters and pets in a combat log; --actor lists every hit",
-  "  bun run sim ingest [WoWCombatLog.txt...] [--watch] [--db file] [--sheets HunterSimRecorder.lua]",
+  "  bun run sim ingest [WoWCombatLog.txt...] [--watch] [--db file] [--sheets Trueshot.lua]",
   "                                                        new lines of the logs (default: the launch client's Logs folder) and the",
   "                                                        recorder addon's character sheets into the local store; --watch: every 30 sec",
   "  bun run sim claims [--hunter name] [--db file]        claimed vs reality: client data, tooltips and our model against the store",

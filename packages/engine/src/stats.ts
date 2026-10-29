@@ -1,6 +1,6 @@
 // The hunter's numbers in combat: attack power, haste, hit and crit, spell modifiers, costs and the
 // target's armor. They read the auras as they stand and keep no fight state of their own.
-import type { GameData, Spell } from "@hunter-sim/data";
+import type { GameData, Spell } from "@trueshot/data";
 import type { AuraSet } from "./auras";
 import type { Character, ResolvedEffect } from "./character";
 import { Aura, DefenseType, EFFECT_VALUE_OPS, School, SpellModOp } from "./enums";

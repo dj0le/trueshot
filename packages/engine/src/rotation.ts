@@ -1,6 +1,6 @@
 // The hunter's priority list: actions in order, each with an optional condition compiled once
 // against the names conditions may read (time, mana, cooldowns, auras).
-import type { GameData, Spell } from "@hunter-sim/data";
+import type { GameData, Spell } from "@trueshot/data";
 import { actionNames, type Character, snake } from "./character";
 import { compile, type Getter } from "./expr";
 import type { Fight } from "./sim";

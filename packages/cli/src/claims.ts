@@ -6,11 +6,11 @@
 // The log cannot give everything. For players the advanced block's last field is item level, not
 // character level, and its attack power does not move Serpent Sting ticks the way ranged attack
 // power does, so claims that need the hunter's level, ranged attack power, crit or bow speed read
-// the HunterSimRecorder addon's sheets, stored next to the events. Creatures and pets log their
+// the Trueshot addon's sheets, stored next to the events. Creatures and pets log their
 // real level.
 import type { Database } from "bun:sqlite";
-import { type GameData, type Sheet, sheetsAt } from "@hunter-sim/data";
-import { attackTable, Aura, resolveEffects } from "@hunter-sim/engine";
+import { type GameData, type Sheet, sheetsAt } from "@trueshot/data";
+import { attackTable, Aura, resolveEffects } from "@trueshot/engine";
 
 export type Verdict = "fits" | "differs" | "too few" | "observed";
 

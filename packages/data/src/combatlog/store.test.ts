@@ -18,7 +18,7 @@ const DEBUFF =
 const LATER_SWING = PET_SWING.replace("18:28:53.062", "18:29:20.000");
 
 function tempLog(lines: string[]): string {
-  const path = join(mkdtempSync(join(tmpdir(), "hunter-sim-")), "WoWCombatLog.txt");
+  const path = join(mkdtempSync(join(tmpdir(), "trueshot-")), "WoWCombatLog.txt");
   writeFileSync(path, `${lines.join("\n")}\n`);
   return path;
 }

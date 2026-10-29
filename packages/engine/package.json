@@ -1,9 +1,9 @@
 {
-  "name": "@hunter-sim/engine",
+  "name": "@trueshot/engine",
   "private": true,
   "type": "module",
   "exports": "./src/index.ts",
   "dependencies": {
-    "@hunter-sim/data": "workspace:*"
+    "@trueshot/data": "workspace:*"
   }
 }

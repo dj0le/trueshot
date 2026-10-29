@@ -1,5 +1,5 @@
 {
-  "name": "hunter-sim",
+  "name": "trueshot",
   "private": true,
   "type": "module",
   "workspaces": ["packages/*"],

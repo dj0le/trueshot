@@ -1,6 +1,6 @@
 // Talents whose client data is a dummy aura: their behaviour is written here by hand, from the
 // tooltip. Keyed by the spell that sets them off when it lands.
-import type { HunterData, Spell } from "@hunter-sim/data";
+import type { HunterData, Spell } from "@trueshot/data";
 import { talentValue } from "./character";
 import type { SimConfig } from "./config";
 

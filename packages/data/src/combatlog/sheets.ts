@@ -1,4 +1,4 @@
-// Character sheets from the HunterSimRecorder addon (packages/addon): its SavedVariables file holds
+// Character sheets from the Trueshot addon (packages/addon): its SavedVariables file holds
 // login sessions, each anchored at a whole second of the local wall clock, with rows written
 // whenever the sheet changed. Rows go into the store with the combat log's timestamps, so a claim
 // can ask what the hunter's level, ranged attack power or bow speed was at any event.
@@ -147,7 +147,7 @@ export function sheetOf(guid: string, ts: number, row: string): Sheet {
 
 // Every sheet in a SavedVariables file, on the combat log's clock.
 export function readSheets(text: string): Sheet[] {
-  const db = parseSavedVariables(text).HunterSimRecorderDB as { sessions?: { wall: string; guid: string; rows: string[] }[] } | undefined;
+  const db = parseSavedVariables(text).TrueshotDB as { sessions?: { wall: string; guid: string; rows: string[] }[] } | undefined;
   return (db?.sessions ?? []).flatMap((s) => {
     const anchor = parseTime(`${s.wall}.000`);
     return s.rows.map((row) => {
@@ -157,13 +157,13 @@ export function readSheets(text: string): Sheet[] {
   });
 }
 
-// The addon's SavedVariables in every account of the launch client (HUNTERSIM_SV overrides).
+// The addon's SavedVariables in every account of the launch client (TRUESHOT_SV overrides).
 export function defaultSheetFiles(): string[] {
-  if (process.env.HUNTERSIM_SV) return [process.env.HUNTERSIM_SV];
+  if (process.env.TRUESHOT_SV) return [process.env.TRUESHOT_SV];
   const accounts = join(dirname(DEFAULT_LOGS_DIR), "WTF", "Account");
   try {
     return readdirSync(accounts)
-      .map((a) => join(accounts, a, "SavedVariables", "HunterSimRecorder.lua"))
+      .map((a) => join(accounts, a, "SavedVariables", "Trueshot.lua"))
       .filter((p) => Bun.file(p).size > 0);
   } catch {
     return [];

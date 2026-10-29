@@ -2,11 +2,11 @@ import { expect, test } from "bun:test";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Build, SimConfigInput } from "@hunter-sim/engine";
+import type { Build, SimConfigInput } from "@trueshot/engine";
 import { buildToml, loadConfig } from "./toml";
 
 test("a build search's --out file extends its parent and reads back as the found config", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "hunter-sim-"));
+  const dir = await mkdtemp(join(tmpdir(), "trueshot-"));
   const parentPath = join(dir, "parent.toml");
   await Bun.write(
     parentPath,
@@ -56,7 +56,7 @@ test("a build search's --out file extends its parent and reads back as the found
 });
 
 test("a new family's ability list replaces the parent's in a build search's --out file", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "hunter-sim-"));
+  const dir = await mkdtemp(join(tmpdir(), "trueshot-"));
   const parentPath = join(dir, "parent.toml");
   await Bun.write(parentPath, ['race = "Orc"', "[pet]", "active = true", 'family = "Cat"', 'abilities = ["claw"]'].join("\n"));
   const parent = await loadConfig(parentPath);

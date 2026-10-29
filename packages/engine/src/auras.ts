@@ -3,7 +3,7 @@
 import type { ActiveSpell, ResolvedEffect } from "./character";
 import { Aura } from "./enums";
 import type { EventQueue } from "./queue";
-import type { Spell } from "@hunter-sim/data";
+import type { Spell } from "@trueshot/data";
 
 // charges: attacks left before the aura is used up (Intimidation's one guaranteed crit); 0 = no limit.
 // stacks: applications so far, for auras that stack (their effects are the base values times this).

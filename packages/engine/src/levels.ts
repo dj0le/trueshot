@@ -1,6 +1,6 @@
 // The attack table against a target of another level: Classic's weapon skill rules, with skill at
 // its cap (5 per level; Forever has no weapon skill racials) and defense 5 per target level.
-import type { Overrides } from "@hunter-sim/data";
+import type { Overrides } from "@trueshot/data";
 
 export type AttackTable = {
   missPct: number;

@@ -12,7 +12,7 @@
 // Talents and rotation depend on each other (a build short on mana wants a thriftier rotation), so
 // optimizeBuild alternates: the rotation for the config's build, then the build with that rotation
 // fixed, then the rotation for the new build, until the build stops changing.
-import type { HunterData, Talent } from "@hunter-sim/data";
+import type { HunterData, Talent } from "@trueshot/data";
 import { talentErrors, talentPoints } from "./character";
 import { SimConfig, type SimConfigInput } from "./config";
 import { optimize, type OptimizeOptions } from "./optimize";

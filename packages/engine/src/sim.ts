@@ -1,6 +1,6 @@
 // One fight, start to finish. The hunter acts from a priority list; everything else (auto shot,
 // regen, ticks, aura expiry) runs off the event queue.
-import { atLevel, type GameData, type Spell } from "@hunter-sim/data";
+import { atLevel, type GameData, type Spell } from "@trueshot/data";
 import { AuraSet } from "./auras";
 import { type ActiveSpell, type Character, type MeleeWeapon, type ResolvedEffect, resolveEffects } from "./character";
 import { Cooldowns } from "./cooldowns";

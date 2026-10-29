@@ -1,6 +1,6 @@
 // Turns a config into a character: validated talents, the spells it knows, and its stats before
 // any in-combat auras. Pure: everything comes in as arguments.
-import { atLevel, type Enchant, type HunterData, type Item, type Overrides, type Spell, type SpellEffect, type Suffix, type Talent } from "@hunter-sim/data";
+import { atLevel, type Enchant, type HunterData, type Item, type Overrides, type Spell, type SpellEffect, type Suffix, type Talent } from "@trueshot/data";
 import { Aura, Stat } from "./enums";
 import type { GEAR_SLOTS, SimConfig, StatBlock } from "./config";
 

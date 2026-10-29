@@ -1,6 +1,6 @@
 // The hunter's cooldowns: each spell's own, and each category's lockout on the other spells in it
 // (Summon Hawk after Arcane Shot, a trinket after another).
-import type { Spell } from "@hunter-sim/data";
+import type { Spell } from "@trueshot/data";
 
 export class Cooldowns {
   private readonly own = new Map<number, number>();
