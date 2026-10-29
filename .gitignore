@@ -9,3 +9,5 @@ packages/data/youtube-cache/
 # Combat logs and the SQLite store ingested from them (tasks 41, 42). Other players' logs and my own
 # play stay local.
 packages/data/logs-cache/
+# Release zips for the addon sites.
+dist/
