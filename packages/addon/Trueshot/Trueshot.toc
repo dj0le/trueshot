@@ -2,7 +2,7 @@
 ## Title: Trueshot
 ## Notes: Saves your character sheet whenever it changes and keeps combat logging on, for Trueshot's claims and benchmarks.
 ## Author: dj0le
-## IconTexture: Interface\Icons\Ability_TrueShot
+## IconTexture: Interface\AddOns\Trueshot\Icon
 ## X-Website: https://github.com/dj0le/trueshot
 ## Version: 0.1.0
 ## SavedVariables: TrueshotDB
