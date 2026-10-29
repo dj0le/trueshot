@@ -4,6 +4,7 @@
 ## Author: dj0le
 ## IconTexture: Interface\AddOns\Trueshot\Icon
 ## X-Website: https://github.com/dj0le/trueshot
+## X-Curse-Project-ID: 1772034
 ## Version: 0.1.0
 ## SavedVariables: TrueshotDB
 

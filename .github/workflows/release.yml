@@ -1,0 +1,74 @@
+# Pushing a tag like v0.1.1 (or v0.1.1-alpha, v0.1.1-beta) builds the addon zip, attaches it to a
+# GitHub release and uploads it to CurseForge. The release type follows the tag's suffix.
+name: Release addon
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+env:
+  CF_PROJECT_ID: "1772034"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Version, release type and changelog
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#v}"
+          case "$tag" in
+            *alpha*) type=alpha ;;
+            *beta*) type=beta ;;
+            *) type=release ;;
+          esac
+          previous=$(git describe --tags --abbrev=0 "${tag}^" 2>/dev/null || true)
+          range="${previous:+$previous..}$tag"
+          git log --no-merges --pretty='- %s' "$range" -- packages/addon > changelog.md
+          [ -s changelog.md ] || echo "- No addon changes since ${previous:-the start}." > changelog.md
+          {
+            echo "VERSION=$version"
+            echo "RELEASE_TYPE=$type"
+          } >> "$GITHUB_ENV"
+          cat changelog.md
+
+      - name: Build zip
+        run: |
+          mkdir -p dist
+          sed -i "s/^## Version: .*/## Version: ${VERSION}/" packages/addon/Trueshot/Trueshot.toc
+          cp LICENSE packages/addon/Trueshot/LICENSE.txt
+          (cd packages/addon && zip -qr "../../dist/Trueshot-${VERSION}.zip" Trueshot -x '*/.*')
+          unzip -l "dist/Trueshot-${VERSION}.zip"
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          [ "$RELEASE_TYPE" = release ] || prerelease="--prerelease"
+          gh release create "$GITHUB_REF_NAME" "dist/Trueshot-${VERSION}.zip" --title "Trueshot ${VERSION}" --notes-file changelog.md $prerelease
+
+      - name: Upload to CurseForge
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+        run: |
+          api=https://wow.curseforge.com/api
+          # The newest game version of CurseForge's Forever flavor.
+          types=$(curl -sf -H "X-Api-Token: $CF_API_KEY" "$api/game/version-types")
+          type_id=$(echo "$types" | jq '[.[] | select((.slug + .name) | test("forever"; "i"))][0].id')
+          if [ "$type_id" = null ]; then
+            echo "No Forever version type on CurseForge. Types:"; echo "$types" | jq -r '.[] | "\(.id) \(.slug)"'; exit 1
+          fi
+          version_id=$(curl -sf -H "X-Api-Token: $CF_API_KEY" "$api/game/versions" | jq "[.[] | select(.gameVersionTypeID == $type_id)] | max_by(.id).id")
+          echo "Forever version type $type_id, game version $version_id"
+          metadata=$(jq -n --rawfile changelog changelog.md --arg type "$RELEASE_TYPE" --argjson v "$version_id" --arg name "Trueshot ${VERSION}" \
+            '{changelog: $changelog, changelogType: "markdown", releaseType: $type, gameVersions: [$v], displayName: $name}')
+          curl -sf -H "X-Api-Token: $CF_API_KEY" -F "metadata=$metadata" -F "file=@dist/Trueshot-${VERSION}.zip" \
+            "$api/projects/$CF_PROJECT_ID/upload-file"
