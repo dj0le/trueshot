@@ -35,3 +35,4 @@ export async function loadGameData(): Promise<GameData> {
 }
 export * from "./combatlog/parse";
 export * from "./combatlog/summary";
+export * from "./combatlog/store";

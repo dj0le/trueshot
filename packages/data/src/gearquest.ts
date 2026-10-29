@@ -18,7 +18,7 @@ import type { Item, Suffix } from "./schema";
 
 const DEFAULT_DIR = join(
   process.env.HOME ?? "",
-  ".local/share/Steam/steamapps/compatdata/3341133374/pfx/drive_c/Program Files (x86)/World of Warcraft/_classic_beta_/Interface/AddOns/GearQuestForever_HUNTER",
+  ".local/share/Steam/steamapps/compatdata/3341133374/pfx/drive_c/Program Files (x86)/World of Warcraft/_forever_/Interface/AddOns/GearQuestForever_HUNTER",
 );
 const OUT_DIR = join(import.meta.dir, "..", "..", "..", "configs", "gear", "gearquest");
 

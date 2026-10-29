@@ -6,3 +6,5 @@ export { Rotation } from "./rotation";
 export * from "./optimize";
 export * from "./talents";
 export { defaultPetAbilities } from "./pet";
+export { attackTable, type AttackTable } from "./levels";
+export { Aura } from "./enums";

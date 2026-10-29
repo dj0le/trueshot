@@ -6,3 +6,6 @@ packages/data/raw/
 packages/data/foreverlogs-cache/
 # YouTube captions, audio and clips used for research. Only derived numbers go in the repo.
 packages/data/youtube-cache/
+# Combat logs and the SQLite store ingested from them (tasks 41, 42). Other players' logs and my own
+# play stay local.
+packages/data/logs-cache/

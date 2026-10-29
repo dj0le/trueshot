@@ -8,6 +8,7 @@
 //   prefix: nothing for SWING_, spell id, name and school for RANGE_, SPELL_ and SPELL_PERIODIC_
 //   advanced (19 fields): unit guid, owner guid, health, max health, attack power, spell power,
 //     armor, absorb, two unknown, power type, power, max power, power cost, x, y, map, facing, level
+//     (a player's item level instead: a naked beta hunter logs 8, the same one geared 34)
 //   damage suffix: amount, amount before armor and resists, overkill, school, resisted, blocked,
 //     absorbed, critical, glancing, crushing
 //   missed suffix: miss type (MISS, DODGE, PARRY, BLOCK, RESIST, ABSORB, ...), offhand, amount
@@ -28,6 +29,7 @@ export type UnitState = {
   powerType: number;
   power: number;
   maxPower: number;
+  // A creature's or pet's level; a player's average item level.
   level: number;
 };
 
@@ -59,6 +61,9 @@ export type LogEvent = {
   missType?: string;
   // Every field after the event name, as written.
   fields: string[];
+  // The fields after the source, dest, prefix and advanced block: an aura's BUFF or DEBUFF and
+  // stacks, an energize's amount and power type. Empty for damage and misses, which decode them.
+  rest: string[];
 };
 
 const NO_GUID = "0000000000000000";
@@ -94,7 +99,7 @@ const num = (s: string | undefined) => (s === undefined || s === "nil" ? 0 : Num
 const flag = (s: string | undefined) => s !== undefined && s !== "nil" && s !== "0";
 
 // "10/17/2026 18:28:53.062-6" in ms, as wall-clock time (the zone suffix is dropped).
-function parseTime(stamp: string): number {
+export function parseTime(stamp: string): number {
   const m = /^(\d+)\/(\d+)\/(\d+) (\d+):(\d+):(\d+)\.(\d+)/.exec(stamp);
   if (!m) throw new Error(`combat log: bad timestamp "${stamp}"`);
   const [, mo, d, y, h, mi, s, ms] = m.map(Number) as number[];
@@ -148,7 +153,7 @@ export function parseLine(line: string, startMs = 0): LogEvent | null {
   const split = line.indexOf("  ");
   if (split < 0) return null;
   const [event, ...fields] = splitFields(line.slice(split + 2).trimEnd());
-  const out: LogEvent = { timeMs: parseTime(line.slice(0, split)) - startMs, event: event!, fields };
+  const out: LogEvent = { timeMs: parseTime(line.slice(0, split)) - startMs, event: event!, fields, rest: fields };
   const prefix = PREFIX.find(([p]) => event!.startsWith(p));
   if (!prefix || fields.length < 8) return out;
   out.source = unit(fields, 0);
@@ -163,6 +168,7 @@ export function parseLine(line: string, startMs = 0): LogEvent | null {
   }
   if (suffix === "DAMAGE" || suffix === "DAMAGE_LANDED") out.damage = damage(fields, at);
   else if (suffix === "MISSED") out.missType = fields[at] ?? "";
+  out.rest = out.damage || out.missType !== undefined ? [] : fields.slice(at);
   return out;
 }
 
