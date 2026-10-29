@@ -60,13 +60,15 @@ jobs:
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
         run: |
           api=https://wow.curseforge.com/api
-          # The newest game version of CurseForge's Forever flavor.
+          # CurseForge's Forever version for the .toc's interface number (1.60.1 is 16001), else its newest.
+          interface=$(sed -n 's/^## Interface: *\([0-9]*\).*/\1/p' packages/addon/Trueshot/Trueshot.toc)
           types=$(curl -sf -H "X-Api-Token: $CF_API_KEY" "$api/game/version-types")
           type_id=$(echo "$types" | jq '[.[] | select((.slug + .name) | test("forever"; "i"))][0].id')
           if [ "$type_id" = null ]; then
             echo "No Forever version type on CurseForge. Types:"; echo "$types" | jq -r '.[] | "\(.id) \(.slug)"'; exit 1
           fi
-          version_id=$(curl -sf -H "X-Api-Token: $CF_API_KEY" "$api/game/versions" | jq "[.[] | select(.gameVersionTypeID == $type_id)] | max_by(.id).id")
+          version_id=$(curl -sf -H "X-Api-Token: $CF_API_KEY" "$api/game/versions" |
+            jq --arg api "$interface" "[.[] | select(.gameVersionTypeID == $type_id)] | (map(select(.apiVersion == \$api))[0] // max_by(.id)).id")
           echo "Forever version type $type_id, game version $version_id"
           metadata=$(jq -n --rawfile changelog changelog.md --arg type "$RELEASE_TYPE" --argjson v "$version_id" --arg name "Trueshot ${VERSION}" \
             '{changelog: $changelog, changelogType: "markdown", releaseType: $type, gameVersions: [$v], displayName: $name}')
