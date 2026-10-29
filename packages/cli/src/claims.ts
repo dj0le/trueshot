@@ -5,10 +5,11 @@
 //
 // The log cannot give everything. For players the advanced block's last field is item level, not
 // character level, and its attack power does not move Serpent Sting ticks the way ranged attack
-// power does, so claims that need the hunter's level or ranged attack power wait for COMBATANT_INFO
-// or the addon's character sheet (task 44). Creatures and pets log their real level.
+// power does, so claims that need the hunter's level, ranged attack power, crit or bow speed read
+// the HunterSimRecorder addon's sheets, stored next to the events. Creatures and pets log their
+// real level.
 import type { Database } from "bun:sqlite";
-import type { GameData } from "@hunter-sim/data";
+import { type GameData, type Sheet, sheetsAt } from "@hunter-sim/data";
 import { attackTable, Aura, resolveEffects } from "@hunter-sim/engine";
 
 export type Verdict = "fits" | "differs" | "too few" | "observed";
@@ -76,6 +77,18 @@ const wilson = (k: number, n: number): [number, number] => {
 };
 const f = (x: number, digits = 2) => x.toFixed(digits);
 
+// y = a + b x by least squares, with b's 95% half-width.
+function fit(xs: number[], ys: number[]): { a: number; b: number; bCi: number } | undefined {
+  const mx = mean(xs);
+  const my = mean(ys);
+  const sxx = xs.reduce((acc, x) => acc + (x - mx) ** 2, 0);
+  if (xs.length < 3 || sxx === 0) return undefined;
+  const b = xs.reduce((acc, x, i) => acc + (x - mx) * (ys[i]! - my), 0) / sxx;
+  const a = my - b * mx;
+  const residual = ys.reduce((acc, y, i) => acc + (y - a - b * xs[i]!) ** 2, 0) / (xs.length - 2);
+  return { a, b, bCi: 1.96 * Math.sqrt(residual / sxx) };
+}
+
 function verdictOfMean(claimed: number, xs: number[], tolerance = 0): Verdict {
   if (xs.length < MIN_N) return "too few";
   return Math.abs(mean(xs) - claimed) <= Math.max(ci95(xs), tolerance) ? "fits" : "differs";
@@ -118,6 +131,7 @@ export function loadRows(db: Database, hunter?: string): Row[] {
 // Creatures' and pets' levels as logged up to each row (players log item level, so they are left
 // out). Pets level with the hunter, so a level is only good for the time it was seen.
 type Leveled = Row & { srcLevel: number | undefined; dstLevel: number | undefined };
+type SheetAt = (guid: string, ts: number) => Sheet | undefined;
 function withLevels(rows: Row[]): Leveled[] {
   const at = new Map<string, number>();
   return rows.map((r) => {
@@ -127,32 +141,54 @@ function withLevels(rows: Row[]): Leveled[] {
 }
 
 // Periodic damage from hunters' spells: the client's tick against the logged ticks, and whether
-// ticks crit (our model never crits a tick).
-function periodic(game: GameData, rows: Row[]): ClaimRow[] {
+// ticks crit (our model never crits a tick). With sheets, the tick is fitted against the ranged
+// attack power at application (ticks snapshot it) to measure the attack power share a tick.
+function periodic(game: GameData, rows: Row[], sheetAt: SheetAt): ClaimRow[] {
   const out: ClaimRow[] = [];
-  const bySpell = new Map<number, Row[]>();
+  const bySpell = new Map<number, { ticks: Row[]; raps: (number | undefined)[] }>();
+  const appliedAt = new Map<string, number>();
   for (const r of rows) {
-    if (r.event === "SPELL_PERIODIC_DAMAGE" && r.src_kind === "hunter" && r.spell_id) {
-      bySpell.set(r.spell_id, [...(bySpell.get(r.spell_id) ?? []), r]);
-    }
+    if (r.src_kind !== "hunter" || !r.spell_id) continue;
+    const key = `${r.src}|${r.dst}|${r.spell_id}`;
+    if (r.event === "SPELL_AURA_APPLIED" || r.event === "SPELL_AURA_REFRESH") appliedAt.set(key, r.ts);
+    if (r.event !== "SPELL_PERIODIC_DAMAGE") continue;
+    const s = bySpell.get(r.spell_id) ?? { ticks: [], raps: [] };
+    const applied = appliedAt.get(key);
+    s.ticks.push(r);
+    s.raps.push(applied !== undefined ? sheetAt(r.src!, applied)?.rap : undefined);
+    bySpell.set(r.spell_id, s);
   }
-  for (const [id, ticks] of bySpell) {
+  for (const [id, { ticks, raps }] of bySpell) {
     const spell = game.data.spells[id];
     const effect = spell && resolveEffects(spell).find((e) => e.aura === Aura.PeriodicDamage);
     const name = `${ticks[0]!.spell_name} (${id})`;
-    const plain = ticks.filter((t) => !t.crit && clean(t)).map((t) => t.amount!);
+    const plain = ticks.flatMap((t, i) => (!t.crit && clean(t) ? [{ amount: t.amount!, rap: raps[i] }] : []));
     if (effect && plain.length) {
       const scales = effect.apCoefficient > 0;
+      const amounts = plain.map((p) => p.amount);
       out.push({
         claim: "periodic tick",
         subject: name,
         source: "client data (our model)",
         claimed: scales ? `${f(effect.value, 0)} + ${effect.apCoefficient} x RAP` : `${f(effect.value, 0)}, no attack power`,
-        observed: `${f(mean(plain), 1)} ± ${f(ci95(plain), 1)} (${Math.min(...plain)}-${Math.max(...plain)})`,
-        n: plain.length,
-        // A tick that scales needs the hunter's ranged attack power, which the log lacks.
-        verdict: scales ? "observed" : verdictOfMean(effect.value, plain, 0.5),
+        observed: `${f(mean(amounts), 1)} ± ${f(ci95(amounts), 1)} (${Math.min(...amounts)}-${Math.max(...amounts)})`,
+        n: amounts.length,
+        // A tick that scales needs the hunter's ranged attack power: the fit below.
+        verdict: scales ? "observed" : verdictOfMean(effect.value, amounts, 0.5),
       });
+      const known = plain.filter((p) => p.rap !== undefined);
+      const line = fit(known.map((p) => p.rap!), known.map((p) => p.amount));
+      if (line) {
+        out.push({
+          claim: "tick per RAP",
+          subject: name,
+          source: "client data (our model); talents that raise stings scale both terms",
+          claimed: `${effect.apCoefficient} a tick`,
+          observed: `${f(line.b, 4)} ± ${f(line.bCi, 4)} (tick ${f(line.a, 1)} at no RAP)`,
+          n: known.length,
+          verdict: known.length < MIN_N ? "too few" : Math.abs(line.b - effect.apCoefficient) <= line.bCi ? "fits" : "differs",
+        });
+      }
     }
     const crits = ticks.filter((t) => t.crit).length;
     out.push({
@@ -192,12 +228,14 @@ function critMultiplier(game: GameData, rows: Row[]): ClaimRow[] {
 // Armor on pet swings: SWING_DAMAGE_LANDED carries the target's live armor (debuffs included), the
 // pet's own swing line its level. Hunters' shots show the armor constant they imply, since the log
 // has no hunter level.
-function armor(game: GameData, rows: Leveled[]): ClaimRow[] {
+function armor(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[] {
   const fo = game.overrides.formula;
   const k = (level: number) => fo.armorConstantBase.value + fo.armorConstantPerLevel.value * level;
   const pet: number[] = [];
   const petClaimed: number[] = [];
   const implied: number[] = [];
+  const shots: number[] = [];
+  const shotsClaimed: number[] = [];
   for (const r of rows) {
     if (r.crit || r.glancing || !clean(r) || r.dmg_school !== PHYSICAL || !r.st_armor || r.st_guid !== r.dst) continue;
     const reduction = 1 - r.amount! / r.unmitigated!;
@@ -209,6 +247,11 @@ function armor(game: GameData, rows: Leveled[]): ClaimRow[] {
     } else if (r.src_kind === "hunter" && (r.event === "RANGE_DAMAGE" || r.event === "SPELL_DAMAGE") && reduction > 0.01) {
       // reduction = armor / (armor + K)  =>  K = armor / reduction - armor
       implied.push(r.st_armor / reduction - r.st_armor);
+      const level = sheetAt(r.src!, r.ts)?.level;
+      if (level) {
+        shots.push(reduction);
+        shotsClaimed.push(r.st_armor / (r.st_armor + k(level)));
+      }
     }
   }
   const out: ClaimRow[] = [];
@@ -222,6 +265,18 @@ function armor(game: GameData, rows: Leveled[]): ClaimRow[] {
       observed: `${f(100 * mean(pet), 1)}% (gap ${f(100 * mean(diffs), 1)} ± ${f(100 * ci95(diffs), 1)})`,
       n: pet.length,
       // Integer rounding moves a single hit's reduction by up to 1 / hit; half a point covers it on average.
+      verdict: verdictOfMean(0, diffs, 0.005),
+    });
+  }
+  if (shots.length) {
+    const diffs = shots.map((x, i) => x - shotsClaimed[i]!);
+    out.push({
+      claim: "armor reduction",
+      subject: "hunter shots",
+      source: "overrides.toml formula.armorConstant* (Classic: armor / (armor + 400 + 85 x level))",
+      claimed: `${f(100 * mean(shotsClaimed), 1)}%`,
+      observed: `${f(100 * mean(shots), 1)}% (gap ${f(100 * mean(diffs), 1)} ± ${f(100 * ci95(diffs), 1)})`,
+      n: shots.length,
       verdict: verdictOfMean(0, diffs, 0.005),
     });
   }
@@ -264,28 +319,61 @@ function petSwings(game: GameData, rows: Row[]): ClaimRow[] {
   }));
 }
 
-// Auto Shot as the log shows it: the time between shots, and the wind-up from its cast start to the
-// shot. Its claimed speed needs the bow, from COMBATANT_INFO or the addon.
-function autoShot(rows: Row[]): ClaimRow[] {
-  const byHunter = new Map<string, { name: string; start?: number | undefined; last?: number; gaps: number[]; windups: number[] }>();
+// Auto Shot: the time between shots against the bow speed on the sheet (haste included), its
+// wind-up from cast start to shot, and its crit rate against the sheet's ranged crit less the
+// target's suppression. Without sheets only the timings show.
+function autoShot(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[] {
+  type Shots = { name: string; start?: number | undefined; last?: number; gaps: number[]; overSpeed: number[]; windups: number[]; hits: number; crits: number; expected: number };
+  const byHunter = new Map<string, Shots>();
   for (const r of rows) {
     if (r.spell_id !== 75 || r.src_kind !== "hunter" || !r.src) continue;
-    const h = byHunter.get(r.src) ?? { name: r.src_name ?? r.src, gaps: [], windups: [] };
+    const h = byHunter.get(r.src) ?? { name: r.src_name ?? r.src, gaps: [], overSpeed: [], windups: [], hits: 0, crits: 0, expected: 0 };
     byHunter.set(r.src, h);
+    const sheet = sheetAt(r.src, r.ts);
     if (r.event === "SPELL_CAST_START") h.start = r.ts;
     else if (r.event === "SPELL_CAST_SUCCESS") {
       if (h.start !== undefined && r.ts - h.start < 1000) h.windups.push((r.ts - h.start) / 1000);
-      if (h.last !== undefined && r.ts - h.last < 5000) h.gaps.push((r.ts - h.last) / 1000);
+      if (h.last !== undefined && r.ts - h.last < 5000) {
+        const gap = (r.ts - h.last) / 1000;
+        h.gaps.push(gap);
+        if (sheet?.rangedSpeed) h.overSpeed.push(gap - sheet.rangedSpeed);
+      }
       h.last = r.ts;
       h.start = undefined;
+    } else if (r.event === "RANGE_DAMAGE" && sheet && r.dstLevel) {
+      const t = attackTable(game.overrides.formula, sheet.level, r.dstLevel);
+      h.hits++;
+      if (r.crit) h.crits++;
+      h.expected += Math.max(0, sheet.rangedCritPct - t.critSuppressionPct) / 100;
     }
   }
-  return [...byHunter.values()].flatMap((h) => [
-    ...(h.gaps.length
-      ? [{ claim: "Auto Shot interval", subject: h.name, source: "bow speed (needs gear)", claimed: "", observed: `${f(median(h.gaps))} sec median`, n: h.gaps.length, verdict: "observed" as const }]
-      : []),
+  return [...byHunter.values()].flatMap((h): ClaimRow[] => [
+    ...(h.overSpeed.length
+      ? [{
+          claim: "Auto Shot interval",
+          subject: h.name,
+          source: "bow speed on the sheet (haste included)",
+          claimed: "+0.00 sec",
+          observed: `${h.overSpeed.length && median(h.overSpeed) >= 0 ? "+" : ""}${f(median(h.overSpeed))} sec median over the bow`,
+          n: h.overSpeed.length,
+          verdict: h.overSpeed.length < MIN_N ? "too few" : Math.abs(median(h.overSpeed)) <= 0.05 ? "fits" : "differs",
+        } as const]
+      : h.gaps.length
+        ? [{ claim: "Auto Shot interval", subject: h.name, source: "bow speed (no sheet)", claimed: "", observed: `${f(median(h.gaps))} sec median`, n: h.gaps.length, verdict: "observed" as const }]
+        : []),
     ...(h.windups.length
       ? [{ claim: "Auto Shot wind-up", subject: h.name, source: "cast start to shot", claimed: "", observed: `${f(median(h.windups))} sec median`, n: h.windups.length, verdict: "observed" as const }]
+      : []),
+    ...(h.hits
+      ? [{
+          claim: "Auto Shot crit",
+          subject: h.name,
+          source: "sheet ranged crit less levels.ts crit suppression",
+          claimed: `${f((100 * h.expected) / h.hits, 1)}%`,
+          observed: rateText(h.crits, h.hits),
+          n: h.hits,
+          verdict: verdictOfRate((100 * h.expected) / h.hits, h.crits, h.hits),
+        }]
       : []),
   ]);
 }
@@ -320,12 +408,13 @@ function petAttackTable(game: GameData, rows: Leveled[]): ClaimRow[] {
 
 export function claims(game: GameData, db: Database, hunter?: string): ClaimRow[] {
   const rows = withLevels(loadRows(db, hunter));
+  const sheetAt = sheetsAt(db);
   return [
-    ...periodic(game, rows),
+    ...periodic(game, rows, sheetAt),
     ...critMultiplier(game, rows),
-    ...armor(game, rows),
+    ...armor(game, rows, sheetAt),
     ...petSwings(game, rows),
     ...petAttackTable(game, rows),
-    ...autoShot(rows),
+    ...autoShot(game, rows, sheetAt),
   ];
 }

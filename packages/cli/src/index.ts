@@ -7,10 +7,12 @@ import {
   actors,
   DEFAULT_DB,
   DEFAULT_LOGS_DIR,
+  defaultSheetFiles,
   type GameData,
   hitsBy,
   hunters,
   ingest,
+  ingestSheets,
   loadGameData,
   openStore,
   parseLog,
@@ -89,8 +91,9 @@ const USAGE = [
   "  bun run sim pets <config.toml> [--iterations N]       every pet family, and none, with these talents",
   "  bun run sim calibrate <calibration.toml> <config.toml>  damage shares against recorded fights",
   "  bun run sim log <WoWCombatLog.txt> [--actor name]     hunters and pets in a combat log; --actor lists every hit",
-  "  bun run sim ingest [WoWCombatLog.txt...] [--watch] [--db file]  new lines of the logs (default: the launch client's",
-  "                                                        Logs folder) into the local store; --watch reads them again every 30 sec",
+  "  bun run sim ingest [WoWCombatLog.txt...] [--watch] [--db file] [--sheets HunterSimRecorder.lua]",
+  "                                                        new lines of the logs (default: the launch client's Logs folder) and the",
+  "                                                        recorder addon's character sheets into the local store; --watch: every 30 sec",
   "  bun run sim claims [--hunter name] [--db file]        claimed vs reality: client data, tooltips and our model against the store",
   "  bun run sim beta <config.toml>...                     each config against the beta dungeon bosses, next to Forever Logs parses",
   "  bun run sim enchants <text>                           enchant ids for gear.enchants, by name",
@@ -295,8 +298,9 @@ Average share over ${fights.length} fights`);
 }
 
 // The given logs, or every WoWCombatLog file in the launch client's Logs folder, into the store.
-async function ingestLogs(paths: string[], dbPath: string, watch: boolean): Promise<void> {
+async function ingestLogs(paths: string[], dbPath: string, watch: boolean, sheets: string | undefined): Promise<void> {
   const db = openStore(dbPath);
+  const sheetFiles = sheets ? [sheets] : defaultSheetFiles();
   const files = () =>
     paths.length
       ? paths
@@ -308,6 +312,11 @@ async function ingestLogs(paths: string[], dbPath: string, watch: boolean): Prom
     for (const path of files()) {
       const r = await ingest(db, path);
       if (r.bytes) console.log(`${path}: ${r.lines} lines, ${r.kept} kept, ${r.hunters} hunters, ${r.fights} fights`);
+    }
+    // The recorder addon's sheets; WoW rewrites the file at logout and /reload.
+    for (const path of sheetFiles) {
+      const added = await ingestSheets(db, path);
+      if (added) console.log(`${path}: ${added} character sheets`);
     }
     if (!watch) break;
     await Bun.sleep(30_000);
@@ -348,6 +357,7 @@ async function main(argv: string[]): Promise<void> {
       actor: { type: "string" },
       db: { type: "string" },
       watch: { type: "boolean" },
+      sheets: { type: "string" },
       hunter: { type: "string" },
     },
   });
@@ -432,7 +442,7 @@ async function main(argv: string[]): Promise<void> {
   } else if (command === "beta" && paths.length >= 1) {
     for (const path of paths) await beta(game, await loadConfig(path, flags), path);
   } else if (command === "ingest") {
-    await ingestLogs(paths, flags.db ?? DEFAULT_DB, flags.watch ?? false);
+    await ingestLogs(paths, flags.db ?? DEFAULT_DB, flags.watch ?? false, flags.sheets);
   } else if (command === "claims" && paths.length === 0) {
     printClaims(game, flags.db ?? DEFAULT_DB, flags.hunter);
   } else if (command === "log" && paths.length === 1) {
