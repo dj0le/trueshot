@@ -19,7 +19,7 @@ test("a pet swing carries its owner, level and attack power", () => {
   const e = parseLine(PET_SWING)!;
   expect(e.event).toBe("SWING_DAMAGE");
   expect(e.source).toMatchObject({ name: "Fox-Forever" });
-  expect(e.state).toMatchObject({ owner: "Player-4613-0104D103", attackPower: 65, armor: 921, powerType: 2, power: 100, level: 8 });
+  expect(e.state).toMatchObject({ owner: "Player-4613-0104D103", attackPower: 65, armor: 921, powerType: 2, power: 100, x: -9269.22, y: 459.67, level: 8 });
   expect(e.damage).toMatchObject({ amount: 27, unmitigated: 33, school: 1, critical: false });
 });
 

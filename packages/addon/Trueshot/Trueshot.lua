@@ -3,14 +3,21 @@
 -- `sim ingest` to line up with the combat log by time. The combat log lacks these: it logs a
 -- player's item level, not level, and an attack power that is not ranged attack power.
 --
+-- Also records every action bar and pet bar button press (what the button held, the spell it casts,
+-- and whether you were in combat), so a fight review can show presses that did nothing and the
+-- busiest buttons for keybinds. The combat log only sees spells that went off.
+--
 -- Also turns combat logging (with advanced logging) on at every login and zone change, since the
 -- game turns it off at logout. `/ts autolog off` stops that.
 --
 -- Saved per login session: the local wall clock at a whole second, the GetTime() at that second, and
 -- rows of "key=value;..." with t, milliseconds since that second. Rows are written only when a value
--- differs from the row before. WoW writes SavedVariables at logout or /reload.
+-- differs from the row before. Presses are "t;slot;kind;spell;combat;name" on the same clock. WoW
+-- writes SavedVariables at logout or /reload.
 
 local MAX_SESSIONS = 200
+-- Presses kept per session; hours of play stay well under it.
+local MAX_PRESSES = 50000
 -- Events that can change the sheet. Ones this client does not know are skipped.
 local EVENTS = {
   "UNIT_AURA", "UNIT_INVENTORY_CHANGED", "PLAYER_EQUIPMENT_CHANGED", "PLAYER_LEVEL_UP", "CHARACTER_POINTS_CHANGED",
@@ -28,6 +35,23 @@ local function num(x)
   if x == nil then return "" end
   if x == math.floor(x) then return tostring(x) end
   return string.format("%.3f", x)
+end
+
+-- Name lookups that moved to C_Spell and C_Item in later clients.
+local function spellName(id)
+  if not id then return nil end
+  if C_Spell and C_Spell.GetSpellName then return C_Spell.GetSpellName(id) end
+  return (GetSpellInfo(id))
+end
+
+local function itemSpell(id)
+  if C_Item and C_Item.GetItemSpell then return select(2, C_Item.GetItemSpell(id)) end
+  return GetItemSpell and select(2, GetItemSpell(id))
+end
+
+local function itemName(id)
+  if C_Item and C_Item.GetItemNameByID then return C_Item.GetItemNameByID(id) end
+  return (GetItemInfo(id))
 end
 
 local function buffIds(unit)
@@ -121,6 +145,40 @@ local function flush()
   session.rows[#session.rows + 1] = "t=" .. math.floor((at - session.gt) * 1000 + 0.5) .. ";" .. row
 end
 
+local function press(slot, kind, spell, name)
+  if not session or #session.presses >= MAX_PRESSES then return end
+  local combat = UnitAffectingCombat("player") and 1 or 0
+  session.presses[#session.presses + 1] = math.floor((GetTime() - session.gt) * 1000 + 0.5) .. ";" .. slot .. ";" .. kind
+    .. ";" .. (spell or 0) .. ";" .. combat .. ";" .. (name or "")
+end
+
+-- Every action button press goes through UseAction, keybinds and clicks alike, whatever bar addon
+-- draws the button.
+local function onUseAction(slot)
+  local kind, id = GetActionInfo(slot)
+  if not kind then return end
+  local spell, name
+  if kind == "spell" then
+    spell = id
+    name = spellName(id)
+  elseif kind == "macro" then
+    name = GetMacroInfo(id)
+    spell = GetMacroSpell and GetMacroSpell(id)
+  elseif kind == "item" then
+    spell = itemSpell(id)
+    name = itemName(id)
+  end
+  press(slot, kind, spell, name or GetActionText(slot) or (kind .. " " .. tostring(id)))
+end
+
+-- Pet bar buttons: Attack, Follow, Stay and the pet's abilities.
+local function onPetAction(index)
+  local name, _, isToken, _, _, _, spell = GetPetActionInfo(index)
+  if not name then return end
+  if isToken then name = _G[name] or name end
+  press(index, "pet", type(spell) == "number" and spell or nil, name)
+end
+
 local function changed()
   if pendingAt then return end
   pendingAt = GetTime()
@@ -144,6 +202,7 @@ local function startSession()
       name = UnitName("player"),
       realm = GetRealmName(),
       rows = {},
+      presses = {},
     }
     db.sessions[#db.sessions + 1] = session
     while #db.sessions > MAX_SESSIONS do table.remove(db.sessions, 1) end
@@ -167,6 +226,8 @@ frame:SetScript("OnEvent", function(_, event, unit)
     if TrueshotDB.autolog == nil then TrueshotDB.autolog = true end
     if select(2, UnitClass("player")) ~= "HUNTER" then return end
     for _, e in ipairs(EVENTS) do pcall(frame.RegisterEvent, frame, e) end
+    hooksecurefunc("UseAction", onUseAction)
+    if CastPetAction then hooksecurefunc("CastPetAction", onPetAction) end
     startSession()
   elseif event == "PLAYER_ENTERING_WORLD" then
     autolog()
@@ -187,7 +248,7 @@ SlashCmdList.TRUESHOT = function(msg)
     if db.autolog then autolog() end
   end
   print(string.format(
-    "|cffabd473Trueshot|r: %d rows this session, %d sessions saved, combat logging %s, autolog %s",
-    session and #session.rows or 0, #db.sessions, LoggingCombat() and "on" or "off", db.autolog and "on" or "off"
+    "|cffabd473Trueshot|r: %d rows and %d presses this session, %d sessions saved, combat logging %s, autolog %s",
+    session and #session.rows or 0, session and #session.presses or 0, #db.sessions, LoggingCombat() and "on" or "off", db.autolog and "on" or "off"
   ))
 end

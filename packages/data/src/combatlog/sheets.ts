@@ -145,10 +145,37 @@ export function sheetOf(guid: string, ts: number, row: string): Sheet {
   };
 }
 
+// A button press the addon saw: an action bar slot (or pet bar slot) and what it held.
+export type Press = {
+  guid: string;
+  ts: number;
+  slot: number;
+  // spell, item, macro, pet, ...: GetActionInfo's type, or "pet" for the pet bar.
+  kind: string;
+  // The spell it casts, when known (a macro's current spell, an item's use spell); 0 otherwise.
+  spellId: number;
+  name: string;
+  combat: boolean;
+};
+
+type Session = { wall: string; guid: string; rows: string[]; presses?: string[] };
+const sessionsOf = (text: string) => (parseSavedVariables(text).TrueshotDB as { sessions?: Session[] } | undefined)?.sessions ?? [];
+
+// Every press in a SavedVariables file, on the combat log's clock. A press is "t;slot;kind;spell;combat;name";
+// the name comes last since macro names may hold anything.
+export function readPresses(text: string): Press[] {
+  return sessionsOf(text).flatMap((s) => {
+    const anchor = parseTime(`${s.wall}.000`);
+    return (s.presses ?? []).map((p) => {
+      const [t, slot, kind, spell, combat, ...name] = p.split(";");
+      return { guid: s.guid, ts: anchor + n(t), slot: n(slot), kind: kind ?? "", spellId: n(spell), name: name.join(";"), combat: combat === "1" };
+    });
+  });
+}
+
 // Every sheet in a SavedVariables file, on the combat log's clock.
 export function readSheets(text: string): Sheet[] {
-  const db = parseSavedVariables(text).TrueshotDB as { sessions?: { wall: string; guid: string; rows: string[] }[] } | undefined;
-  return (db?.sessions ?? []).flatMap((s) => {
+  return sessionsOf(text).flatMap((s) => {
     const anchor = parseTime(`${s.wall}.000`);
     return s.rows.map((row) => {
       const t = Number(/^t=(-?\d+)/.exec(row)?.[1] ?? 0);
@@ -170,20 +197,37 @@ export function defaultSheetFiles(): string[] {
   }
 }
 
-const SCHEMA = "CREATE TABLE IF NOT EXISTS sheets (guid TEXT NOT NULL, ts INTEGER NOT NULL, sheet TEXT NOT NULL, PRIMARY KEY (guid, ts));";
+const SCHEMA = `
+CREATE TABLE IF NOT EXISTS sheets (guid TEXT NOT NULL, ts INTEGER NOT NULL, sheet TEXT NOT NULL, PRIMARY KEY (guid, ts));
+CREATE TABLE IF NOT EXISTS presses (
+  guid TEXT NOT NULL, ts INTEGER NOT NULL, slot INTEGER NOT NULL, kind TEXT NOT NULL, spell_id INTEGER NOT NULL,
+  name TEXT NOT NULL, combat INTEGER NOT NULL, PRIMARY KEY (guid, ts, slot, kind)
+);`;
 
-// Stores a SavedVariables file's sheets; ones already stored are kept. Returns how many were new.
-export async function ingestSheets(db: Database, path: string): Promise<number> {
+// Stores a SavedVariables file's sheets and presses; ones already stored are kept. Returns how many
+// of each were new.
+export async function ingestSheets(db: Database, path: string): Promise<{ sheets: number; presses: number }> {
   db.exec(SCHEMA);
   const add = db.query("INSERT INTO sheets (guid, ts, sheet) VALUES (?, ?, ?) ON CONFLICT DO NOTHING");
-  const sheets = readSheets(await Bun.file(path).text());
-  let added = 0;
+  const addPress = db.query("INSERT INTO presses (guid, ts, slot, kind, spell_id, name, combat) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING");
+  const text = await Bun.file(path).text();
+  const added = { sheets: 0, presses: 0 };
   db.transaction(() => {
-    for (const s of sheets) {
-      added += add.run(s.guid, s.ts, JSON.stringify(s)).changes;
-    }
+    for (const s of readSheets(text)) added.sheets += add.run(s.guid, s.ts, JSON.stringify(s)).changes;
+    for (const p of readPresses(text)) added.presses += addPress.run(p.guid, p.ts, p.slot, p.kind, p.spellId, p.name, Number(p.combat)).changes;
   })();
   return added;
+}
+
+// One hunter's presses between two times, or every hunter's over all time.
+export function pressesIn(db: Database, guid?: string, from = Number.MIN_SAFE_INTEGER, to = Number.MAX_SAFE_INTEGER): Press[] {
+  db.exec(SCHEMA);
+  return db
+    .query<{ guid: string; ts: number; slot: number; kind: string; spell_id: number; name: string; combat: number }, [string, string, number, number]>(
+      "SELECT * FROM presses WHERE (? = '' OR guid = ?) AND ts BETWEEN ? AND ? ORDER BY ts",
+    )
+    .all(guid ?? "", guid ?? "", from, to)
+    .map((p) => ({ guid: p.guid, ts: p.ts, slot: p.slot, kind: p.kind, spellId: p.spell_id, name: p.name, combat: p.combat === 1 }));
 }
 
 // Buffs come and go all through play, so a sheet older than this means the addon was not running.

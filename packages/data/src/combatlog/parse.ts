@@ -29,6 +29,9 @@ export type UnitState = {
   powerType: number;
   power: number;
   maxPower: number;
+  // Map position in yards.
+  x: number;
+  y: number;
   // A creature's or pet's level; a player's average item level.
   level: number;
 };
@@ -67,6 +70,7 @@ export type LogEvent = {
 };
 
 const NO_GUID = "0000000000000000";
+const GUID = /^(?:[A-Z][A-Za-z]*-[\dA-F-]+|0000000000000000)$/;
 const ADVANCED_FIELDS = 19;
 
 // Splits on commas outside double quotes and brackets (COMBATANT_INFO nests lists in () and []).
@@ -120,6 +124,8 @@ function state(f: string[], at: number): UnitState {
     powerType: num(f[at + 10]),
     power: num(f[at + 11]),
     maxPower: num(f[at + 12]),
+    x: num(f[at + 14]),
+    y: num(f[at + 15]),
     level: num(f[at + 18]),
   };
 }
@@ -154,10 +160,12 @@ export function parseLine(line: string, startMs = 0): LogEvent | null {
   if (split < 0) return null;
   const [event, ...fields] = splitFields(line.slice(split + 2).trimEnd());
   const out: LogEvent = { timeMs: parseTime(line.slice(0, split)) - startMs, event: event!, fields, rest: fields };
-  const prefix = PREFIX.find(([p]) => event!.startsWith(p));
-  if (!prefix || fields.length < 8) return out;
+  // Every combat event starts with source and dest (UNIT_DIED too); meta lines like ENCOUNTER_START do not.
+  if (fields.length < 8 || !GUID.test(fields[0]!)) return out;
   out.source = unit(fields, 0);
   out.dest = unit(fields, 4);
+  const prefix = PREFIX.find(([p]) => event!.startsWith(p));
+  if (!prefix) return out;
   const [p, n] = prefix;
   if (n) out.spell = { id: num(fields[8]), name: fields[9]!, school: Number(fields[10]) };
   const suffix = event!.slice(p.length);

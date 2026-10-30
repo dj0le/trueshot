@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS events (
   id INTEGER PRIMARY KEY, file TEXT NOT NULL, ts INTEGER NOT NULL, event TEXT NOT NULL,
   src TEXT, src_name TEXT, dst TEXT, dst_name TEXT, spell_id INTEGER, spell_name TEXT, school INTEGER,
   st_guid TEXT, st_owner TEXT, st_hp INTEGER, st_max_hp INTEGER, st_ap INTEGER, st_armor INTEGER,
-  st_power_type INTEGER, st_power INTEGER, st_max_power INTEGER, st_level INTEGER,
+  st_power_type INTEGER, st_power INTEGER, st_max_power INTEGER, st_level INTEGER, st_x REAL, st_y REAL,
   amount INTEGER, unmitigated INTEGER, overkill INTEGER, dmg_school INTEGER, resisted INTEGER, blocked INTEGER,
   absorbed INTEGER, crit INTEGER, glancing INTEGER, crushing INTEGER, miss_type TEXT, rest TEXT,
   -- The raw line's hash: a line read twice (a copied log, a re-ingest) is stored once.
@@ -58,6 +58,9 @@ export function openStore(path = DEFAULT_DB): Database {
   const db = new Database(path, { create: true });
   db.exec("PRAGMA journal_mode = WAL;");
   db.exec(SCHEMA);
+  // Stores made before positions were kept.
+  const columns = new Set(db.query<{ name: string }, []>("PRAGMA table_info(events)").all().map((c) => c.name));
+  for (const c of ["st_x", "st_y"]) if (!columns.has(c)) db.exec(`ALTER TABLE events ADD COLUMN ${c} REAL`);
   return db;
 }
 
@@ -119,9 +122,9 @@ export async function ingest(db: Database, path: string): Promise<IngestResult> 
   };
   const insert = db.query(
     `INSERT INTO events (file, ts, event, src, src_name, dst, dst_name, spell_id, spell_name, school,
-      st_guid, st_owner, st_hp, st_max_hp, st_ap, st_armor, st_power_type, st_power, st_max_power, st_level,
+      st_guid, st_owner, st_hp, st_max_hp, st_ap, st_armor, st_power_type, st_power, st_max_power, st_level, st_x, st_y,
       amount, unmitigated, overkill, dmg_school, resisted, blocked, absorbed, crit, glancing, crushing, miss_type, rest, line_hash)
-     VALUES (${Array(33).fill("?").join(", ")}) ON CONFLICT (line_hash) DO NOTHING`,
+     VALUES (${Array(35).fill("?").join(", ")}) ON CONFLICT (line_hash) DO NOTHING`,
   );
   const startEncounter = db.query("INSERT INTO encounters (file, start_ts, encounter_id, name, difficulty, group_size) VALUES (?, ?, ?, ?, ?, ?)");
   const endEncounter = db.query(
@@ -187,7 +190,7 @@ export async function ingest(db: Database, path: string): Promise<IngestResult> 
           e.dest?.guid ?? null, e.dest ? shortName(e.dest.name) : null,
           e.spell?.id ?? null, e.spell?.name ?? null, e.spell?.school ?? null,
           s?.guid ?? null, s?.owner ?? null, s?.health ?? null, s?.maxHealth ?? null, s?.attackPower ?? null, s?.armor ?? null,
-          s?.powerType ?? null, s?.power ?? null, s?.maxPower ?? null, s?.level ?? null,
+          s?.powerType ?? null, s?.power ?? null, s?.maxPower ?? null, s?.level ?? null, s?.x ?? null, s?.y ?? null,
           d?.amount ?? null, d?.unmitigated ?? null, d?.overkill ?? null, d?.school ?? null, d?.resisted ?? null, d?.blocked ?? null,
           d?.absorbed ?? null, d ? Number(d.critical) : null, d ? Number(d.glancing) : null, d ? Number(d.crushing) : null,
           e.missType ?? null, e.rest.length ? e.rest.join(",") : null, BigInt.asIntN(64, BigInt(Bun.hash(line))),

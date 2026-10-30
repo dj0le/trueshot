@@ -16,6 +16,7 @@ import {
   loadGameData,
   openStore,
   parseLog,
+  pressesIn,
   unconfirmed,
 } from "@trueshot/data";
 import {
@@ -39,6 +40,7 @@ import {
   type SimResult,
 } from "@trueshot/engine";
 import { claims } from "./claims";
+import { type FightReview, listFights, review } from "./review";
 import { actionsToml, buildToml, loadConfig } from "./toml";
 
 const fmt = (n: number, digits = 1) => n.toFixed(digits);
@@ -95,6 +97,10 @@ const USAGE = [
   "                                                        new lines of the logs (default: the launch client's Logs folder) and the",
   "                                                        recorder addon's character sheets into the local store; --watch: every 30 sec",
   "  bun run sim claims [--hunter name] [--db file]        claimed vs reality: client data, tooltips and our model against the store",
+  "  bun run sim review [fight] [--hunter name] [--config file.toml] [--db file]",
+  "                                                        the stored fights, or one fight's casts, Auto Shot timing, uptimes, mana",
+  "                                                        and movement; --config also sims it at the logged length and target level",
+  "  bun run sim presses [--hunter name] [--db file]       button presses the addon recorded, most used first, for keybinds",
   "  bun run sim beta <config.toml>...                     each config against the beta dungeon bosses, next to Forever Logs parses",
   "  bun run sim enchants <text>                           enchant ids for gear.enchants, by name",
   "  bun run sim build <config.toml> [--budget N] [--rotation-budget N] [--rounds N] [--iterations N] [--keep-pet] [--keep-style] [--spec bm|mm|sv] [--out file.toml]",
@@ -316,7 +322,7 @@ async function ingestLogs(paths: string[], dbPath: string, watch: boolean, sheet
     // The recorder addon's sheets; WoW rewrites the file at logout and /reload.
     for (const path of sheetFiles) {
       const added = await ingestSheets(db, path);
-      if (added) console.log(`${path}: ${added} character sheets`);
+      if (added.sheets || added.presses) console.log(`${path}: ${added.sheets} character sheets, ${added.presses} button presses`);
     }
     if (!watch) break;
     await Bun.sleep(30_000);
@@ -335,6 +341,136 @@ function printClaims(game: GameData, dbPath: string, hunter: string | undefined)
       [["Verdict", "Claim", "Subject", "Claimed", "Observed (95%)", "Source", "n"], ...rows.map((r) => [r.verdict, r.claim, r.subject, r.claimed, r.observed, r.source, String(r.n)])],
       6,
     ),
+  );
+}
+
+function printFights(db: ReturnType<typeof openStore>, hunter: string | undefined): void {
+  const fights = listFights(db, hunter);
+  console.log(`\n${fights.length} fights${hunter ? ` for ${hunter}` : ""}; \`sim review <fight>\` for one\n`);
+  console.log(
+    table(
+      [
+        ["Fight", "Hunter", "Target", "Sec", "Damage", "DPS"],
+        ...fights.map((f) => {
+          const sec = Math.max(1, (f.endTs - f.startTs) / 1000);
+          return [String(f.id), f.hunterName, f.label, fmt(sec), String(f.damage), fmt(f.damage / sec)];
+        }),
+      ],
+      3,
+    ),
+  );
+}
+
+const pct = (x: number) => `${fmt(100 * x)}%`;
+
+function printReview(r: FightReview): void {
+  const total = r.damage.hunter + r.damage.pet;
+  const f = r.fight;
+  const t = r.target;
+  console.log(`\nFight ${f.id}: ${f.hunterName} against ${f.label}, ${fmt(r.durationSec)} sec${r.level ? `, level ${r.level}` : ""}`);
+  if (t) console.log(`Main target ${t.name}${t.level ? `, level ${t.level}` : ""}${t.armor ? `, ${t.armor} armor` : ""}`);
+  console.log(`Damage ${total} (${fmt(total / r.durationSec)} DPS): you ${r.damage.hunter}, pet ${r.damage.pet}; overkill ${r.damage.overkill} (${pct(r.damage.overkill / Math.max(1, total))})\n`);
+
+  console.log(
+    table([
+      ["Ability", "Casts", "Damage", "Share", "GCD and cast sec"],
+      ...r.casts.map((c) => [c.dealsDamage ? c.name : `${c.name} (no damage)`, c.casts ? String(c.casts) : "", String(c.damage), pct(c.damage / Math.max(1, total)), fmt(c.busySec)]),
+      ...r.petAbilities.map((p) => [p.name, p.casts ? String(p.casts) : "", String(p.damage), pct(p.damage / Math.max(1, total)), ""]),
+    ]),
+  );
+  const utility = r.casts.filter((c) => !c.dealsDamage);
+  if (utility.length) {
+    const sec = utility.reduce((a, c) => a + c.busySec, 0);
+    console.log(`\nNo-damage casts held the GCD or a cast bar for ${fmt(sec)} sec (${pct(sec / r.durationSec)} of the fight)`);
+  }
+  console.log(`Free time, no GCD or cast running: ${fmt(r.freeSec)} sec (${pct(r.freeSec / r.durationSec)})`);
+
+  const a = r.autoShot;
+  if (a.shots) {
+    const speed = a.speedSec ? `${fmt(a.speedSec, 2)} sec bow${a.speedFromSheet ? "" : " (no sheet: the fastest gaps)"}` : "no bow speed";
+    const lost = a.speedSec ? (a.delaySec + a.stoppedSec) / a.speedSec : 0;
+    console.log(
+      `\nAuto Shot: ${a.shots} shots, ${speed}; late by ${fmt(a.delaySec, 2)} sec in all, off for ${fmt(a.stoppedSec)} sec` +
+        (a.speedSec ? `: about ${fmt(lost)} shots lost (${fmt(lost * a.avgDamage, 0)} damage at ${fmt(a.avgDamage, 0)} a shot)` : ""),
+    );
+  }
+  for (const d of r.dots) {
+    console.log(
+      `${d.name}: ${d.applied} applied, ${d.ticks} ticks; ${fmt(d.lostToDeathSec)} of ${fmt(d.appliedSec)} sec lost to the target dying, ${fmt(d.clippedSec)} sec clipped by early refreshes`,
+    );
+  }
+
+  const u = r.uptime;
+  const up = [
+    ...(u.mark !== undefined ? [`Hunter's Mark ${pct(u.mark)}`] : []),
+    ...u.aspects.map((x) => `${x.name} ${pct(x.pct)}`),
+    ...(u.pet !== undefined ? [`pet attacking ${pct(u.pet)}`] : ["no pet"]),
+    ...(u.dazed ? [`Dazed ${u.dazed} times`] : []),
+  ];
+  console.log(`\nUptime: ${up.join(", ")}`);
+  if (r.mana) console.log(`Mana: ${fmt(r.mana.startPct, 0)}% at the pull, lowest ${fmt(r.mana.minPct, 0)}%, ${fmt(r.mana.endPct, 0)}% at the end`);
+  const m = r.movement;
+  if (m.samples > 1) console.log(`Moving: about ${fmt(m.movingSec)} sec (${pct(m.movingSec / r.durationSec)}), ${fmt(m.yards, 0)} yd, from ${m.samples} positions`);
+
+  if (r.failures.length) {
+    console.log(`\nFailed casts`);
+    console.log(table([["Spell", "Reason", "Times"], ...r.failures.map((x) => [x.name, x.reason, String(x.count)])], 2));
+  }
+  if (r.presses) {
+    console.log(`\nButton presses`);
+    console.log(table([["Action", "Presses", "Cast", "Did nothing"], ...r.presses.map((p) => [p.name, String(p.presses), String(p.casts), String(p.presses - p.casts)])]));
+  }
+
+  console.log(`\nTimeline (sec from the first hit)`);
+  console.log(
+    table(
+      [
+        ["Sec", "Cast", "Target", "Mana"],
+        ...r.timeline.map((x) => [fmt(x.t), x.failed ? `${x.what} failed: ${x.failed}` : x.what, x.target, x.manaPct === undefined ? "" : `${fmt(x.manaPct, 0)}%`]),
+      ],
+      4,
+    ),
+  );
+}
+
+// The same fight simmed: the config at the logged length, against the main target's level and armor.
+function printReviewSim(game: GameData, r: FightReview, config: SimConfigInput): void {
+  const { preset: _, ...fight } = config.fight ?? {};
+  const target = { ...config.target, ...(r.target?.level ? { level: r.target.level } : {}), ...(r.target?.armor ? { armor: r.target.armor } : {}) };
+  const sim = simulate(game, { ...config, fight: { ...fight, durationSec: r.durationSec, durationVariancePct: 0 }, target });
+  const total = r.damage.hunter + r.damage.pet;
+  const mine = new Map([...r.casts, ...r.petAbilities].map((c) => [c.name, c]));
+  const names = [...new Set([...sim.abilities.map((a) => a.name), ...mine.keys()])];
+  const yours = total / r.durationSec;
+  console.log(`\n${sim.name}, ${sim.iterations} fights of ${fmt(r.durationSec)} sec against level ${target.level ?? "preset"}: ${fmt(sim.dps.mean)} ± ${fmt(sim.dps.error95)} DPS`);
+  console.log(`You did ${fmt(yours)} DPS, ${pct(yours / sim.dps.mean)} of the sim${config.level && r.level && config.level !== r.level ? ` (the config is level ${config.level}, you were ${r.level})` : ""}\n`);
+  console.log(
+    table([
+      ["Ability", "Your casts", "Sim casts", "Your DPS", "Sim DPS"],
+      ...names.map((name) => {
+        const s = sim.abilities.find((a) => a.name === name);
+        const m = mine.get(name);
+        return [name, m?.casts ? String(m.casts) : "", s ? fmt(s.castsPerFight) : "", m ? fmt(m.damage / r.durationSec) : "", s ? fmt(s.dps) : ""];
+      }),
+    ]),
+  );
+}
+
+// Every recorded press, per action: in combat and out, and how often it did nothing.
+function printPresses(db: ReturnType<typeof openStore>, hunter: string | undefined): void {
+  const guid = hunter && db.query<{ guid: string }, [string, string]>("SELECT guid FROM units WHERE kind = 'hunter' AND (name = ? OR guid = ?)").get(hunter, hunter)?.guid;
+  const presses = pressesIn(db, guid || undefined);
+  const rows = new Map<string, { name: string; kind: string; combat: number; out: number }>();
+  for (const p of presses) {
+    const r = rows.get(p.name) ?? { name: p.name, kind: p.kind, combat: 0, out: 0 };
+    if (p.combat) r.combat++;
+    else r.out++;
+    rows.set(p.name, r);
+  }
+  const sorted = [...rows.values()].sort((a, b) => b.combat + b.out - (a.combat + a.out));
+  console.log(`\n${presses.length} button presses recorded${hunter ? ` for ${hunter}` : ""}\n`);
+  console.log(
+    table([["Action", "Kind", "In combat", "Out of combat", "Share"], ...sorted.map((r) => [r.name, r.kind, String(r.combat), String(r.out), pct((r.combat + r.out) / Math.max(1, presses.length))])], 2),
   );
 }
 
@@ -359,6 +495,7 @@ async function main(argv: string[]): Promise<void> {
       watch: { type: "boolean" },
       sheets: { type: "string" },
       hunter: { type: "string" },
+      config: { type: "string" },
     },
   });
   const [command, ...paths] = positionals;
@@ -445,6 +582,16 @@ async function main(argv: string[]): Promise<void> {
     await ingestLogs(paths, flags.db ?? DEFAULT_DB, flags.watch ?? false, flags.sheets);
   } else if (command === "claims" && paths.length === 0) {
     printClaims(game, flags.db ?? DEFAULT_DB, flags.hunter);
+  } else if (command === "review" && paths.length <= 1) {
+    const db = openStore(flags.db ?? DEFAULT_DB);
+    if (paths.length === 0) printFights(db, flags.hunter);
+    else {
+      const r = review(game, db, Number(paths[0]));
+      printReview(r);
+      if (flags.config) printReviewSim(game, r, await loadConfig(flags.config, { iterations: flags.iterations ?? "500", seed: flags.seed }));
+    }
+  } else if (command === "presses" && paths.length === 0) {
+    printPresses(openStore(flags.db ?? DEFAULT_DB), flags.hunter);
   } else if (command === "log" && paths.length === 1) {
     printLog(await Bun.file(paths[0]!).text(), flags.actor);
   } else if (command === "enchants" && paths.length >= 1) {
