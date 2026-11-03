@@ -1,0 +1,24 @@
+# GearQuest Forever average gear for a level 50 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 50; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 10741  # Lordrec Helmet
+neck = 13084  # Kaleidoscope Chain
+shoulder = 271811  # Clacking Carapace Spaulders
+back = 8215  # Wild Leather Cloak of Agility
+chest = 19127  # Charred Leather Tunic
+wrist = 272186  # Overgrown Cuffs
+hands = 10110  # Wanderer's Gloves of the Tiger
+waist = 11686  # Girdle of Beastial Fury
+legs = 8206  # Tough Scorpid Leggings
+feet = 20091  # Highlander's Chain Greaves
+finger1 = 275685  # Stormwind Intelligence Seal
+finger2 = 13095  # Assault Band
+trinket1 = 21117  # Talisman of Arathor
+trinket2 = 744  # Thunderbrew's Boot Flask
+mainHand = 10698  # Enchanted Azsharite Felbane Staff
+ranged = 13139  # Guttbuster
+
+[gear.suffixes]
+back = 173
+hands = 702

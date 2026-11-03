@@ -1,0 +1,27 @@
+# GearQuest Forever good gear for a level 40 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 40; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 250499  # Guard's Chain Helm
+neck = 13084  # Kaleidoscope Chain
+shoulder = 9389  # Revelosh's Spaulders of Agility
+back = 7483  # Ranger Cloak of Agility
+chest = 281299  # Profane Ritual Robes
+wrist = 9886  # Huntsman's Bands of the Falcon
+hands = 15365  # Trickster's Handwraps of the Falcon
+waist = 252521  # Stalker's Leather Belt
+legs = 252517  # Trapper's Leather Legguards
+feet = 20122  # Highlander's Mail Greaves
+finger1 = 19515  # Protector's Band
+finger2 = 281634  # Field Researcher's Loop
+trinket1 = 18706  # Arena Master
+trinket2 = 271905  # Enriched Seal
+mainHand = 277248  # Notched Ritual Rib
+offHand = 274753  # Jhordy's Misplaced Screwdriver
+ranged = 13038  # Swiftwind
+
+[gear.suffixes]
+shoulder = 211
+back = 171
+wrist = 251
+hands = 437

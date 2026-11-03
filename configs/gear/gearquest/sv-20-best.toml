@@ -1,0 +1,19 @@
+# GearQuest Forever best gear for a level 20 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 20; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 252504  # Brawler's Leather Hood
+neck = 20444  # Sentinel's Medallion
+shoulder = 270044  # Darkshire Shoulderguards
+back = 6449  # Glowing Lizardscale Cloak
+chest = 6473  # Armor of the Fang
+wrist = 270033  # Demonhide Bracers
+hands = 10413  # Gloves of the Fang
+waist = 10412  # Belt of the Fang
+legs = 10410  # Leggings of the Fang
+feet = 10411  # Footpads of the Fang
+finger1 = 281634  # Field Researcher's Loop
+finger2 = 2933  # Seal of Wrynn
+trinket1 = 21568  # Rune of Duty
+mainHand = 2205  # Duskbringer
+ranged = 6469  # Venomstrike

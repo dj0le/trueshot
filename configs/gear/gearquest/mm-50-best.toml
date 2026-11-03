@@ -1,0 +1,25 @@
+# GearQuest Forever best gear for a level 50 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 50; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 8208  # Tough Scorpid Helm
+neck = 11946  # Fire Opal Necklace of the Falcon
+shoulder = 252566  # Stalker's Mail Shoulders
+back = 15661  # Impenetrable Cloak of the Falcon
+chest = 21320  # Vest of the Den Watcher
+wrist = 19589  # Forest Stalker's Bracers
+hands = 252584  # Stalker's Mail Gauntlets
+waist = 252588  # Stalker's Mail Belt
+legs = 11749  # Searingscale Leggings
+feet = 11627  # Fleetfoot Greaves
+finger1 = 11945  # Dark Iron Ring of the Falcon
+finger2 = 9533  # Masons Fraternity Ring
+trinket1 = 270275  # Cleansed Vilebranch Medallion
+trinket2 = 270225  # Jewel of the Guard Captain
+mainHand = 9527  # Spellshifter Rod
+ranged = 16004  # Dark Iron Rifle
+
+[gear.suffixes]
+neck = 440
+back = 440
+finger1 = 440

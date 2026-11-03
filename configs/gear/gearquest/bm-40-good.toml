@@ -1,0 +1,31 @@
+# GearQuest Forever good gear for a level 40 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 40; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 9902  # Jazeraint Helm of the Monkey
+neck = 277981  # Souvenir Ogre Tooth
+shoulder = 9894  # Huntsman's Shoulders of Agility
+back = 7483  # Ranger Cloak of Agility
+chest = 7477  # Ranger Tunic of Agility
+wrist = 270091  # Seadog's Battered Cuffs
+hands = 9930  # Brigade Gauntlets of the Monkey
+waist = 7494  # Captain's Waistguard of the Monkey
+legs = 9893  # Huntsman's Leggings of Agility
+feet = 15614  # Bonelink Sabatons of Agility
+finger1 = 281634  # Field Researcher's Loop
+finger2 = 7552  # Falcon's Hook
+trinket1 = 18706  # Arena Master
+trinket2 = 271905  # Enriched Seal
+mainHand = 8226  # The Butcher
+offHand = 274753  # Jhordy's Misplaced Screwdriver
+ranged = 13038  # Swiftwind
+
+[gear.suffixes]
+head = 614
+shoulder = 211
+back = 171
+chest = 361
+hands = 608
+waist = 608
+legs = 359
+feet = 212

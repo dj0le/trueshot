@@ -1,0 +1,23 @@
+# GearQuest Forever good gear for a level 20 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 20; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 252506  # Stormrider's Leather Hood
+neck = 281321  # Giantstone Medallion
+shoulder = 3560  # Mantle of Honor
+back = 15526  # Sentry's Cape of the Tiger
+chest = 10399  # Blackened Defias Armor
+wrist = 4794  # Wolf Bracers
+hands = 14572  # Bristlebark Gloves
+waist = 3562  # Belt of Vindication
+legs = 3022  # Bluegill Breeches
+feet = 10402  # Blackened Defias Boots
+finger1 = 12007  # Prairie Ring of the Tiger
+finger2 = 1076  # Defias Renegade Ring
+trinket1 = 21568  # Rune of Duty
+mainHand = 890  # Twisted Chanter's Staff
+ranged = 13136  # Lil Timmy's Peashooter
+
+[gear.suffixes]
+back = 675
+finger1 = 678

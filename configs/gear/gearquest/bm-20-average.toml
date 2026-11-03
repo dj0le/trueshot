@@ -1,0 +1,25 @@
+# GearQuest Forever average gear for a level 20 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 20; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 4373  # Shadow Goggles
+neck = 281321  # Giantstone Medallion
+shoulder = 281694  # Restored Leather Spaulders
+back = 6585  # Scouting Cloak of Agility
+chest = 2317  # Dark Leather Tunic
+wrist = 9777  # Bandit Bracers of Agility
+hands = 252494  # Brawler's Leather Gloves
+waist = 252428  # Brawler's Leather Belt
+legs = 15017  # Lupine Leggings of Agility
+feet = 14568  # Bristlebark Boots
+finger1 = 4998  # Blood Ring
+finger2 = 11993  # Clay Ring of Stamina
+trinket1 = 21568  # Rune of Duty
+mainHand = 1406  # Pearl-encrusted Spear
+ranged = 4576  # Light Bow
+
+[gear.suffixes]
+back = 93
+wrist = 93
+legs = 151
+finger2 = 114

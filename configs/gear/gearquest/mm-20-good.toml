@@ -1,0 +1,20 @@
+# GearQuest Forever good gear for a level 20 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 20; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 4373  # Shadow Goggles
+neck = 281321  # Giantstone Medallion
+shoulder = 17047  # Luminescent Amice
+back = 3018  # Hide of Lupos
+chest = 14369  # Mystic's Wrap
+wrist = 270033  # Demonhide Bracers
+hands = 7285  # Nimble Leather Gloves
+waist = 6468  # Deviate Scale Belt
+legs = 2954  # Night Watch Pantaloons
+feet = 1121  # Feet of the Lynx
+finger1 = 1156  # Lavishly Jeweled Ring
+finger2 = 1491  # Ring of Precision
+trinket1 = 21568  # Rune of Duty
+mainHand = 4445  # Flesh Carver
+offHand = 1951  # Blackwater Cutlass
+ranged = 13136  # Lil Timmy's Peashooter

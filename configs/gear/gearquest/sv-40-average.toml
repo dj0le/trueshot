@@ -1,0 +1,26 @@
+# GearQuest Forever average gear for a level 40 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 40; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 7915  # Barbaric Iron Helm
+neck = 12047  # Spectral Necklace of the Tiger
+shoulder = 10774  # Fleshhide Shoulders
+back = 7483  # Ranger Cloak of Agility
+chest = 6773  # Kolkar Marauder Chain
+wrist = 270080  # Arathi Armbands
+hands = 4063  # Imperial Leather Gloves
+waist = 252459  # Prowler's Leather Belt
+legs = 15573  # Marauder's Leggings of the Tiger
+feet = 15614  # Bonelink Sabatons of Agility
+finger1 = 2262  # Mark of Kern
+finger2 = 281634  # Field Researcher's Loop
+trinket1 = 10418  # Glimmering Mithril Insignia
+trinket2 = 10659  # Shard of the Splithooves
+mainHand = 6830  # Bonebiter
+ranged = 17687  # Master Hunter's Rifle
+
+[gear.suffixes]
+neck = 678
+back = 171
+legs = 696
+feet = 212

@@ -1,0 +1,25 @@
+# GearQuest Forever best gear for a level 50 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 50; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 17776  # Sprightring Helm
+neck = 11946  # Fire Opal Necklace of Agility
+shoulder = 252566  # Stalker's Mail Shoulders
+back = 13122  # Dark Phantom Cape
+chest = 21320  # Vest of the Den Watcher
+wrist = 19589  # Forest Stalker's Bracers
+hands = 252584  # Stalker's Mail Gauntlets
+waist = 252588  # Stalker's Mail Belt
+legs = 9964  # Warmonger's Leggings of Agility
+feet = 11627  # Fleetfoot Greaves
+finger1 = 11945  # Dark Iron Ring of Agility
+finger2 = 9533  # Masons Fraternity Ring
+trinket1 = 270275  # Cleansed Vilebranch Medallion
+trinket2 = 270225  # Jewel of the Guard Captain
+mainHand = 9416  # Grimlok's Charge
+ranged = 16004  # Dark Iron Rifle
+
+[gear.suffixes]
+neck = 211
+legs = 364
+finger1 = 211

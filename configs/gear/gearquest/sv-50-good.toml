@@ -1,0 +1,23 @@
+# GearQuest Forever good gear for a level 50 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 50; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 8208  # Tough Scorpid Helm
+neck = 281657  # Corrupted Riverglades Pendant
+shoulder = 252566  # Stalker's Mail Shoulders
+back = 10120  # Ornate Cloak of Agility
+chest = 17777  # Relentless Chain
+wrist = 17714  # Bracers of the Stone Princess
+hands = 252584  # Stalker's Mail Gauntlets
+waist = 252588  # Stalker's Mail Belt
+legs = 11749  # Searingscale Leggings
+feet = 17728  # Albino Crocscale Boots
+finger1 = 275831  # Highfeather Bangle
+finger2 = 2951  # Ring of the Underwood
+trinket1 = 274760  # Everlook Delivery Bot
+trinket2 = 270275  # Cleansed Vilebranch Medallion
+mainHand = 9475  # Diabolic Skiver
+ranged = 17717  # Megashot Rifle
+
+[gear.suffixes]
+back = 211

@@ -1,0 +1,23 @@
+# GearQuest Forever best gear for a level 40 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 40; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 9902  # Jazeraint Helm of the Tiger
+neck = 281657  # Corrupted Riverglades Pendant
+shoulder = 9647  # Failed Flying Experiment
+back = 5257  # Dark Hooded Cape
+chest = 11193  # Blazewind Breastplate
+wrist = 19590  # Forest Stalker's Bracers
+hands = 10331  # Scarlet Gauntlets
+waist = 13117  # Ogron's Sash
+legs = 9652  # Gryphon Rider's Leggings
+feet = 252465  # Prowler's Leather Shoes
+finger1 = 9533  # Masons Fraternity Ring
+finger2 = 19515  # Protector's Band
+trinket1 = 744  # Thunderbrew's Boot Flask
+trinket2 = 21118  # Talisman of Arathor
+mainHand = 13051  # Witchfury
+ranged = 277254  # Truthseeker's Bow
+
+[gear.suffixes]
+head = 699

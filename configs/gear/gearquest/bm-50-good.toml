@@ -1,0 +1,26 @@
+# GearQuest Forever good gear for a level 50 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 50; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 10741  # Lordrec Helmet
+neck = 277202  # Artifact Seeker's Pendant
+shoulder = 8207  # Tough Scorpid Shoulders
+back = 10120  # Ornate Cloak of Agility
+chest = 15076  # Heavy Scorpid Vest
+wrist = 14807  # Bloodlust Bracelets
+hands = 252548  # Skulker's Leather Gauntlets
+waist = 15654  # Merciless Belt of the Monkey
+legs = 15394  # Jadefire Pants of Agility
+feet = 252576  # Stalker's Mail Sabatons
+finger1 = 19516  # Protector's Band
+finger2 = 281634  # Field Researcher's Loop
+trinket1 = 271906  # Volunteer's Lucky Seal
+trinket2 = 271903  # Enriched Seal
+mainHand = 276903  # Shimmerwine Shanker
+offHand = 7947  # Ebon Shiv
+ranged = 17753  # Verdant Keeper's Aim
+
+[gear.suffixes]
+back = 211
+waist = 617
+legs = 365

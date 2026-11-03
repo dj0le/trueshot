@@ -1,0 +1,23 @@
+# GearQuest Forever average gear for a level 50 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 50; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 8348  # Helm of Fire
+neck = 260171  # Timbermaw Prayer Beads
+shoulder = 281276  # Pauldrons of Scaleslaying
+back = 13109  # Blackflame Cape
+chest = 7527  # Cabalist Chestpiece of Agility
+wrist = 15084  # Wicked Leather Bracers
+hands = 260211  # Panic Hands
+waist = 274757  # Substandard Belt Chain
+legs = 12041  # Windshear Leggings
+feet = 252562  # Stalker's Mail Boots
+finger1 = 7686  # Ironspine's Eye
+finger2 = 276202  # Disengagement Ring
+trinket1 = 17904  # Stormpike Insignia Rank 6
+trinket2 = 276337  # Thaelemaches' Talisman
+mainHand = 20083  # Hunting Spear
+ranged = 13139  # Guttbuster
+
+[gear.suffixes]
+chest = 364

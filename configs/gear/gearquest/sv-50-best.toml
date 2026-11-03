@@ -1,0 +1,24 @@
+# GearQuest Forever best gear for a level 50 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 50; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 8348  # Helm of Fire
+neck = 11946  # Fire Opal Necklace of the Tiger
+shoulder = 252534  # Prowler's Leather Shoulders
+back = 13122  # Dark Phantom Cape
+chest = 15064  # Warbear Harness
+wrist = 19589  # Forest Stalker's Bracers
+hands = 252547  # Prowler's Leather Gauntlets
+waist = 252474  # Skulker's Leather Waistguard
+legs = 8262  # Serpentskin Leggings
+feet = 11627  # Fleetfoot Greaves
+finger1 = 11945  # Dark Iron Ring of the Tiger
+finger2 = 19516  # Protector's Band
+trinket1 = 274759  # Everlook Pathcarver
+trinket2 = 260205  # Highborne Research Tablet
+mainHand = 9477  # The Chief's Enforcer
+ranged = 2100  # Precisely Calibrated Boomstick
+
+[gear.suffixes]
+neck = 693
+finger1 = 693

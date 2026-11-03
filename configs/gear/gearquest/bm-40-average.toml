@@ -1,0 +1,27 @@
+# GearQuest Forever average gear for a level 40 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 40; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 7456  # Knight's Headguard of the Monkey
+neck = 271919  # Seal of the Expedition
+shoulder = 16793  # Arcmetal Shoulders
+back = 10518  # Parachute Cloak
+chest = 8175  # Nightscape Tunic
+wrist = 15590  # Steadfast Bracelets of the Monkey
+hands = 7480  # Ranger Gloves of the Monkey
+waist = 9916  # Tracker's Belt of the Monkey
+legs = 9509  # Petrolspill Leggings
+feet = 7490  # Captain's Boots of Agility
+finger1 = 1491  # Ring of Precision
+finger2 = 275045  # Ogre Horn Ring
+trinket1 = 10659  # Shard of the Splithooves
+trinket2 = 4130  # Smotts' Compass
+mainHand = 271800  # Scavenged Magram Armament
+ranged = 3430  # Sniper Rifle
+
+[gear.suffixes]
+head = 611
+wrist = 599
+hands = 608
+waist = 608
+feet = 211

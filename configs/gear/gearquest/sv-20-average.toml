@@ -1,0 +1,26 @@
+# GearQuest Forever average gear for a level 20 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 20; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 4373  # Shadow Goggles
+neck = 281321  # Giantstone Medallion
+shoulder = 281694  # Restored Leather Spaulders
+back = 15333  # Wrangler's Cloak of Agility
+chest = 15018  # Lupine Vest of Agility
+wrist = 15112  # Rigid Bracelets of Agility
+hands = 5970  # Serpent Gloves
+waist = 3429  # Guardsman Belt
+legs = 15312  # Feral Leggings of Agility
+feet = 14568  # Bristlebark Boots
+finger1 = 1156  # Lavishly Jeweled Ring
+finger2 = 11993  # Clay Ring of Strength
+trinket1 = 21568  # Rune of Duty
+mainHand = 872  # Rockslicer
+ranged = 4576  # Light Bow
+
+[gear.suffixes]
+back = 111
+chest = 151
+wrist = 93
+legs = 151
+finger2 = 115

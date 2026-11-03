@@ -1,0 +1,22 @@
+# GearQuest Forever average gear for a level 20 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 20; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 4368  # Flying Tiger Goggles
+neck = 281321  # Giantstone Medallion
+shoulder = 4709  # Forest Leather Mantle
+back = 14571  # Bristlebark Cape
+chest = 270035  # Reclaimer's Robes
+wrist = 9777  # Bandit Bracers of Agility
+hands = 1304  # Riding Gloves
+waist = 14567  # Bristlebark Belt
+legs = 6480  # Slick Deviate Leggings
+feet = 4660  # Walking Boots
+finger1 = 6748  # Monkey Ring
+finger2 = 20439  # Protector's Band
+trinket1 = 21568  # Rune of Duty
+mainHand = 5749  # Scythe Axe
+ranged = 4576  # Light Bow
+
+[gear.suffixes]
+wrist = 93

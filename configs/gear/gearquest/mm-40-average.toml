@@ -1,0 +1,24 @@
+# GearQuest Forever average gear for a level 40 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 40; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 4078  # Chief Brigadier Coif
+neck = 12022  # Iridium Chain of the Eagle
+shoulder = 8192  # Nightscape Shoulders
+back = 271810  # Corpsefeeder's Shedding
+chest = 8175  # Nightscape Tunic
+wrist = 270091  # Seadog's Battered Cuffs
+hands = 10331  # Scarlet Gauntlets
+waist = 15361  # Trickster's Sash of the Falcon
+legs = 9652  # Gryphon Rider's Leggings
+feet = 2276  # Swampwalker Boots
+finger1 = 276202  # Disengagement Ring
+finger2 = 2933  # Seal of Wrynn
+trinket1 = 10659  # Shard of the Splithooves
+trinket2 = 4130  # Smotts' Compass
+mainHand = 5200  # Impaling Harpoon
+ranged = 3430  # Sniper Rifle
+
+[gear.suffixes]
+neck = 854
+waist = 437

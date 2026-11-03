@@ -1,0 +1,27 @@
+# GearQuest Forever good gear for a level 50 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 50; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 9932  # Brigade Circlet of the Falcon
+neck = 13085  # Horizon Choker
+shoulder = 15067  # Ironfeather Shoulders
+back = 15190  # Grand Cloak of Agility
+chest = 11193  # Blazewind Breastplate
+wrist = 270110  # First Mate's Armguards
+hands = 8204  # Tough Scorpid Gloves
+waist = 10197  # Crusader's Belt of the Falcon
+legs = 15394  # Jadefire Pants of the Falcon
+feet = 20121  # Highlander's Mail Greaves
+finger1 = 2951  # Ring of the Underwood
+finger2 = 19516  # Protector's Band
+trinket1 = 271906  # Volunteer's Lucky Seal
+trinket2 = 271903  # Enriched Seal
+mainHand = 17710  # Charstone Dirk
+offHand = 7947  # Ebon Shiv
+ranged = 17753  # Verdant Keeper's Aim
+
+[gear.suffixes]
+head = 449
+back = 212
+waist = 449
+legs = 458

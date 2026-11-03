@@ -1,0 +1,27 @@
+# GearQuest Forever good gear for a level 40 survival hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 40; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 10741  # Lordrec Helmet
+neck = 13084  # Kaleidoscope Chain
+shoulder = 7459  # Knight's Pauldrons of the Tiger
+back = 15594  # Steadfast Cloak of the Tiger
+chest = 7454  # Knight's Breastplate of the Tiger
+wrist = 277230  # Grayscale Bracers
+hands = 7724  # Gauntlets of Divinity
+waist = 7494  # Captain's Waistguard of the Tiger
+legs = 10330  # Scarlet Leggings
+feet = 252562  # Stalker's Mail Boots
+finger1 = 275044  # Bloodsport Band
+finger2 = 7686  # Ironspine's Eye
+trinket1 = 271904  # Volunteer's Lucky Seal
+trinket2 = 18706  # Arena Master
+mainHand = 2815  # Curve-bladed Ripper
+offHand = 277244  # Guardian's Maulers
+ranged = 13038  # Swiftwind
+
+[gear.suffixes]
+shoulder = 690
+back = 684
+chest = 696
+waist = 693

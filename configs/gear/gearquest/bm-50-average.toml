@@ -1,0 +1,26 @@
+# GearQuest Forever average gear for a level 50 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 50; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 14658  # Scorpashi Skullcap
+neck = 22657  # Amulet of the Dawn
+shoulder = 271811  # Clacking Carapace Spaulders
+back = 10071  # Righteous Cloak of Agility
+chest = 19128  # Seared Mail Vest
+wrist = 270103  # Reloading Assist Armbands
+hands = 252526  # Stalker's Leather Gloves
+waist = 15636  # Formidable Belt of the Monkey
+legs = 15385  # Rageclaw Leggings of Agility
+feet = 15630  # Formidable Sabatons of Agility
+finger1 = 276202  # Disengagement Ring
+finger2 = 1491  # Ring of Precision
+trinket1 = 17904  # Stormpike Insignia Rank 6
+trinket2 = 276337  # Thaelemaches' Talisman
+mainHand = 250605  # Steel Spear
+ranged = 13139  # Guttbuster
+
+[gear.suffixes]
+back = 173
+waist = 614
+legs = 364
+feet = 358

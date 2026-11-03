@@ -1,0 +1,26 @@
+# GearQuest Forever best gear for a level 40 marksmanship hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 40; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 9932  # Brigade Circlet of the Falcon
+neck = 19540  # Sentinel's Medallion
+shoulder = 277228  # Snakescale Pauldrons
+back = 9959  # Warmonger's Cloak of the Falcon
+chest = 11193  # Blazewind Breastplate
+wrist = 19590  # Forest Stalker's Bracers
+hands = 8204  # Tough Scorpid Gloves
+waist = 15613  # Bonelink Belt of the Falcon
+legs = 1718  # Basilisk Hide Pants
+feet = 252562  # Stalker's Mail Boots
+finger1 = 9533  # Masons Fraternity Ring
+finger2 = 9461  # Charged Gear of the Falcon
+trinket1 = 21118  # Talisman of Arathor
+trinket2 = 21567  # Rune of Duty
+mainHand = 9527  # Spellshifter Rod
+ranged = 277254  # Truthseeker's Bow
+
+[gear.suffixes]
+head = 449
+back = 254
+waist = 440
+finger2 = 254

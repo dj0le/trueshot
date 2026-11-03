@@ -1,0 +1,20 @@
+# GearQuest Forever best gear for a level 40 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 40; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 10741  # Lordrec Helmet
+neck = 19540  # Sentinel's Medallion
+shoulder = 277228  # Snakescale Pauldrons
+back = 13108  # Tigerstrike Mantle
+chest = 11193  # Blazewind Breastplate
+wrist = 19590  # Forest Stalker's Bracers
+hands = 252526  # Stalker's Leather Gloves
+waist = 6425  # Blackforge Girdle
+legs = 1718  # Basilisk Hide Pants
+feet = 252562  # Stalker's Mail Boots
+finger1 = 9533  # Masons Fraternity Ring
+finger2 = 2951  # Ring of the Underwood
+trinket1 = 21118  # Talisman of Arathor
+trinket2 = 21567  # Rune of Duty
+mainHand = 276203  # Primitive Fishing Pole
+ranged = 277254  # Truthseeker's Bow

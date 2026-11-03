@@ -1,0 +1,25 @@
+# GearQuest Forever good gear for a level 20 beast mastery hunter (Alliance), written by `bun run gearquest`.
+# Extend it and set level = 20; Classic stat weights rank the addon's picks.
+
+[gear.items]
+head = 252447  # Defender's Leather Hood
+neck = 281321  # Giantstone Medallion
+shoulder = 3560  # Mantle of Honor
+back = 9805  # Superior Cloak of Agility
+chest = 15018  # Lupine Vest of Agility
+wrist = 274742  # Ratchet Wristwraps
+hands = 7285  # Nimble Leather Gloves
+waist = 4249  # Dark Leather Belt
+legs = 5961  # Dark Leather Pants
+feet = 252440  # Trapper's Leather Boots
+finger1 = 12006  # Meadow Ring of Agility
+finger2 = 20439  # Protector's Band
+trinket1 = 21568  # Rune of Duty
+mainHand = 4445  # Flesh Carver
+offHand = 1951  # Blackwater Cutlass
+ranged = 13136  # Lil Timmy's Peashooter
+
+[gear.suffixes]
+back = 111
+chest = 151
+finger1 = 111
