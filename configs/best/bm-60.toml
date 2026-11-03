@@ -1,0 +1,91 @@
+# Best 1 minute build for BM ranged: talents and rotation from 3 independent `sim build --keep-style --budget 600` searches (2026-11-03, after the patch and the channel swing fix), solo against a level 63 boss.
+extends = "../bm-cat.optimized.toml"
+name = "BM ranged, 60 sec, best build"
+position = "ranged"
+
+[weave]
+maxAutoShotDelayMs = 1200
+
+[talents]
+"Deadly Aspects" = 5
+"Endurance Training" = 1
+"Focused Fire" = 2
+"Improved Aspect of the Monkey" = 2
+"Bestial Swiftness" = 1
+"Unleashed Fury" = 5
+"Ferocity" = 5
+"Summon Hawk" = 1
+"Bestial Discipline" = 2
+"Intimidation" = 1
+"Frenzy" = 5
+"Bestial Wrath" = 1
+"Lethal Attacks" = 5
+"Efficiency" = 5
+"Careful Aim" = 3
+"Improved Arcane Shot" = 0
+"Trueshot Aura" = 1
+"Improved Tracking" = 3
+"Improved Stings" = 3
+
+[pet]
+active = true
+family = "Raptor"
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "hunters_mark", "trueshot_aura"]
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "elunes_light"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "arcane_shot"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up"
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "mana.pct > 25"
+
+[[rotation.actions]]
+action = "multi_shot"
+if = "mana.pct > 40"
+
+[[rotation.actions]]
+action = "berserking"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "summon_hawk"
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "immolation_trap"
+
+[[rotation.actions]]
+action = "explosive_trap"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[fight]
+durationSec = 60
+durationVariancePct = 20

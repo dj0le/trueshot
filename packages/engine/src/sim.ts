@@ -505,6 +505,11 @@ export class Fight implements PetHost {
   private arriveInMelee(): void {
     this.at = "melee";
     this.act();
+    // A channel started on arrival holds the swing until it ends.
+    if (this.casting) {
+      this.queue.push(this.casting.endsAt, () => this.arriveInMelee());
+      return;
+    }
     this.strike(this.ch.mainHand!, false);
     if (this.ch.offHand && this.swingReadyAt.offHand <= this.now) this.strike(this.ch.offHand, true);
     this.leaveMelee(false);
@@ -536,9 +541,14 @@ export class Fight implements PetHost {
 
   // Melee swings ==============================================================
   // In melee position each weapon swings on its own timer. A queued next-swing attack replaces the
-  // main hand's white swing when its cooldown and mana allow.
+  // main hand's white swing when its cooldown and mana allow. A swing that comes due during a cast or
+  // channel (Volley) waits for it to end: auto attacks stop while casting.
 
   private swing(weapon: MeleeWeapon, offHand: boolean): void {
+    if (this.casting) {
+      this.queue.push(this.casting.endsAt, () => this.swing(weapon, offHand));
+      return;
+    }
     this.strike(weapon, offHand);
     this.queue.push(this.swingReadyAt[offHand ? "offHand" : "mainHand"], () => this.swing(weapon, offHand));
   }

@@ -1,0 +1,77 @@
+# Best 2 minute build for BM ranged: talents and rotation from 3 independent `sim build --keep-style --budget 600` searches (2026-11-03, after the patch and the channel swing fix), solo against a level 63 boss.
+extends = "../bm-cat.optimized.toml"
+name = "BM ranged, 120 sec, best build"
+position = "ranged"
+
+[weave]
+maxAutoShotDelayMs = 1200
+
+[talents]
+"Deadly Aspects" = 5
+"Endurance Training" = 1
+"Focused Fire" = 2
+"Improved Aspect of the Monkey" = 2
+"Bestial Swiftness" = 1
+"Unleashed Fury" = 5
+"Ferocity" = 5
+"Summon Hawk" = 1
+"Bestial Discipline" = 2
+"Intimidation" = 1
+"Frenzy" = 5
+"Bestial Wrath" = 1
+"Lethal Attacks" = 5
+"Efficiency" = 5
+"Careful Aim" = 5
+"Improved Arcane Shot" = 0
+"Trueshot Aura" = 1
+"Improved Stings" = 3
+"Improved Tracking" = 1
+
+[pet]
+active = true
+family = "Wind Serpent"
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "hunters_mark", "trueshot_aura"]
+
+[[rotation.actions]]
+action = "elunes_light"
+
+[[rotation.actions]]
+action = "multi_shot"
+if = "mana.pct > 50"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up"
+
+[[rotation.actions]]
+action = "berserking"
+
+[[rotation.actions]]
+action = "arcane_shot"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "sniper_shot"
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "immolation_trap"
+
+[fight]
+durationSec = 120
+durationVariancePct = 20

@@ -503,6 +503,12 @@ test("in melee the hunter swings instead of shooting, and each side's abilities 
   const ranged = run("ranged", [{ action: "raptor_strike" }]);
   expect(find(ranged, "Raptor Strike")).toBeUndefined();
   expect(find(ranged, "Melee")).toBeUndefined();
+  // Volley has no minimum range, but channeling it stops the swings: back to back channels leave
+  // only the swing that waited out each one, where 100 would land without it.
+  const volley = run("melee", [{ action: "volley" }]);
+  const channels = find(volley, "Volley")!.castsPerFight;
+  expect(channels).toBeGreaterThan(50);
+  expect(find(volley, "Melee")!.castsPerFight).toBeLessThanOrEqual(channels + 1);
 });
 
 test("Strider Kick multiplies its weapon damage by its percent instead of adding the two", () => {

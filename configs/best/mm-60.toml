@@ -1,0 +1,83 @@
+# Best 1 minute build for MM ranged: talents and rotation from 3 independent `sim build --keep-style --budget 600` searches (2026-11-03, after the patch and the channel swing fix), solo against a level 63 boss.
+extends = "../mm-lone-wolf.optimized.toml"
+name = "MM ranged, 60 sec, best build"
+position = "ranged"
+
+[weave]
+maxAutoShotDelayMs = 1200
+
+[talents]
+"Hawk Eye" = 0
+"Lethal Attacks" = 5
+"Improved Stings" = 3
+"Efficiency" = 5
+"Careful Aim" = 5
+"Rapid Killing" = 2
+"Improved Arcane Shot" = 3
+"Lone Wolf" = 0
+"Trueshot Aura" = 1
+"Mortal Shots" = 5
+"Rapid Recuperation" = 2
+"Barrage" = 3
+"Ranged Weapon Specialization" = 5
+"Sniper Shot" = 0
+"Deadly Aspects" = 5
+"Improved Tracking" = 5
+"Focused Fire" = 2
+
+[pet]
+active = true
+family = "Raptor"
+
+[rotation]
+precombat = ["aspect_of_the_hawk", "trueshot_aura", "hunters_mark"]
+
+[[rotation.actions]]
+action = "mongoose_bite"
+
+[[rotation.actions]]
+action = "rapid_fire"
+
+[[rotation.actions]]
+action = "blood_fury"
+
+[[rotation.actions]]
+action = "berserking"
+
+[[rotation.actions]]
+action = "elunes_light"
+
+[[rotation.actions]]
+action = "bestial_wrath"
+
+[[rotation.actions]]
+action = "summon_hawk"
+if = "mana.pct > 40"
+
+[[rotation.actions]]
+action = "serpent_sting"
+if = "!debuff.serpent_sting.up & fight.remains > 3"
+
+[[rotation.actions]]
+action = "raptor_strike"
+
+[[rotation.actions]]
+action = "immolation_trap"
+
+[[rotation.actions]]
+action = "explosive_trap"
+
+[[rotation.actions]]
+action = "hunters_mark"
+if = "!debuff.hunters_mark.up"
+
+[[rotation.actions]]
+action = "aimed_shot"
+if = "mana.pct > 30"
+
+[[rotation.actions]]
+action = "arcane_shot"
+
+[fight]
+durationSec = 60
+durationVariancePct = 20

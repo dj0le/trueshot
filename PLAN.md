@@ -191,6 +191,13 @@ These rest on the guesses listed in overrides.toml, so they are leads to check a
 - Lone Wolf beats keeping the pet once the pet attacks less than about 84% of the fight in wowsims
   (93% here, where the pet is weaker).
 
+- Spec comparison after the 2026-11-03 patch (configs/best, 3 independent searches each, solo, level 63
+  boss, MythicSim gear, MM and BM ranged only): 1 min MM 482, BM 497, SV melee 339, SV weave 523;
+  2 min MM 376, BM 405, SV melee 328, SV weave 431. SV weave assumes perfect weaving (a beta SV on
+  stream did about 135 against 178 simmed). BM's lead is its pet (30% of its damage, against 16% for
+  MM's; beta boss fights showed 30-36%). The 3 min default fight overrated mana: no hunter comparison
+  should use it. Fixed on the way: melee swings kept going through Volley's channel.
+
 ## Data sources
 
 | Source | Gives | Notes |
