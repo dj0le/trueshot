@@ -119,6 +119,10 @@ const Overrides = z.object({
         "an effect hotfix needs effectIndex",
       ),
   ),
+  // A talent's value per rank for one effect, where the server changed it and the client did not.
+  talentHotfix: z
+    .array(z.object({ talent: z.string(), effectIndex: z.number(), values: z.array(z.number()), ...provenance }))
+    .default([]),
 });
 export type Overrides = z.infer<typeof Overrides> & { levels: Levels };
 
@@ -193,7 +197,19 @@ export function applyHotfixes(data: HunterData, o: Overrides): HunterData {
       effect.classMask = [...h.classMask];
     }
   }
-  return { ...data, spells };
+  const talents = structuredClone(data.talents);
+  for (const t of o.talentHotfix) {
+    const talent = talents.find((x) => x.name === t.talent);
+    if (!talent) throw new Error(`talentHotfix: no talent "${t.talent}"`);
+    const ranks = talent.rankEffects.find((r) => r.effectIndex === t.effectIndex);
+    if (!ranks) throw new Error(`talentHotfix: ${t.talent} has no rank values for effect ${t.effectIndex}`);
+    if (ranks.values.length !== t.values.length) throw new Error(`talentHotfix: ${t.talent} has ${ranks.values.length} ranks, not ${t.values.length}`);
+    if (ranks.values.every((v, i) => v === t.values[i])) {
+      throw new Error(`talentHotfix: ${t.talent} effect ${t.effectIndex} already has ${t.values.join("/")} in the client; remove the override`);
+    }
+    ranks.values = [...t.values];
+  }
+  return { ...data, spells, talents };
 }
 
 // Every override that is not confirmed, flattened for reports.

@@ -45,13 +45,14 @@ const EXTRA_SPELLS: { id: number; why: string }[] = [
 // picked by hand and checked against the racial's tooltip). Active ones have a cooldown and are cast.
 const RACIALS: { name: string; spellId: number; tooltip: string }[] = [
   { name: "Blood Fury", spellId: 20572, tooltip: "Increases Attack Power and Spell Power by 10% for 15 sec" },
-  { name: "Savage", spellId: 20574, tooltip: "critical strike chance with all spells and abilities by 1%" },
-  { name: "Berserking", spellId: 20554, tooltip: "spellcasting and attack speed by 10% for 10 sec" },
-  { name: "Wind Blessed", spellId: 1259710, tooltip: "melee, and ranged Haste by 3%" },
-  { name: "Ruthless", spellId: 20597, tooltip: "critical strike chance with all spells and attacks by 2%" },
-  { name: "The Human Spirit", spellId: 20598, tooltip: "Spirit increased by 5%" },
-  { name: "Endurance", spellId: 20550, tooltip: "critical strike bonus to damage and healing increased by 2%" },
-  { name: "Earth Fury", spellId: 1259719, tooltip: "critical strike bonus to damage and healing by 2%" },
+  // The hunter rank: a flat +5 to every effect of the pet passive, as Unleashed Fury raises it.
+  { name: "Command", spellId: 20576, tooltip: "Damage dealt by Hunter and Warlock pets increased by 5%" },
+  { name: "Berserking", spellId: 20554, tooltip: "spellcasting and attack speed by 10% for 15 sec" },
+  { name: "Wind Blessed", spellId: 1259710, tooltip: "melee, and ranged Haste by 2%" },
+  { name: "Ruthless", spellId: 20597, tooltip: "critical strike chance with all spells and attacks by 1%" },
+  { name: "The Human Spirit", spellId: 20598, tooltip: "Spirit increased by 10%" },
+  // Build 70753 turned Earth Fury's spell into Artisan's Precision.
+  { name: "Artisan's Precision", spellId: 1259719, tooltip: "hit chance with spells and attacks by 1%" },
   { name: "Elune's Light", spellId: 1259799, tooltip: "critical strike chance with all spells and attacks by 10% for 15 sec" },
   { name: "Beast Slaying", spellId: 20557, tooltip: "Damage dealt versus Beasts increased by 5%" },
   { name: "Big Game Hunter", spellId: 1259721, tooltip: "Damage dealt versus Beasts increased by 5%" },

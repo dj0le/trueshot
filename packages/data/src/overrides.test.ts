@@ -18,8 +18,9 @@ test("overrides.toml validates", async () => {
 test("hotfixes replace effect base points without touching the input", async () => {
   const o = await loadOverrides();
   const patched = applyHotfixes(d, o);
-  expect(patched.spells["14325"]!.effects[1]!.basePoints).toBe(143);
-  expect(d.spells["14325"]!.effects[1]!.basePoints).toBe(71);
+  expect(patched.spells["3044"]!.effects[0]!.basePoints).toBe(25);
+  expect(patched.spells["3044"]!.effects[0]!.apCoefficient).toBe(0.15);
+  expect(d.spells["3044"]!.effects[0]!.basePoints).toBe(20);
 });
 
 test("talent hotfixes follow the tooltip: weapon-only damage, Auto Shot-only procs", async () => {
@@ -34,8 +35,17 @@ test("talent hotfixes follow the tooltip: weapon-only damage, Auto Shot-only pro
 
 test("a hotfix the client already has is rejected as stale", async () => {
   const o = await loadOverrides();
-  o.hotfix = [{ spell: 14325, effectIndex: 1, basePoints: 71, confidence: "reported", source: "test" }];
-  expect(() => applyHotfixes(d, o)).toThrow(/already has 71/);
+  o.hotfix = [{ spell: 14325, effectIndex: 1, basePoints: 143, confidence: "reported", source: "test" }];
+  expect(() => applyHotfixes(d, o)).toThrow(/already has 143/);
+});
+
+test("talent hotfixes replace rank values and reject stale ones", async () => {
+  const o = await loadOverrides();
+  const barrage = (data: typeof d) => data.talents.find((t) => t.name === "Barrage")!.rankEffects[0]!.values;
+  expect(barrage(applyHotfixes(d, o))).toEqual([5, 10, 15]);
+  expect(barrage(d)).toEqual([3, 7, 10]);
+  o.talentHotfix = [{ talent: "Barrage", effectIndex: 0, values: [3, 7, 10], confidence: "reported", source: "test" }];
+  expect(() => applyHotfixes(d, o)).toThrow(/already has 3\/7\/10/);
 });
 
 test("unconfirmed lists guesses with their keys", async () => {

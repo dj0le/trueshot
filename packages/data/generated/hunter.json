@@ -1,9 +1,9 @@
 {
- "build": "1.60.1.70532",
+ "build": "1.60.1.70753",
  "sources": [
   {
    "name": "WoW Forever client tables via wago.tools",
-   "url": "https://wago.tools/db2?build=1.60.1.70532"
+   "url": "https://wago.tools/db2?build=1.60.1.70753"
   },
   {
    "name": "talentsforever.com",
@@ -199,7 +199,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -294,7 +294,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -453,7 +453,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -835,7 +835,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -962,7 +962,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -1305,7 +1305,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -1392,7 +1392,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -1544,7 +1544,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -1639,7 +1639,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -1655,7 +1655,7 @@
    "cooldownMs": 0,
    "categoryCooldownMs": 30000,
    "gcdMs": 1500,
-   "category": 2183,
+   "category": 411,
    "gcdCategory": 133,
    "defenseType": 0,
    "preventionType": 1,
@@ -1734,7 +1734,7 @@
     0,
     0,
     1,
-    0,
+    64,
     8192,
     0
    ],
@@ -1893,7 +1893,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -2255,7 +2255,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -2916,7 +2916,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -3123,7 +3123,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -3313,7 +3313,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -3408,7 +3408,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -3725,7 +3725,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -3820,7 +3820,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -3927,7 +3927,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -4022,7 +4022,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -4225,7 +4225,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -4320,7 +4320,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -4415,7 +4415,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -5778,7 +5778,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -5873,7 +5873,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -6104,7 +6104,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -6595,7 +6595,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -17205,7 +17205,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -17344,7 +17344,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -17515,7 +17515,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -17610,7 +17610,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -17668,7 +17668,7 @@
      "index": 0,
      "effect": 6,
      "aura": 124,
-     "basePoints": 20,
+     "basePoints": 15,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -20478,7 +20478,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -20573,7 +20573,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -20668,7 +20668,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -20763,7 +20763,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -20858,7 +20858,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -20953,7 +20953,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -21048,7 +21048,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -21143,7 +21143,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -21238,7 +21238,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -21333,7 +21333,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -22439,7 +22439,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -22622,7 +22622,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -22638,7 +22638,7 @@
    "cooldownMs": 0,
    "categoryCooldownMs": 30000,
    "gcdMs": 1500,
-   "category": 2183,
+   "category": 411,
    "gcdCategory": 133,
    "defenseType": 0,
    "preventionType": 1,
@@ -22700,7 +22700,7 @@
   },
   "13812": {
    "id": 13812,
-   "name": "Explosive Trap Effect",
+   "name": "Explosive Trap",
    "school": 4,
    "attributes": [
     0,
@@ -22837,7 +22837,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -24376,7 +24376,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -24471,7 +24471,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -24566,7 +24566,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -24661,7 +24661,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -24756,7 +24756,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -24851,7 +24851,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -24946,7 +24946,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -25041,7 +25041,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -25168,7 +25168,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -25295,7 +25295,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -25390,7 +25390,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -25485,7 +25485,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -25580,7 +25580,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -25675,7 +25675,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -25770,7 +25770,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -25865,7 +25865,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -25960,7 +25960,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -26055,7 +26055,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -26150,7 +26150,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -26245,7 +26245,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -26340,7 +26340,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -26435,7 +26435,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -26530,7 +26530,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -26625,7 +26625,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -26720,7 +26720,7 @@
     0,
     0,
     1,
-    0,
+    64,
     8192,
     0
    ],
@@ -26879,7 +26879,7 @@
     0,
     0,
     1,
-    0,
+    64,
     8192,
     0
    ],
@@ -27390,7 +27390,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -27485,7 +27485,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -27580,7 +27580,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -27675,7 +27675,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -27770,7 +27770,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -27786,7 +27786,7 @@
    "cooldownMs": 0,
    "categoryCooldownMs": 30000,
    "gcdMs": 1500,
-   "category": 2183,
+   "category": 411,
    "gcdCategory": 133,
    "defenseType": 0,
    "preventionType": 1,
@@ -27865,7 +27865,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -27881,7 +27881,7 @@
    "cooldownMs": 0,
    "categoryCooldownMs": 30000,
    "gcdMs": 1500,
-   "category": 2183,
+   "category": 411,
    "gcdCategory": 133,
    "defenseType": 0,
    "preventionType": 1,
@@ -27943,7 +27943,7 @@
   },
   "14314": {
    "id": 14314,
-   "name": "Explosive Trap Effect",
+   "name": "Explosive Trap",
    "school": 4,
    "attributes": [
     0,
@@ -28063,7 +28063,7 @@
   },
   "14315": {
    "id": 14315,
-   "name": "Explosive Trap Effect",
+   "name": "Explosive Trap",
    "school": 4,
    "attributes": [
     0,
@@ -28200,7 +28200,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -28295,7 +28295,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -28390,7 +28390,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -28448,7 +28448,7 @@
      "index": 0,
      "effect": 6,
      "aura": 124,
-     "basePoints": 35,
+     "basePoints": 22,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -28529,7 +28529,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -28587,7 +28587,7 @@
      "index": 0,
      "effect": 6,
      "aura": 124,
-     "basePoints": 50,
+     "basePoints": 30,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -28668,7 +28668,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -28726,7 +28726,7 @@
      "index": 0,
      "effect": 6,
      "aura": 124,
-     "basePoints": 70,
+     "basePoints": 38,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -28807,7 +28807,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -28865,7 +28865,7 @@
      "index": 0,
      "effect": 6,
      "aura": 124,
-     "basePoints": 90,
+     "basePoints": 47,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -28946,7 +28946,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -29085,7 +29085,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -29224,7 +29224,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -29363,7 +29363,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -29453,7 +29453,7 @@
      "index": 1,
      "effect": 6,
      "aura": 127,
-     "basePoints": 71,
+     "basePoints": 143,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -29502,7 +29502,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -29633,7 +29633,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -31684,6 +31684,38 @@
       0,
       0
      ]
+    },
+    {
+     "index": 1,
+     "effect": 6,
+     "aura": 55,
+     "basePoints": 1,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
     }
    ]
   },
@@ -32381,7 +32413,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -32476,7 +32508,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -32571,7 +32603,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -32666,7 +32698,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -53920,7 +53952,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -54422,7 +54454,7 @@
      "classMask": [
       522818,
       -2146955264,
-      8192,
+      2105344,
       8388608
      ]
     }
@@ -54535,7 +54567,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     128
    ],
@@ -55153,7 +55185,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -55199,7 +55231,7 @@
      "index": 0,
      "effect": 65,
      "aura": 124,
-     "basePoints": 50,
+     "basePoints": 30,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -58225,7 +58257,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -58345,7 +58377,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -58465,7 +58497,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -58585,7 +58617,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -58705,7 +58737,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -58825,7 +58857,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -58945,7 +58977,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -59097,7 +59129,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -59192,7 +59224,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -59448,150 +59480,6 @@
     }
    ]
   },
-  "20550": {
-   "id": 20550,
-   "name": "Endurance",
-   "school": 1,
-   "attributes": [
-    80,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    8192,
-    0
-   ],
-   "castTimeMs": 0,
-   "durationMs": 0,
-   "maxDurationMs": 0,
-   "rangeMin": 0,
-   "rangeMax": 0,
-   "speed": 0,
-   "baseLevel": 0,
-   "spellLevel": 0,
-   "maxLevel": 0,
-   "cooldownMs": 0,
-   "categoryCooldownMs": 0,
-   "gcdMs": 0,
-   "category": 0,
-   "gcdCategory": 0,
-   "defenseType": 0,
-   "preventionType": 0,
-   "mechanic": 0,
-   "dispelType": 0,
-   "casterAuraState": 0,
-   "power": [],
-   "proc": null,
-   "classOptions": null,
-   "effects": [
-    {
-     "index": 0,
-     "effect": 6,
-     "aura": 133,
-     "basePoints": 5,
-     "variance": 0,
-     "pointsPerLevel": 0,
-     "apCoefficient": 0,
-     "spCoefficient": 1,
-     "periodMs": 0,
-     "triggerSpell": 0,
-     "chainTargets": 0,
-     "mechanic": 0,
-     "miscValue": [
-      0,
-      0
-     ],
-     "radiusIndex": [
-      0,
-      0
-     ],
-     "implicitTarget": [
-      1,
-      0
-     ],
-     "classMask": [
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "index": 1,
-     "effect": 6,
-     "aura": 163,
-     "basePoints": 2,
-     "variance": 0,
-     "pointsPerLevel": 0,
-     "apCoefficient": 0,
-     "spCoefficient": 1,
-     "periodMs": 0,
-     "triggerSpell": 0,
-     "chainTargets": 0,
-     "mechanic": 0,
-     "miscValue": [
-      0,
-      0
-     ],
-     "radiusIndex": [
-      0,
-      0
-     ],
-     "implicitTarget": [
-      1,
-      0
-     ],
-     "classMask": [
-      0,
-      0,
-      0,
-      0
-     ]
-    },
-    {
-     "index": 2,
-     "effect": 6,
-     "aura": 50,
-     "basePoints": 2,
-     "variance": 0,
-     "pointsPerLevel": 0,
-     "apCoefficient": 0,
-     "spCoefficient": 1,
-     "periodMs": 0,
-     "triggerSpell": 0,
-     "chainTargets": 0,
-     "mechanic": 0,
-     "miscValue": [
-      0,
-      0
-     ],
-     "radiusIndex": [
-      0,
-      0
-     ],
-     "implicitTarget": [
-      1,
-      0
-     ],
-     "classMask": [
-      0,
-      0,
-      0,
-      0
-     ]
-    }
-   ]
-  },
   "20554": {
    "id": 20554,
    "name": "Berserking",
@@ -59616,8 +59504,8 @@
     0
    ],
    "castTimeMs": 0,
-   "durationMs": 10000,
-   "maxDurationMs": 10000,
+   "durationMs": 15000,
+   "maxDurationMs": 15000,
    "rangeMin": 0,
    "rangeMax": 0,
    "speed": 0,
@@ -59848,7 +59736,7 @@
    "baseLevel": 0,
    "spellLevel": 0,
    "maxLevel": 0,
-   "cooldownMs": 180000,
+   "cooldownMs": 120000,
    "categoryCooldownMs": 0,
    "gcdMs": 0,
    "category": 0,
@@ -59960,9 +59848,9 @@
     }
    ]
   },
-  "20574": {
-   "id": 20574,
-   "name": "Savage",
+  "20576": {
+   "id": 20576,
+   "name": "Command",
    "school": 1,
    "attributes": [
     80,
@@ -60004,13 +59892,21 @@
    "casterAuraState": 0,
    "power": [],
    "proc": null,
-   "classOptions": null,
+   "classOptions": {
+    "set": 9,
+    "mask": [
+     0,
+     0,
+     0,
+     0
+    ]
+   },
    "effects": [
     {
      "index": 0,
      "effect": 6,
-     "aura": 290,
-     "basePoints": 1,
+     "aura": 107,
+     "basePoints": 5,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -60020,7 +59916,7 @@
      "chainTargets": 0,
      "mechanic": 0,
      "miscValue": [
-      0,
+      8,
       0
      ],
      "radiusIndex": [
@@ -60032,7 +59928,7 @@
       0
      ],
      "classMask": [
-      0,
+      33554432,
       0,
       0,
       0
@@ -60390,7 +60286,7 @@
      "index": 0,
      "effect": 6,
      "aura": 290,
-     "basePoints": 2,
+     "basePoints": 1,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -60470,7 +60366,7 @@
      "index": 0,
      "effect": 6,
      "aura": 137,
-     "basePoints": 5,
+     "basePoints": 10,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -60611,7 +60507,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -61066,7 +60962,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     128
    ],
@@ -61161,7 +61057,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     128
    ],
@@ -61256,7 +61152,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     128
    ],
@@ -61351,7 +61247,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     128
    ],
@@ -61446,7 +61342,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     128
    ],
@@ -61541,7 +61437,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -61587,7 +61483,7 @@
      "index": 0,
      "effect": 65,
      "aura": 124,
-     "basePoints": 75,
+     "basePoints": 40,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -61636,7 +61532,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -61731,7 +61627,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -61902,7 +61798,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -63937,6 +63833,98 @@
     }
    ]
   },
+  "21747": {
+   "id": 21747,
+   "name": "Lawbringer",
+   "school": 1,
+   "attributes": [
+    262208,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": -1,
+   "maxDurationMs": -1,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "casterAuraState": 0,
+   "power": [],
+   "proc": {
+    "chance": 100,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     20,
+     0
+    ],
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
+   },
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 42,
+     "basePoints": 0,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 1,
+     "periodMs": 0,
+     "triggerSpell": 23544,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "21751": {
    "id": 21751,
    "name": "Perm. Illusion Skeleton",
@@ -64011,6 +63999,98 @@
      "miscValue": [
       11258,
       1
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "21838": {
+   "id": 21838,
+   "name": "Battlegear of Might",
+   "school": 1,
+   "attributes": [
+    2496,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": -1,
+   "maxDurationMs": -1,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "casterAuraState": 0,
+   "power": [],
+   "proc": {
+    "chance": 20,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     1048576,
+     0
+    ],
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
+   },
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 42,
+     "basePoints": 0,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 29478,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
      ],
      "radiusIndex": [
       0,
@@ -71404,6 +71484,98 @@
     }
    ]
   },
+  "23544": {
+   "id": 23544,
+   "name": "Healing Circle",
+   "school": 1,
+   "attributes": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "casterAuraState": 0,
+   "power": [],
+   "proc": {
+    "chance": 101,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     0,
+     0
+    ],
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
+   },
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 10,
+     "aura": 0,
+     "basePoints": 200,
+     "variance": 0.11,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      10,
+      0
+     ],
+     "implicitTarget": [
+      20,
+      0
+     ],
+     "classMask": [
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
   "23559": {
    "id": 23559,
    "name": "Improved Aspect of the Hawk",
@@ -71661,6 +71833,98 @@
      ],
      "classMask": [
       8388608,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "23562": {
+   "id": 23562,
+   "name": "Block Value 30",
+   "school": 1,
+   "attributes": [
+    192,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": -1,
+   "maxDurationMs": -1,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 0,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "casterAuraState": 0,
+   "power": [],
+   "proc": {
+    "chance": 101,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     0,
+     0
+    ],
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
+   },
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 6,
+     "aura": 274,
+     "basePoints": 30,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      0,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
       0,
       0,
       0
@@ -85937,7 +86201,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -86127,7 +86391,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -96278,6 +96542,98 @@
      ],
      "classMask": [
       16777825,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "29478": {
+   "id": 29478,
+   "name": "Battlegear of Might",
+   "school": 1,
+   "attributes": [
+    262160,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8192,
+    0
+   ],
+   "castTimeMs": 0,
+   "durationMs": 0,
+   "maxDurationMs": 0,
+   "rangeMin": 0,
+   "rangeMax": 0,
+   "speed": 0,
+   "baseLevel": 0,
+   "spellLevel": 1,
+   "maxLevel": 0,
+   "cooldownMs": 0,
+   "categoryCooldownMs": 0,
+   "gcdMs": 0,
+   "category": 0,
+   "gcdCategory": 0,
+   "defenseType": 0,
+   "preventionType": 0,
+   "mechanic": 0,
+   "dispelType": 0,
+   "casterAuraState": 0,
+   "power": [],
+   "proc": {
+    "chance": 101,
+    "charges": 0,
+    "ppm": 0,
+    "categoryRecoveryMs": 0,
+    "typeMask": [
+     0,
+     0
+    ],
+    "cumulative": 0,
+    "serverRate": false,
+    "critOnly": false
+   },
+   "classOptions": null,
+   "effects": [
+    {
+     "index": 0,
+     "effect": 30,
+     "aura": 0,
+     "basePoints": 10,
+     "variance": 0,
+     "pointsPerLevel": 0,
+     "apCoefficient": 0,
+     "spCoefficient": 0,
+     "periodMs": 0,
+     "triggerSpell": 0,
+     "chainTargets": 0,
+     "mechanic": 0,
+     "miscValue": [
+      1,
+      0
+     ],
+     "radiusIndex": [
+      0,
+      0
+     ],
+     "implicitTarget": [
+      1,
+      0
+     ],
+     "classMask": [
+      0,
       0,
       0,
       0
@@ -109103,7 +109459,7 @@
     0,
     0,
     128,
-    0,
+    64,
     8192,
     0
    ],
@@ -109897,7 +110253,7 @@
      "index": 0,
      "effect": 6,
      "aura": 342,
-     "basePoints": 3,
+     "basePoints": 2,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -109929,7 +110285,7 @@
      "index": 1,
      "effect": 6,
      "aura": 65,
-     "basePoints": 3,
+     "basePoints": 2,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -109961,7 +110317,7 @@
   },
   "1259719": {
    "id": 1259719,
-   "name": "Earth Fury",
+   "name": "Artisan's Precision",
    "school": 1,
    "attributes": [
     80,
@@ -110008,8 +110364,8 @@
     {
      "index": 0,
      "effect": 6,
-     "aura": 163,
-     "basePoints": 2,
+     "aura": 54,
+     "basePoints": 1,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -110040,8 +110396,8 @@
     {
      "index": 1,
      "effect": 6,
-     "aura": 50,
-     "basePoints": 2,
+     "aura": 55,
+     "basePoints": 1,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -117868,7 +118224,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -118059,7 +118415,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -118250,7 +118606,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -118441,7 +118797,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -121635,7 +121991,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -121681,7 +122037,7 @@
      "index": 0,
      "effect": 65,
      "aura": 124,
-     "basePoints": 30,
+     "basePoints": 15,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -121730,7 +122086,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -121776,7 +122132,7 @@
      "index": 0,
      "effect": 65,
      "aura": 124,
-     "basePoints": 40,
+     "basePoints": 22,
      "variance": 0,
      "pointsPerLevel": 0,
      "apCoefficient": 0,
@@ -121997,7 +122353,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -122168,7 +122524,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -122339,7 +122695,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     0
    ],
@@ -126050,19 +126406,7 @@
    "dispelType": 0,
    "casterAuraState": 0,
    "power": [],
-   "proc": {
-    "chance": 100,
-    "charges": 0,
-    "ppm": 0,
-    "categoryRecoveryMs": 0,
-    "typeMask": [
-     328020,
-     0
-    ],
-    "cumulative": 0,
-    "serverRate": false,
-    "critOnly": false
-   },
+   "proc": null,
    "classOptions": {
     "set": 9,
     "mask": [
@@ -126805,7 +127149,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     128
    ],
@@ -127036,7 +127380,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     128
    ],
@@ -127175,7 +127519,7 @@
     0,
     0,
     0,
-    0,
+    64,
     8192,
     128
    ],
@@ -133464,35 +133808,10 @@
    "classicStatus": "changed"
   },
   {
-   "name": "Pathfinding",
-   "tree": "Beast Mastery",
-   "row": 2,
-   "col": 3,
-   "maxRank": 2,
-   "passive": true,
-   "spellId": 19559,
-   "rankEffects": [
-    {
-     "effectIndex": 0,
-     "operation": 0,
-     "values": [
-      3,
-      6
-     ]
-    }
-   ],
-   "requires": [],
-   "text": [
-    "Increases the speed bonus of your Aspect of the Cheetah and Aspect of the Pack by 3%.",
-    "Increases the speed bonus of your Aspect of the Cheetah and Aspect of the Pack by 6%."
-   ],
-   "classicStatus": "moved"
-  },
-  {
    "name": "Improved Revive Pet",
    "tree": "Beast Mastery",
    "row": 2,
-   "col": 4,
+   "col": 3,
    "maxRank": 2,
    "passive": true,
    "spellId": 24443,
@@ -133526,6 +133845,31 @@
    "text": [
     "Revive Pet's casting time is reduced by 3 sec, mana cost is reduced by 20%, and increases the health your pet returns with by an additional 15%.",
     "Revive Pet's casting time is reduced by 6 sec, mana cost is reduced by 40%, and increases the health your pet returns with by an additional 30%."
+   ],
+   "classicStatus": "moved"
+  },
+  {
+   "name": "Pathfinding",
+   "tree": "Beast Mastery",
+   "row": 3,
+   "col": 1,
+   "maxRank": 2,
+   "passive": true,
+   "spellId": 19559,
+   "rankEffects": [
+    {
+     "effectIndex": 0,
+     "operation": 0,
+     "values": [
+      3,
+      6
+     ]
+    }
+   ],
+   "requires": [],
+   "text": [
+    "Increases the speed bonus of your Aspect of the Cheetah and Aspect of the Pack by 3%.",
+    "Increases the speed bonus of your Aspect of the Cheetah and Aspect of the Pack by 6%."
    ],
    "classicStatus": "same"
   },
@@ -134084,7 +134428,7 @@
    "rankEffects": [],
    "requires": [],
    "text": [
-    "Increases the Ranged Attack Power of party or raid members within 45 yds by 30."
+    "Increases the Ranged Attack Power of party or raid members within 45 yds by 20."
    ],
    "classicStatus": "changed"
   },
@@ -134177,9 +134521,9 @@
    ],
    "requires": [],
    "text": [
-    "Increases the damage done by your Multi-Shot, Aimed Shot, and Volley abilities by 3%.",
-    "Increases the damage done by your Multi-Shot, Aimed Shot, and Volley abilities by 7%.",
-    "Increases the damage done by your Multi-Shot, Aimed Shot, and Volley abilities by 10%."
+    "Increases the damage done by your Multi-Shot, Aimed Shot, and Volley abilities by 5%.",
+    "Increases the damage done by your Multi-Shot, Aimed Shot, and Volley abilities by 10%.",
+    "Increases the damage done by your Multi-Shot, Aimed Shot, and Volley abilities by 15%."
    ],
    "classicStatus": "changed"
   },
@@ -134501,6 +134845,15 @@
       2,
       3
      ]
+    },
+    {
+     "effectIndex": 3,
+     "operation": 0,
+     "values": [
+      1,
+      2,
+      3
+     ]
     }
    ],
    "requires": [],
@@ -134739,13 +135092,13 @@
    ],
    "requires": [],
    "text": [
-    "Increases your Agility by 2%.",
-    "Increases your Agility by 4%.",
+    "Increases your Agility by 3%.",
     "Increases your Agility by 6%.",
-    "Increases your Agility by 8%.",
-    "Increases your Agility by 10%."
+    "Increases your Agility by 9%.",
+    "Increases your Agility by 12%.",
+    "Increases your Agility by 15%."
    ],
-   "classicStatus": "changed"
+   "classicStatus": "same"
   },
   {
    "name": "Lacerating Strikes",
@@ -135287,14 +135640,8 @@
   },
   {
    "race": "Orc",
-   "name": "Savage",
-   "spellId": 20574,
-   "active": false
-  },
-  {
-   "race": "Tauren",
-   "name": "Endurance",
-   "spellId": 20550,
+   "name": "Command",
+   "spellId": 20576,
    "active": false
   },
   {
@@ -135335,7 +135682,7 @@
   },
   {
    "race": "Dwarf",
-   "name": "Earth Fury",
+   "name": "Artisan's Precision",
    "spellId": 1259719,
    "active": false
   },
@@ -140249,6 +140596,126 @@
     {
      "threshold": 5,
      "spellId": 1324684
+    }
+   ]
+  },
+  {
+   "id": 2141,
+   "name": "Nightslayer Armor",
+   "items": [
+    288847,
+    288848,
+    288849,
+    288850,
+    288851,
+    288852,
+    288853,
+    288854
+   ],
+   "bonuses": [
+    {
+     "threshold": 5,
+     "spellId": 21975
+    }
+   ]
+  },
+  {
+   "id": 2142,
+   "name": "Cenarion Raiment",
+   "items": [
+    288855,
+    288856,
+    288857,
+    288858,
+    288859,
+    288860,
+    288861,
+    288862
+   ],
+   "bonuses": [
+    {
+     "threshold": 5,
+     "spellId": 18382
+    }
+   ]
+  },
+  {
+   "id": 2144,
+   "name": "Giantstalker Armor",
+   "items": [
+    288871,
+    288872,
+    288873,
+    288874,
+    288875,
+    288876,
+    288877,
+    288878
+   ],
+   "bonuses": [
+    {
+     "threshold": 3,
+     "spellId": 23560
+    },
+    {
+     "threshold": 5,
+     "spellId": 21926
+    },
+    {
+     "threshold": 8,
+     "spellId": 23566
+    }
+   ]
+  },
+  {
+   "id": 2145,
+   "name": "Lawbringer Armor",
+   "items": [
+    288879,
+    288880,
+    288881,
+    288882,
+    288883,
+    288884,
+    288885,
+    288886
+   ],
+   "bonuses": [
+    {
+     "threshold": 5,
+     "spellId": 18384
+    },
+    {
+     "threshold": 5,
+     "spellId": 7597
+    },
+    {
+     "threshold": 8,
+     "spellId": 21747
+    }
+   ]
+  },
+  {
+   "id": 2146,
+   "name": "Battlegear of Might",
+   "items": [
+    288887,
+    288888,
+    288889,
+    288890,
+    288891,
+    288892,
+    288893,
+    288894
+   ],
+   "bonuses": [
+    {
+     "threshold": 3,
+     "spellId": 23562
+    },
+    {
+     "threshold": 5,
+     "spellId": 21838
     }
    ]
   }

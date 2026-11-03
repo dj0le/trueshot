@@ -135,7 +135,9 @@ test("a DoT gets all its ticks, including the one landing on expiry", () => {
   });
   const sting = r.abilities.find((a) => a.name === "Serpent Sting")!;
   expect(sting.castsPerFight).toBe(2);
-  expect(sting.avgHit).toBeCloseTo(111 * 5, 5);
+  // Rank 9 after the 2026-11-03 patch: 135 a tick plus 5% of ranged attack power.
+  const ch = buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({ ...base, gear: { ...base.gear!, stats: { hitPct: 9, mp5: 100000 } } }));
+  expect(sting.avgHit).toBeCloseTo((135 + 0.05 * ch.rangedAttackPower) * 5, 5);
 });
 
 test("gear items add their stats, convert ratings, and supply the ranged weapon", () => {
@@ -307,17 +309,17 @@ test("conditions can name a consumable's cooldown by its action name", () => {
   expect(r.abilities.find((a) => a.name === "Major Mana Potion")!.castsPerFight).toBe(1);
 });
 
-test("racials: Wind Blessed hastes Auto Shot, Berserking is cast, Savage adds crit", () => {
+test("racials: Wind Blessed hastes Auto Shot, Berserking is cast, Orcs get Command", () => {
   const fight = { durationSec: 300, iterations: 20 };
   const autos = (race: string) =>
     simulate(game, { ...base, race, fight }).abilities.find((a) => a.name === "Auto Shot")!.castsPerFight;
-  expect(autos("Skyborne")).toBeGreaterThan(autos("Tauren") * 1.025);
+  expect(autos("Skyborne")).toBeGreaterThan(autos("Tauren") * 1.015);
 
   const troll = simulate(game, { ...base, race: "Troll", fight, rotation: { actions: [{ action: "berserking" }] } });
   expect(troll.abilities.find((a) => a.name === "Berserking")!.castsPerFight).toBe(2);
 
   const orc = buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({ ...base, race: "Orc" }));
-  expect(orc.passives.map((p) => p.source)).toContain("Savage");
+  expect(orc.passives.map((p) => p.source)).toContain("Command");
   expect(orc.abilities.has("blood_fury")).toBe(true);
 });
 
@@ -339,6 +341,8 @@ test("hawks and the dive get Unleashed Fury and Ferocity, but not Bestial Wrath"
   const run = (talents: Record<string, number>, precombat: string[] = [], preset: "boss" | "normal" = "boss") =>
     simulate(game, {
       ...base,
+      // Not Orc: Command raises the same pet passive and would sit under Unleashed Fury's ratio.
+      race: "Troll",
       talents,
       gear: { ...base.gear!, stats: { hitPct: 9, mp5: 10000 } },
       pet: { active: true, family: "Cat", abilities: [] },
