@@ -23,6 +23,7 @@ local EVENTS = {
   "UNIT_AURA", "UNIT_INVENTORY_CHANGED", "PLAYER_EQUIPMENT_CHANGED", "PLAYER_LEVEL_UP", "CHARACTER_POINTS_CHANGED",
   "PLAYER_TALENT_UPDATE", "UNIT_RANGED_ATTACK_POWER", "UNIT_ATTACK_POWER", "UNIT_RANGEDDAMAGE", "UNIT_DAMAGE",
   "UNIT_ATTACK_SPEED", "UNIT_STATS", "UNIT_PET", "UNIT_LEVEL", "COMBAT_RATING_UPDATE", "PLAYER_DAMAGE_DONE_MODS",
+  "TRAIT_CONFIG_UPDATED", "TRAIT_NODE_CHANGED", "ACTIVE_COMBAT_CONFIG_CHANGED", "PLAYER_REGEN_ENABLED",
 }
 
 local frame = CreateFrame("Frame")
@@ -31,8 +32,26 @@ local last
 -- GetTime() of the first event in a burst, or nil when none waits.
 local pendingAt
 
+-- Forever hides some unit values from addons as secret numbers (retail's restrictions), mostly in
+-- combat: no arithmetic, comparison or formatting. A sheet that meets one is not saved (a blank
+-- would read as 0), so the last whole sheet stays in force until combat ends.
+local sawSecret = false
+local function secret(x)
+  if issecretvalue ~= nil and issecretvalue(x) then
+    sawSecret = true
+    return true
+  end
+  return false
+end
+
+-- Attack power's base + buffs + debuffs, or nil when any part is secret.
+local function sum(base, pos, neg)
+  if base == nil or secret(base) or secret(pos) or secret(neg) then return nil end
+  return base + (pos or 0) + (neg or 0)
+end
+
 local function num(x)
-  if x == nil then return "" end
+  if x == nil or secret(x) then return "" end
   if x == math.floor(x) then return tostring(x) end
   return string.format("%.3f", x)
 end
@@ -85,8 +104,37 @@ local function gear()
   return table.concat(out, ",")
 end
 
--- Each tree's ranks in talent order, trees split by "/".
+-- Forever runs the retail talent system (C_ClassTalents, C_Traits; GetNumTalentTabs is nil):
+-- "spellID:rank" for each talent with points in it, sorted by spell. Choice nodes report the
+-- chosen entry's spell.
+local function traitTalents()
+  local configID = C_ClassTalents.GetActiveConfigID and C_ClassTalents.GetActiveConfigID()
+  local config = configID and C_Traits.GetConfigInfo(configID)
+  if not config or not config.treeIDs then return nil end
+  local out = {}
+  for _, treeID in ipairs(config.treeIDs) do
+    for _, nodeID in ipairs(C_Traits.GetTreeNodes(treeID) or {}) do
+      local node = C_Traits.GetNodeInfo(configID, nodeID)
+      local rank = node and (node.activeRank or node.currentRank) or 0
+      local entryID = node and rank > 0 and ((node.activeEntry and node.activeEntry.entryID) or (node.entryIDs and node.entryIDs[1]))
+      local entry = entryID and C_Traits.GetEntryInfo(configID, entryID)
+      local def = entry and entry.definitionID and C_Traits.GetDefinitionInfo(entry.definitionID)
+      local spell = def and (def.spellID or def.overriddenSpellID)
+      if spell then out[#out + 1] = { spell, rank } end
+    end
+  end
+  table.sort(out, function(a, b) return a[1] < b[1] end)
+  for i, t in ipairs(out) do out[i] = t[1] .. ":" .. t[2] end
+  return table.concat(out, ",")
+end
+
+-- Each tree's ranks in talent order, trees split by "/" (the Classic API), else the trait list
+-- above. A client with neither leaves it empty.
 local function talents()
+  if not GetNumTalentTabs and C_ClassTalents and C_Traits then
+    local ok, list = pcall(traitTalents)
+    return ok and list or ""
+  end
   local trees = {}
   for tab = 1, (GetNumTalentTabs and GetNumTalentTabs() or 0) do
     local ranks = {}
@@ -102,10 +150,8 @@ local function sheet()
   local v = {}
   local add = function(k, x) v[#v + 1] = k .. "=" .. x end
   add("level", num(UnitLevel("player")))
-  local base, pos, neg = UnitRangedAttackPower("player")
-  add("rap", num(base + pos + neg))
-  base, pos, neg = UnitAttackPower("player")
-  add("ap", num(base + pos + neg))
+  add("rap", num(sum(UnitRangedAttackPower("player"))))
+  add("ap", num(sum(UnitAttackPower("player"))))
   local speed, low, high, _, _, pct = UnitRangedDamage("player")
   add("rspeed", num(speed))
   add("rmin", num(low))
@@ -124,8 +170,7 @@ local function sheet()
   if UnitExists("pet") then
     add("pet", UnitCreatureFamily("pet") or "")
     add("petlevel", num(UnitLevel("pet")))
-    base, pos, neg = UnitAttackPower("pet")
-    add("petap", num(base + pos + neg))
+    add("petap", num(sum(UnitAttackPower("pet"))))
     add("petspeed", num(UnitAttackSpeed("pet")))
     low, high = UnitDamage("pet")
     add("petmin", num(low))
@@ -139,8 +184,10 @@ local function flush()
   local at = pendingAt or GetTime()
   pendingAt = nil
   if not session then return end
-  local row = sheet()
-  if row == last then return end
+  -- A value this client guards in a new way must not stop the recorder.
+  sawSecret = false
+  local ok, row = pcall(sheet)
+  if not ok or sawSecret or row == last then return end
   last = row
   session.rows[#session.rows + 1] = "t=" .. math.floor((at - session.gt) * 1000 + 0.5) .. ";" .. row
 end
@@ -244,8 +291,9 @@ frame:SetScript("OnEvent", function(_, event, unit)
     if TrueshotDB.autolog == nil then TrueshotDB.autolog = true end
     if select(2, UnitClass("player")) ~= "HUNTER" then return end
     for _, e in ipairs(EVENTS) do pcall(frame.RegisterEvent, frame, e) end
-    hooksecurefunc("UseAction", onUseAction)
-    if CastPetAction then hooksecurefunc("CastPetAction", onPetAction) end
+    -- Press tracking must never throw into the player's button press.
+    hooksecurefunc("UseAction", function(...) pcall(onUseAction, ...) end)
+    if CastPetAction then hooksecurefunc("CastPetAction", function(...) pcall(onPetAction, ...) end) end
     startSession()
   elseif event == "PLAYER_ENTERING_WORLD" then
     autolog()
