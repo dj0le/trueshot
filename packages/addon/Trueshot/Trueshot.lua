@@ -295,6 +295,9 @@ frame:SetScript("OnEvent", function(_, event, unit)
     hooksecurefunc("UseAction", function(...) pcall(onUseAction, ...) end)
     if CastPetAction then hooksecurefunc("CastPetAction", function(...) pcall(onPetAction, ...) end) end
     startSession()
+    -- Talent changes fire no event this addon receives on Forever (2026-11-06: spent points showed
+    -- up only with the next unrelated event), so look every 10 sec; an unchanged sheet is not saved.
+    if C_Timer.NewTicker then C_Timer.NewTicker(10, changed) end
   elseif event == "PLAYER_ENTERING_WORLD" then
     autolog()
     changed()
