@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { actors, hitsBy, hunters, parseLine, parseLog, splitFields } from "../index";
+import { parseTime } from "./parse";
 
 // Lines from a public beta log (gist.github.com/ArcSim/9ef18a6ea02db6588e213b6225201225), names shortened.
 const PET_SWING =
@@ -41,4 +42,12 @@ test("a log sums each unit's abilities and finds hunters with their pets", () =>
   expect(hitsBy(events, fox.guid)).toEqual([
     { timeMs: 0, ability: "Melee", target: "Defias Bandit", amount: 27, unmitigated: 33, critical: false, glancing: false, level: 8, attackPower: 65 },
   ]);
+});
+
+test("the seconds fraction is a decimal: 3 digits in beta logs, 4 in launch logs", () => {
+  const base = Date.UTC(2026, 10, 5, 19, 18, 30);
+  expect(parseTime("11/5/2026 19:18:30.062")).toBe(base + 62);
+  expect(parseTime("11/5/2026 19:18:30.3531")).toBe(base + 353);
+  expect(parseTime("11/5/2026 19:18:30.0921")).toBe(base + 92);
+  expect(parseTime("11/5/2026 19:18:30.9999")).toBe(base + 1000);
 });

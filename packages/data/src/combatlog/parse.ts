@@ -102,12 +102,14 @@ export function splitFields(text: string): string[] {
 const num = (s: string | undefined) => (s === undefined || s === "nil" ? 0 : Number(s));
 const flag = (s: string | undefined) => s !== undefined && s !== "nil" && s !== "0";
 
-// "10/17/2026 18:28:53.062-6" in ms, as wall-clock time (the zone suffix is dropped).
+// "10/17/2026 18:28:53.062-6" in ms, as wall-clock time (the zone suffix is dropped). The fraction
+// is a decimal, not a count of ms: beta logs write 3 digits, launch logs 4 ("19:18:30.3531").
 export function parseTime(stamp: string): number {
   const m = /^(\d+)\/(\d+)\/(\d+) (\d+):(\d+):(\d+)\.(\d+)/.exec(stamp);
   if (!m) throw new Error(`combat log: bad timestamp "${stamp}"`);
-  const [, mo, d, y, h, mi, s, ms] = m.map(Number) as number[];
-  return Date.UTC(y!, mo! - 1, d!, h!, mi!, s!, ms!);
+  const [mo, d, y, h, mi, s] = m.slice(1, 7).map(Number) as number[];
+  const ms = Math.round(Number(`0.${m[7]}`) * 1000);
+  return Date.UTC(y!, mo! - 1, d!, h!, mi!, s!) + ms;
 }
 
 const unit = (f: string[], at: number): Unit => ({ guid: f[at]!, name: f[at + 1]!, flags: Number(f[at + 2]) });
