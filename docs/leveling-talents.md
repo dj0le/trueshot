@@ -1,14 +1,14 @@
-<!-- Backup of the Claude Doc "Troll Hunter Leveling Talents" (https://claude.ai/artifact/HouCfuBiQqbGqAqM4RLYFr), exported 2026-11-03 at revision 11. The doc is the live copy; this file is the fallback. -->
+<!-- Backup of the Claude Doc "Troll Hunter Leveling Talents" (https://claude.ai/artifact/HouCfuBiQqbGqAqM4RLYFr), exported 2026-11-06 at revision 22. The doc is the live copy; this file is the fallback. -->
 
 # Troll Hunter Leveling Talents
 
-Nov 3, 2026 · @Djo Wea
+Nov 6, 2026 · @Djo Wea
 
 ## At a glance
 
-Level 10 to 60 ends at 31/20/0 (Beast Mastery / Marksmanship / Survival) with no respec on the way, and Trueshot Aura is picked up at 56. At 60, respec the 20 non-Beast Mastery points (see Level 60 respec).
+Level 10 to 60 ends at 31/20/0 (Beast Mastery / Marksmanship / Survival) with no respec on the way, and Trueshot Aura is picked up at 56. Keep it at 60: since Serpent Sting ticks crit, a respec no longer pays (see Levels 51 to 55).
 
-- Race and pet: Troll with a Raptor or Cat (Raptor simmed about 1% ahead).
+- Race and pet: Troll with a Cat or Raptor (within 0.4% of each other, which is noise; a 1.2 sec Cat swings at its shown speed).
 - No Summon Hawk. The filler point that used to go to Pathfinding goes to a 4th point of Endurance Training.
 - Bestial Wrath lands at 45, Careful Aim is finished at 50.
 - Rotation assumed: Bestial Wrath, Arcane Shot, Serpent Sting, Rapid Fire, all from range.
@@ -58,67 +58,46 @@ Tick each point off as you take it. One point per level from 10 to 60.
 - [ ] Level 48: Careful Aim 3/5 (Marksmanship)
 - [ ] Level 49: Careful Aim 4/5 (Marksmanship)
 - [ ] Level 50: Careful Aim 5/5 (Marksmanship)
-- [ ] Level 51: Improved Arcane Shot 1/5 (Marksmanship)
-- [ ] Level 52: Improved Arcane Shot 2/5 (Marksmanship)
-- [ ] Level 53: Improved Arcane Shot 3/5 (Marksmanship)
-- [ ] Level 54: Improved Arcane Shot 4/5 (Marksmanship)
-- [ ] Level 55: Improved Arcane Shot 5/5 (Marksmanship)
+- [ ] Level 51: Improved Stings 1/3 (Marksmanship)
+- [ ] Level 52: Improved Stings 2/3 (Marksmanship)
+- [ ] Level 53: Improved Stings 3/3 (Marksmanship)
+- [ ] Level 54: Efficiency 1/5 (Marksmanship)
+- [ ] Level 55: Efficiency 2/5 (Marksmanship)
 - [ ] Level 56: Trueshot Aura 1/1 (Marksmanship)
 - [ ] Level 57: Mortal Shots 1/5 (Marksmanship)
 - [ ] Level 58: Mortal Shots 2/5 (Marksmanship)
 - [ ] Level 59: Mortal Shots 3/5 (Marksmanship)
 - [ ] Level 60: Mortal Shots 4/5 (Marksmanship)
 
-## Level 60 respec
+## Levels 51 to 55: Improved Stings and Efficiency
 
-At 60, keep all 31 Beast Mastery points and respec the other 20 into Efficiency and Improved Stings, ending at 31/17/3. It is worth 4 to 7% in most fights and never costs more than 0.5%.
+Take Improved Stings 3 and Efficiency 2 at 51 to 55 instead of Improved Arcane Shot 5, and keep the build at 60. Launch logs showed Serpent Sting ticks crit at the hunter's ranged crit, which the sim did not model before 2026-11-06.
 
-| Talent | Leveling path | Level 60 |
+Troll with a Cat at level 60, ranged, solo, searched rotation. Change against the old path (Improved Arcane Shot 5):
+
+| Talents at 60 | 1 min fight | 2 min fight |
 | --- | --- | --- |
-| Lethal Attacks | 5 | 5 |
-| Careful Aim | 5 | 3 |
-| Improved Arcane Shot | 5 | 0 |
-| Mortal Shots | 4 | 0 |
-| Trueshot Aura | 1 | 1 |
-| Efficiency | 0 | 5 |
-| Improved Stings | 0 | 3 |
-| Improved Tracking (Survival) | 0 | 3 |
+| Best build from the talent search | +2.4% | +6.2% |
+| Old 31/17/3 respec | -1.0% | +6.2% |
+| This path (Improved Stings 3 + Efficiency 2) | +0.6% | +5.6% |
+| Old path (Improved Arcane Shot 5) | 0 | 0 |
 
-Troll with a Raptor, ranged, solo against a level 63 boss (DPS, each option with its own best rotation):
-
-| Rotation | Talents | 1 min fight | 2 min fight |
-| --- | --- | --- | --- |
-| With Aimed Shot | Level 60 respec | 491.2 | 416.8 |
-| With Aimed Shot | Leveling path | 471.6 | 388.6 |
-| Simple (Bestial Wrath, Rapid Fire, Serpent Sting, Arcane Shot) | Level 60 respec | 461.2 | 408.1 |
-| Simple (Bestial Wrath, Rapid Fire, Serpent Sting, Arcane Shot) | Leveling path | 463.3 | 379.4 |
-
-- The gain is mostly Serpent Sting: Efficiency pays for an extra cast, and Improved Stings adds 20% to its damage.
-- Adding Aimed Shot (when mana is above 25%) is worth about 6% in a 1 minute fight.
-- Only with the simple rotation in short fights do the leveling path's picks hold their own, by 2 DPS.
+- With the simple rotation the swap is worth +0.6% / +4.4% at 60, and -0.4% / +2.8% at 55.
+- Keep Mortal Shots 4 at 57 to 60: ending on Efficiency 5 without Mortal Shots loses 1.3 to 2.9% in 1 minute fights.
+- Against this path the old respec gains only 0.6% in 2 minute fights and loses 1.7% in 1 minute fights, so it is not worth the gold.
 
 ## Why this order
 
-In the hunter sim this path was within 2% of the best build found at every level checked, and at 60 it beat every alternative in normal pulls and dungeons with the simple rotation. With Aimed Shot added it no longer does: see Level 60 respec.
+Rechecked on 2026-11-06 with Serpent Sting tick crits: the path is within 2% of the best build found at 20 and 50, and up to 3.5% behind at 30 and 40, a gap only a respec closes.
 
-- Lethal Attacks first is about 3% ahead of starting with Deadly Aspects at level 20, and even by 30.
+- Lethal Attacks first is 3.8% ahead of starting with Deadly Aspects at level 20, and 1.5 to 1.8% ahead at 30.
 - Straight Beast Mastery to Bestial Wrath wins from 40 to 50. Bestial Wrath alone is worth about +2.6% DPS.
-- A respec at 40 into the best build found gains only 1 to 2%, so it is not worth the gold.
+- A respec at 30 or 40 into the best build found gains 2 to 3.5%. Moving Careful Aim to 15 to 19 instead gains 1.4% at 20 but loses 2.4 to 4.6% at 40, because Frenzy comes later, so the order stays.
 - Summon Hawk adds under 1 DPS on this path.
-
-Level 60 Marksmanship picks, Troll with a Raptor (DPS):
-
-| Build | 25 sec pulls, full mana | Dungeon boss | 2 min nonstop |
-| --- | --- | --- | --- |
-| This path (Improved Arcane Shot + Mortal Shots) | 473.0 | 497.1 | 404.8 |
-| Efficiency + Improved Arcane Shot | 459.5 | 485.3 | 410.7 |
-| Efficiency + Improved Stings | 449.8 | 477.7 | 425.1 |
-| Best build from the talent search (no Bestial Wrath) | 454.2 | 449.7 | 420.4 |
 
 ## Notes
 
 - Filler: row 3 needs 10 Beast Mastery points and row 6 needs 25, so 4 points of Endurance Training are unavoidable filler. Improved Revive Pet or Improved Aspect of the Monkey work the same for damage.
 - Bestial Swiftness is required for Intimidation, which is required for Bestial Wrath.
-- If you chain pull for minutes without drinking, Efficiency 5 + Improved Stings 3 beats Improved Arcane Shot + Mortal Shots by about 5%.
 - Trueshot Aura only raises ranged attack power, so in a group it helps hunters only. It stacks with Aspect of the Hawk and Hunter's Mark, but not with a second Trueshot Aura.
-- Data: client build 1.60.1.70753 plus the 2026-11-03 hunter patch notes. Pet damage numbers are partly guesses until launch logs exist, so recheck after launch.
+- Data: client build 1.60.1.70753 plus the 2026-11-03 hunter patch notes. Rechecked on 2026-11-06 against launch logs: Auto Shot speed, pet swing speed and Serpent Sting tick crits now match the game.
