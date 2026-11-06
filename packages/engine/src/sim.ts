@@ -89,6 +89,8 @@ export type AbilityStats = {
   crits: number;
   misses: number;
   ticks: number;
+  // Ticks that crit, counted in ticks too.
+  tickCrits: number;
   damage: number;
 };
 
@@ -852,12 +854,19 @@ export class Fight implements PetHost {
           const endsAt = this.now + duration;
           if (triggered) each(e, () => this.trigger(triggered, endsAt - this.now));
         }
-        // Periodic damage snapshots its tick when applied.
+        // Periodic damage snapshots its tick when applied. Ranged ticks (stings) can crit in
+        // Forever (overrides.toml formula.rangedTicksCrit); each tick rolls on its own.
         else if (e.aura === Aura.PeriodicDamage) {
           const tick =
             this.calc.modded(e.value + e.apCoefficient * this.calc.rangedAttackPower(), spell, SpellModOp.PeriodicDamage) *
             this.calc.damageDone(spell.school);
-          each(e, () => this.record(spell.name, "tick", tick));
+          const canCrit = spell.defenseType === DefenseType.Ranged && this.game.overrides.formula.rangedTicksCrit.value > 0;
+          each(e, () => {
+            // A crit tick still counts as a tick, and as a crit.
+            const crit = canCrit && this.rng.stream("tick-crit").chance(this.calc.critPct(spell));
+            if (crit) this.stat(spell.name).tickCrits++;
+            this.record(spell.name, "tick", crit ? tick * this.calc.critMultiplier(spell) : tick);
+          });
         }
       }
     });
@@ -921,7 +930,7 @@ export class Fight implements PetHost {
   private stat(name: string): AbilityStats {
     let s = this.stats.get(name);
     if (!s) {
-      s = { name, casts: 0, hits: 0, crits: 0, misses: 0, ticks: 0, damage: 0 };
+      s = { name, casts: 0, hits: 0, crits: 0, misses: 0, ticks: 0, tickCrits: 0, damage: 0 };
       this.stats.set(name, s);
     }
     return s;

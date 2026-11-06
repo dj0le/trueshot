@@ -140,6 +140,25 @@ test("a DoT gets all its ticks, including the one landing on expiry", () => {
   expect(sting.avgHit).toBeCloseTo((135 + 0.05 * ch.rangedAttackPower) * 5, 5);
 });
 
+test("Serpent Sting ticks crit at ranged crit, and not when formula.rangedTicksCrit is 0", () => {
+  const input: SimConfigInput = {
+    ...base,
+    gear: { ...base.gear!, stats: { hitPct: 9, critPct: 40, mp5: 100000 } },
+    fight: { durationSec: 300, iterations: 40 },
+    rotation: { actions: [{ action: "serpent_sting", if: "!dot.serpent_sting.ticking" }] },
+  };
+  const sting = (g: typeof game) => simulate(g, input).abilities.find((a) => a.name === "Serpent Sting")!;
+  const on = sting(game);
+  const ticks = on.ticksPerFight / (on.ticksPerFight + on.castsPerFight);
+  // Crit% counts casts and ticks; only ticks crit, at roughly the sheet's 40% less suppression.
+  expect(on.critPct / ticks).toBeGreaterThan(30);
+  expect(on.critPct / ticks).toBeLessThan(42);
+  const formula = { ...game.overrides.formula, rangedTicksCrit: { ...game.overrides.formula.rangedTicksCrit, value: 0 } };
+  const off = sting({ ...game, overrides: { ...game.overrides, formula } });
+  expect(off.critPct).toBe(0);
+  expect(on.dps / off.dps).toBeGreaterThan(1.25);
+});
+
 test("gear items add their stats, convert ratings, and supply the ranged weapon", () => {
   const ch = buildCharacter(game.data, game.overrides, game.items, game.enchants, SimConfig.parse({
     ...base,

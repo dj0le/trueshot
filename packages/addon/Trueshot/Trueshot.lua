@@ -158,7 +158,25 @@ local function onUseAction(slot)
   local kind, id = GetActionInfo(slot)
   if not kind then return end
   local spell, name
-  if kind == "spell" then
+  if kind == "spell" and (not id or id == 0) then
+    -- A pet bar action (Attack, Follow, a pet ability) dragged to the main bar reports spell 0:
+    -- find it on the pet bar by its icon.
+    -- Action textures come back as file IDs, pet bar ones as paths or global tokens.
+    local function fileID(t)
+      if type(t) == "string" and GetFileIDFromPath then return GetFileIDFromPath(t) or t end
+      return t
+    end
+    local icon = fileID(GetActionTexture(slot))
+    for i = 1, NUM_PET_ACTION_SLOTS or 10 do
+      local petName, petIcon, isToken, _, _, _, petSpell = GetPetActionInfo(i)
+      if petName and icon and fileID(isToken and _G[petIcon] or petIcon) == icon then
+        if isToken then petName = _G[petName] or petName end
+        press(slot, "pet", type(petSpell) == "number" and petSpell or nil, petName)
+        return
+      end
+    end
+    name = "Pet action"
+  elseif kind == "spell" then
     spell = id
     name = spellName(id)
   elseif kind == "macro" then

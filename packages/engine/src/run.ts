@@ -61,7 +61,7 @@ export function simulate(game: GameData, input: SimConfigInput): SimResult {
   const lengths = new Stream(`${seed}/fight-length`);
 
   const dps: number[] = [];
-  const totals = new Map<string, { damage: number; casts: number; hits: number; crits: number; misses: number; ticks: number }>();
+  const totals = new Map<string, { damage: number; casts: number; hits: number; crits: number; misses: number; ticks: number; tickCrits: number }>();
   let totalMs = 0;
   let manaSpent = 0;
   let manaLeft = 0;
@@ -77,13 +77,14 @@ export function simulate(game: GameData, input: SimConfigInput): SimResult {
     manaLeft += r.manaLeft;
     oomMs += r.oomMs;
     for (const a of r.abilities) {
-      const t = totals.get(a.name) ?? { damage: 0, casts: 0, hits: 0, crits: 0, misses: 0, ticks: 0 };
+      const t = totals.get(a.name) ?? { damage: 0, casts: 0, hits: 0, crits: 0, misses: 0, ticks: 0, tickCrits: 0 };
       t.damage += a.damage;
       t.casts += a.casts;
       t.hits += a.hits;
       t.crits += a.crits;
       t.misses += a.misses;
       t.ticks += a.ticks;
+      t.tickCrits += a.tickCrits;
       totals.set(a.name, t);
     }
   }
@@ -100,7 +101,8 @@ export function simulate(game: GameData, input: SimConfigInput): SimResult {
         share: totalDamage ? t.damage / totalDamage : 0,
         castsPerFight: t.casts / iterations,
         ticksPerFight: t.ticks / iterations,
-        critPct: t.hits + t.crits ? (100 * t.crits) / (t.hits + t.crits) : 0,
+        // Over every hit and tick: a sting's crits are its ticks'.
+        critPct: t.hits + t.crits + t.ticks ? (100 * (t.crits + t.tickCrits)) / (t.hits + t.crits + t.ticks) : 0,
         missPct: attempts ? (100 * t.misses) / attempts : 0,
         avgHit: t.hits + t.crits ? t.damage / (t.hits + t.crits) : 0,
       };

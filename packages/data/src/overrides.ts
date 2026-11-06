@@ -51,6 +51,7 @@ const Overrides = z.object({
     attackPowerPerDps: Value,
     baseCritPct: Value,
     critDamageBonusPct: Value,
+    rangedTicksCrit: Value,
     armorConstantBase: Value,
     armorConstantPerLevel: Value,
     normalizedRangedSpeed: Value,

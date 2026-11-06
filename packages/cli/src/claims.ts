@@ -10,7 +10,7 @@
 // real level.
 import type { Database } from "bun:sqlite";
 import { type GameData, type Sheet, sheetsAt } from "@trueshot/data";
-import { attackTable, Aura, resolveEffects } from "@trueshot/engine";
+import { attackTable, Aura, DefenseType, resolveEffects } from "@trueshot/engine";
 
 export type Verdict = "fits" | "differs" | "too few" | "observed";
 
@@ -128,24 +128,38 @@ export function loadRows(db: Database, hunter?: string): Row[] {
   return rows.filter((r) => mine(r.src));
 }
 
-// Creatures' and pets' levels as logged up to each row (players log item level, so they are left
-// out). Pets level with the hunter, so a level is only good for the time it was seen.
+// Creatures' levels as logged up to each row. Players log item level, and pets log their owner's
+// item level (297 of 300 sampled pet lines matched, launch logs 2026-11-05), so both are left out;
+// a pet's level comes from its owner's addon sheet at the time, else it is unknown.
 type Leveled = Row & { srcLevel: number | undefined; dstLevel: number | undefined };
 type SheetAt = (guid: string, ts: number) => Sheet | undefined;
-function withLevels(rows: Row[]): Leveled[] {
+function withLevels(rows: Row[], petSheet: PetSheetAt): Leveled[] {
+  const petLevel = (guid: string, ts: number) => petSheet(guid, ts)?.pet?.level || undefined;
   const at = new Map<string, number>();
+  const level = (guid: string | null, ts: number) =>
+    !guid ? undefined : guid.startsWith("Pet-") ? petLevel(guid, ts) : at.get(guid);
   return rows.map((r) => {
-    if (r.st_guid && !r.st_guid.startsWith("Player-") && r.st_level) at.set(r.st_guid, r.st_level);
-    return { ...r, srcLevel: r.src ? at.get(r.src) : undefined, dstLevel: r.dst ? at.get(r.dst) : undefined };
+    if (r.st_guid && !r.st_guid.startsWith("Player-") && !r.st_guid.startsWith("Pet-") && r.st_level) at.set(r.st_guid, r.st_level);
+    return { ...r, srcLevel: level(r.src, r.ts), dstLevel: level(r.dst, r.ts) };
   });
 }
 
+// A pet's owner's sheet at a time: its pet block gives the pet's level and shown swing speed.
+type PetSheetAt = (guid: string, ts: number) => Sheet | undefined;
+function petSheets(db: Database, sheetAt: SheetAt): PetSheetAt {
+  const owner = new Map(db.query<{ guid: string; owner: string }, []>("SELECT guid, owner FROM units WHERE owner != ''").all().map((u) => [u.guid, u.owner]));
+  return (guid, ts) => {
+    const o = owner.get(guid);
+    return o ? sheetAt(o, ts) : undefined;
+  };
+}
+
 // Periodic damage from hunters' spells: the client's tick against the logged ticks, and whether
-// ticks crit (our model never crits a tick). With sheets, the tick is fitted against the ranged
+// ticks crit (at ranged crit, formula.rangedTicksCrit). With sheets, the tick is fitted against the ranged
 // attack power at application (ticks snapshot it) to measure the attack power share a tick.
-function periodic(game: GameData, rows: Row[], sheetAt: SheetAt): ClaimRow[] {
+function periodic(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[] {
   const out: ClaimRow[] = [];
-  const bySpell = new Map<number, { ticks: Row[]; raps: (number | undefined)[] }>();
+  const bySpell = new Map<number, { ticks: Leveled[]; raps: (number | undefined)[] }>();
   const appliedAt = new Map<string, number>();
   for (const r of rows) {
     if (r.src_kind !== "hunter" || !r.spell_id) continue;
@@ -190,15 +204,25 @@ function periodic(game: GameData, rows: Row[], sheetAt: SheetAt): ClaimRow[] {
         });
       }
     }
+    // The model crits ranged ticks at the sheet's ranged crit less suppression (formula.rangedTicksCrit).
     const crits = ticks.filter((t) => t.crit).length;
+    const ticksCrit = game.overrides.formula.rangedTicksCrit.value > 0 && spell?.defenseType === DefenseType.Ranged;
+    let expected = 0;
+    if (ticksCrit) {
+      for (const t of ticks) {
+        const sheet = sheetAt(t.src!, t.ts);
+        if (sheet && t.dstLevel) expected += Math.max(0, sheet.rangedCritPct - attackTable(game.overrides.formula, sheet.level, t.dstLevel).critSuppressionPct);
+      }
+    }
+    const claimedPct = ticksCrit ? expected / ticks.length : 0;
     out.push({
       claim: "ticks crit",
       subject: name,
-      source: "our model: ticks never crit",
-      claimed: "0%",
+      source: ticksCrit ? "sheet ranged crit less levels.ts crit suppression (formula.rangedTicksCrit)" : "our model: ticks never crit",
+      claimed: `${f(claimedPct, 1)}%`,
       observed: rateText(crits, ticks.length),
       n: ticks.length,
-      verdict: verdictOfRate(0, crits, ticks.length),
+      verdict: verdictOfRate(claimedPct, crits, ticks.length),
     });
   }
   return out;
@@ -295,28 +319,37 @@ function armor(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[] {
 }
 
 // Pet swing timer: gaps between one pet's swings, under 4 sec so pauses drop out.
-function petSwings(game: GameData, rows: Row[]): ClaimRow[] {
-  const claimed = game.overrides.pet.attackSpeedSec.value;
+// With the owner's sheet the claim is the speed the game shows for the pet (UnitAttackSpeed), else
+// the override. The mean is the verdict: a fast pet swings in pairs (short gap, long gap), so its
+// median lands on the long gap and says nothing about damage.
+function petSwings(game: GameData, rows: Row[], petSheet: PetSheetAt): ClaimRow[] {
+  const fallback = game.overrides.pet.attackSpeedSec.value;
   const last = new Map<string, number>();
-  const gaps = new Map<string, { name: string; gaps: number[] }>();
+  const gaps = new Map<string, { name: string; gaps: number[]; shown: number[] }>();
   for (const r of rows) {
     if (r.src_kind !== "pet" || !(r.event === "SWING_DAMAGE" || r.event === "SWING_MISSED") || !r.src) continue;
     const prev = last.get(r.src);
     last.set(r.src, r.ts);
     if (prev === undefined || r.ts - prev > 4000 || r.ts === prev) continue;
-    const g = gaps.get(r.src) ?? { name: r.src_name ?? r.src, gaps: [] };
+    const g = gaps.get(r.src) ?? { name: r.src_name ?? r.src, gaps: [], shown: [] };
     g.gaps.push((r.ts - prev) / 1000);
+    const speed = petSheet(r.src, r.ts)?.pet?.speed;
+    if (speed) g.shown.push(speed);
     gaps.set(r.src, g);
   }
-  return [...gaps.values()].map((g) => ({
-    claim: "pet swing speed",
-    subject: g.name,
-    source: "overrides.toml pet.attackSpeedSec (fast pets assumed normalized to the same DPS)",
-    claimed: `${claimed} sec`,
-    observed: `${f(median(g.gaps))} sec median`,
-    n: g.gaps.length,
-    verdict: g.gaps.length < MIN_N ? "too few" : Math.abs(median(g.gaps) - claimed) <= 0.1 ? "fits" : "differs",
-  }));
+  return [...gaps.values()].map((g) => {
+    const claimed = g.shown.length ? median(g.shown) : fallback;
+    const mean = g.gaps.reduce((a, b) => a + b, 0) / g.gaps.length;
+    return {
+      claim: "pet swing speed",
+      subject: g.name,
+      source: g.shown.length ? "pet speed on the owner's sheet" : "overrides.toml pet.attackSpeedSec (fast pets assumed normalized to the same DPS)",
+      claimed: `${f(claimed)} sec`,
+      observed: `${f(mean)} sec mean, ${f(median(g.gaps))} median`,
+      n: g.gaps.length,
+      verdict: g.gaps.length < MIN_N ? "too few" : Math.abs(mean - claimed) <= 0.1 ? "fits" : "differs",
+    };
+  });
 }
 
 // Auto Shot: the time between shots against the bow speed on the sheet (haste included), its
@@ -407,13 +440,14 @@ function petAttackTable(game: GameData, rows: Leveled[]): ClaimRow[] {
 }
 
 export function claims(game: GameData, db: Database, hunter?: string): ClaimRow[] {
-  const rows = withLevels(loadRows(db, hunter));
   const sheetAt = sheetsAt(db);
+  const petSheet = petSheets(db, sheetAt);
+  const rows = withLevels(loadRows(db, hunter), petSheet);
   return [
     ...periodic(game, rows, sheetAt),
     ...critMultiplier(game, rows),
     ...armor(game, rows, sheetAt),
-    ...petSwings(game, rows),
+    ...petSwings(game, rows, petSheet),
     ...petAttackTable(game, rows),
     ...autoShot(game, rows, sheetAt),
   ];

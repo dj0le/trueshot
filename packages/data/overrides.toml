@@ -102,6 +102,13 @@ value = 100
 confidence = "classic"
 source = "Classic: ranged and melee crits deal 200% damage before talents"
 
+# 1 when the ticks of a ranged periodic effect (Serpent Sting) roll crit at the hunter's ranged crit,
+# 0 for Classic's ticks that never crit. Traps (magic) and bleeds are not measured and stay non-crit.
+[formula.rangedTicksCrit]
+value = 1
+confidence = "confirmed"
+source = "Measured in launch logs 2026-11-05/06 (Flipp, levels 7-13): Serpent Sting rank 1 ticks crit 5.7% (3.4-9.4), rank 2 8.1% (5.4-12.1), against 4.9-6.4% sheet ranged crit; crits about 2.0-2.1x"
+
 [formula.armorConstantBase]
 value = 400
 confidence = "classic"
