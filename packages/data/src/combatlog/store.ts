@@ -7,6 +7,7 @@
 // are the players who fire Auto Shot; pets and hawks are the units whose advanced block names a
 // hunter as owner, or that a hunter summons.
 import { Database } from "bun:sqlite";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { type Patch, patchAt } from "../patches";
 import { type LogEvent, parseLine } from "./parse";
@@ -215,6 +216,15 @@ export async function ingest(db: Database, path: string, utcOffsetMin?: number):
   result.hunters = hunters.size;
   result.fights = rebuildFights(db, path);
   return result;
+}
+
+// Units left out of the claims (logs-cache/exclude.toml: pets tamed only to learn an ability, and the
+// like), by GUID.
+export const EXCLUDE_PATH = join(LOGS_CACHE, "exclude.toml");
+export function excludedUnits(path = EXCLUDE_PATH): Set<string> {
+  if (!existsSync(path)) return new Set();
+  const parsed = Bun.TOML.parse(readFileSync(path, "utf8")) as { unit?: { guid: string }[] };
+  return new Set((parsed.unit ?? []).map((u) => u.guid));
 }
 
 // The patch of a stored line, from its file's clock offset and its stamp.

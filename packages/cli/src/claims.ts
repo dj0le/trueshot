@@ -9,7 +9,7 @@
 // the Trueshot addon's sheets, stored next to the events. Creatures and pets log their
 // real level.
 import type { Database } from "bun:sqlite";
-import { type GameData, type Patch, patchOfLine, type Sheet, sheetsAt } from "@trueshot/data";
+import { excludedUnits, type GameData, type Patch, patchOfLine, type Sheet, sheetsAt } from "@trueshot/data";
 import { attackTable, Aura, DefenseType, resolveEffects } from "@trueshot/engine";
 
 export type Verdict = "fits" | "differs" | "too few" | "observed";
@@ -124,7 +124,8 @@ export function loadRows(db: Database, hunter?: string, patches?: Patch[], patch
     )
     .all();
   const patchOf = patches && patch ? patchOfLine(db, patches) : undefined;
-  const rows = patchOf ? all.filter((r) => patchOf(r.file, r.ts).id === patch!.id) : all;
+  const excluded = excludedUnits();
+  const rows = all.filter((r) => !(r.src && excluded.has(r.src)) && (!patchOf || patchOf(r.file, r.ts).id === patch!.id));
   if (!hunter) return rows;
   const owners = new Map(db.query<{ guid: string; owner: string; name: string; kind: string }, []>("SELECT * FROM units").all().map((u) => [u.guid, u]));
   const mine = (guid: string | null) => {
