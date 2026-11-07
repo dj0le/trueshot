@@ -339,165 +339,11 @@ source = "Summon Hawk rank 4 tooltip: 108 plus 5% of your Ranged Attack Power"
 
 # Patch of 2026-11-03: shot, sting and aspect numbers the server changed. The client keeps Classic's.
 [[hotfix]]
-spell = 13165
-effectIndex = 0
-basePoints = 20
-confidence = "reported"
-source = "Aspect of the Hawk rank 1: 20 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14318
-effectIndex = 0
-basePoints = 35
-confidence = "reported"
-source = "Aspect of the Hawk rank 2: 35 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14319
-effectIndex = 0
-basePoints = 50
-confidence = "reported"
-source = "Aspect of the Hawk rank 3: 50 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14320
-effectIndex = 0
-basePoints = 70
-confidence = "reported"
-source = "Aspect of the Hawk rank 4: 70 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14321
-effectIndex = 0
-basePoints = 90
-confidence = "reported"
-source = "Aspect of the Hawk rank 5: 90 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14322
-effectIndex = 0
-basePoints = 110
-confidence = "reported"
-source = "Aspect of the Hawk rank 6: 110 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 1299346
-effectIndex = 0
-basePoints = 20
-confidence = "reported"
-source = "Trueshot Aura rank 1: 20 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 1299348
-effectIndex = 0
-basePoints = 35
-confidence = "reported"
-source = "Trueshot Aura rank 2: 35 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 19506
-effectIndex = 0
-basePoints = 50
-confidence = "reported"
-source = "Trueshot Aura rank 3: 50 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 20905
-effectIndex = 0
-basePoints = 75
-confidence = "reported"
-source = "Trueshot Aura rank 4: 75 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 20906
-effectIndex = 0
-basePoints = 100
-confidence = "reported"
-source = "Trueshot Aura rank 5: 100 ranged attack power. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 1310687
-effectIndex = 0
-basePoints = 320
-confidence = "reported"
-source = "Sniper Shot rank 1: ranged damage plus 320. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 1310785
-effectIndex = 0
-basePoints = 450
-confidence = "reported"
-source = "Sniper Shot rank 2: ranged damage plus 450. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 1310786
-effectIndex = 0
-basePoints = 590
-confidence = "reported"
-source = "Sniper Shot rank 3: ranged damage plus 590. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 19434
-effectIndex = 0
-basePoints = 40
-confidence = "reported"
-source = "Aimed Shot rank 1: +40 ranged damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 20900
-effectIndex = 0
-basePoints = 70
-confidence = "reported"
-source = "Aimed Shot rank 2: +70 ranged damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 20901
-effectIndex = 0
-basePoints = 115
-confidence = "reported"
-source = "Aimed Shot rank 3: +115 ranged damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 20902
-effectIndex = 0
-basePoints = 185
-confidence = "reported"
-source = "Aimed Shot rank 4: +185 ranged damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 20903
-effectIndex = 0
-basePoints = 260
-confidence = "reported"
-source = "Aimed Shot rank 5: +260 ranged damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 20904
-effectIndex = 0
-basePoints = 350
-confidence = "reported"
-source = "Aimed Shot rank 6: +350 ranged damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 3044
-effectIndex = 0
-basePoints = 25
-confidence = "reported"
-source = "Arcane Shot rank 1: 25 Arcane damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
 spell = 3044
 effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
 source = "Arcane Shot rank 1: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14281
-effectIndex = 0
-basePoints = 35
-confidence = "reported"
-source = "Arcane Shot rank 2: 35 Arcane damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
 spell = 14281
@@ -509,23 +355,9 @@ source = "Arcane Shot rank 2: 15% of attack power, up from 10%. Hunter patch not
 [[hotfix]]
 spell = 14282
 effectIndex = 0
-basePoints = 50
-confidence = "reported"
-source = "Arcane Shot rank 3: 50 Arcane damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14282
-effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
 source = "Arcane Shot rank 3: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14283
-effectIndex = 0
-basePoints = 85
-confidence = "reported"
-source = "Arcane Shot rank 4: 85 Arcane damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
 spell = 14283
@@ -537,23 +369,9 @@ source = "Arcane Shot rank 4: 15% of attack power, up from 10%. Hunter patch not
 [[hotfix]]
 spell = 14284
 effectIndex = 0
-basePoints = 120
-confidence = "reported"
-source = "Arcane Shot rank 5: 120 Arcane damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14284
-effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
 source = "Arcane Shot rank 5: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14285
-effectIndex = 0
-basePoints = 175
-confidence = "reported"
-source = "Arcane Shot rank 6: 175 Arcane damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
 spell = 14285
@@ -565,23 +383,9 @@ source = "Arcane Shot rank 6: 15% of attack power, up from 10%. Hunter patch not
 [[hotfix]]
 spell = 14286
 effectIndex = 0
-basePoints = 220
-confidence = "reported"
-source = "Arcane Shot rank 7: 220 Arcane damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14286
-effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
 source = "Arcane Shot rank 7: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 14287
-effectIndex = 0
-basePoints = 280
-confidence = "reported"
-source = "Arcane Shot rank 8: 280 Arcane damage. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
 spell = 14287
@@ -593,23 +397,9 @@ source = "Arcane Shot rank 8: 15% of attack power, up from 10%. Hunter patch not
 [[hotfix]]
 spell = 1978
 effectIndex = 0
-basePoints = 3
-confidence = "reported"
-source = "Serpent Sting rank 1: 15 over 15 sec, 3 a tick for 5 ticks. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 1978
-effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
 source = "Serpent Sting rank 1: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 13549
-effectIndex = 0
-basePoints = 7
-confidence = "reported"
-source = "Serpent Sting rank 2: 35 over 15 sec, 7 a tick for 5 ticks. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
 spell = 13549
@@ -621,23 +411,9 @@ source = "Serpent Sting rank 2: each tick gains 5% of attack power, up from 3%. 
 [[hotfix]]
 spell = 13550
 effectIndex = 0
-basePoints = 14
-confidence = "reported"
-source = "Serpent Sting rank 3: 70 over 15 sec, 14 a tick for 5 ticks. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 13550
-effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
 source = "Serpent Sting rank 3: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 13551
-effectIndex = 0
-basePoints = 26
-confidence = "reported"
-source = "Serpent Sting rank 4: 130 over 15 sec, 26 a tick for 5 ticks. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
 spell = 13551
@@ -649,23 +425,9 @@ source = "Serpent Sting rank 4: each tick gains 5% of attack power, up from 3%. 
 [[hotfix]]
 spell = 13552
 effectIndex = 0
-basePoints = 40
-confidence = "reported"
-source = "Serpent Sting rank 5: 200 over 15 sec, 40 a tick for 5 ticks. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 13552
-effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
 source = "Serpent Sting rank 5: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 13553
-effectIndex = 0
-basePoints = 58
-confidence = "reported"
-source = "Serpent Sting rank 6: 290 over 15 sec, 58 a tick for 5 ticks. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
 spell = 13553
@@ -677,23 +439,9 @@ source = "Serpent Sting rank 6: each tick gains 5% of attack power, up from 3%. 
 [[hotfix]]
 spell = 13554
 effectIndex = 0
-basePoints = 75
-confidence = "reported"
-source = "Serpent Sting rank 7: 375 over 15 sec, 75 a tick for 5 ticks. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 13554
-effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
 source = "Serpent Sting rank 7: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 13555
-effectIndex = 0
-basePoints = 100
-confidence = "reported"
-source = "Serpent Sting rank 8: 500 over 15 sec, 100 a tick for 5 ticks. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
 spell = 13555
@@ -705,30 +453,9 @@ source = "Serpent Sting rank 8: each tick gains 5% of attack power, up from 3%. 
 [[hotfix]]
 spell = 25295
 effectIndex = 0
-basePoints = 135
-confidence = "reported"
-source = "Serpent Sting rank 9: 675 over 15 sec, 135 a tick for 5 ticks. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[hotfix]]
-spell = 25295
-effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
 source = "Serpent Sting rank 9: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[talentHotfix]]
-talent = "Barrage"
-effectIndex = 0
-values = [5, 10, 15]
-confidence = "reported"
-source = "Barrage: 5/10/15% by rank instead of 3/7/10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
-
-[[talentHotfix]]
-talent = "Lightning Reflexes"
-effectIndex = 0
-values = [3, 6, 9, 12, 15]
-confidence = "reported"
-source = "Lightning Reflexes: 3/6/9/12/15% Agility by rank instead of 2/4/6/8/10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 # Multi-Shot has a 0.5 sec cast that ranged haste shortens, like Aimed Shot; the client row has none.
 [[hotfix]]

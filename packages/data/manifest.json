@@ -1,299 +1,299 @@
 {
-  "build": "1.60.1.70753",
+  "build": "1.60.1.70862",
   "files": [
     {
       "file": "SpellName.csv",
-      "url": "https://wago.tools/db2/SpellName/csv?build=1.60.1.70753",
-      "bytes": 840644,
-      "sha256": "0a7dd2a3ee0be5b00e0ae91abf93d73fafa4c4c5be4fdc39245ca0227c0a4480",
-      "fetchedAt": "2026-11-03T11:50:53.672Z"
+      "url": "https://wago.tools/db2/SpellName/csv?build=1.60.1.70862",
+      "bytes": 851003,
+      "sha256": "4358b3d1a2a859284b2f46cf614e6a1f85320be342acc1c4b68b625f30cf47a5",
+      "fetchedAt": "2026-11-07T08:43:05.370Z"
     },
     {
       "file": "Spell.csv",
-      "url": "https://wago.tools/db2/Spell/csv?build=1.60.1.70753",
-      "bytes": 2219866,
-      "sha256": "6305a313e7dddb481982b34bcabbbcf17d2afc0579c5e492f85fa2cb919ec86e",
-      "fetchedAt": "2026-11-03T11:50:54.026Z"
+      "url": "https://wago.tools/db2/Spell/csv?build=1.60.1.70862",
+      "bytes": 2246144,
+      "sha256": "935973b636b2f108ea84276dc992334e2880e216c4295cf9f2277c0a0b65f375",
+      "fetchedAt": "2026-11-07T08:43:05.727Z"
     },
     {
       "file": "SpellEffect.csv",
-      "url": "https://wago.tools/db2/SpellEffect/csv?build=1.60.1.70753",
-      "bytes": 3871850,
-      "sha256": "ad022c86368a1e850be3c960cf39b92847aeefe51760a95c4da3eea53ea55291",
-      "fetchedAt": "2026-11-03T11:50:54.603Z"
+      "url": "https://wago.tools/db2/SpellEffect/csv?build=1.60.1.70862",
+      "bytes": 3924515,
+      "sha256": "cc8f167fe246b495294b560196f6c59439f703e8f937ddb6acd81157bd5f8b9c",
+      "fetchedAt": "2026-11-07T08:43:06.259Z"
     },
     {
       "file": "SpellMisc.csv",
-      "url": "https://wago.tools/db2/SpellMisc/csv?build=1.60.1.70753",
-      "bytes": 3041801,
-      "sha256": "a0e6b8805f695cbadb8af9c28a9f7b89418d6e2804d0d09c06c2471110f39b48",
-      "fetchedAt": "2026-11-03T11:50:55.082Z"
+      "url": "https://wago.tools/db2/SpellMisc/csv?build=1.60.1.70862",
+      "bytes": 3082689,
+      "sha256": "1188fc9a62e24ca11c682cd8ae2ecb2e8eb19f72e7f76fd8bec1ef22e2732192",
+      "fetchedAt": "2026-11-07T08:43:06.721Z"
     },
     {
       "file": "SpellLevels.csv",
-      "url": "https://wago.tools/db2/SpellLevels/csv?build=1.60.1.70753",
-      "bytes": 313650,
-      "sha256": "eddb84994bcb0e15fd61e10ddedf7151efb2d893eea04f75142c91d37a8416cc",
-      "fetchedAt": "2026-11-03T11:50:55.197Z"
+      "url": "https://wago.tools/db2/SpellLevels/csv?build=1.60.1.70862",
+      "bytes": 315859,
+      "sha256": "c9ef7708478aaff1b5e488c58356df443ee7d6c08a53017819f9af37cd5bef5a",
+      "fetchedAt": "2026-11-07T08:43:06.802Z"
     },
     {
       "file": "SpellPower.csv",
-      "url": "https://wago.tools/db2/SpellPower/csv?build=1.60.1.70753",
-      "bytes": 140092,
-      "sha256": "173d7214c7d70506f25e176d3fe93c8bb0ec8b1d5a30fd2b88fc6daa14bc2bce",
-      "fetchedAt": "2026-11-03T11:50:55.301Z"
+      "url": "https://wago.tools/db2/SpellPower/csv?build=1.60.1.70862",
+      "bytes": 141387,
+      "sha256": "bdbd6ba6b4d5236d23c9348fcb383c2e81bbc724279b22b3e2cbd0a8c5954a65",
+      "fetchedAt": "2026-11-07T08:43:06.856Z"
     },
     {
       "file": "SpellCooldowns.csv",
-      "url": "https://wago.tools/db2/SpellCooldowns/csv?build=1.60.1.70753",
-      "bytes": 119747,
-      "sha256": "0b69d28bd8a47614473fbbf59e699b9db474a809dfcdb4252e9efdfbd9fbd37f",
-      "fetchedAt": "2026-11-03T11:50:55.370Z"
+      "url": "https://wago.tools/db2/SpellCooldowns/csv?build=1.60.1.70862",
+      "bytes": 120638,
+      "sha256": "05d259167be145cb392ab408a648db4b3c0e959424d244ae42ed7e7dd98a39d7",
+      "fetchedAt": "2026-11-07T08:43:06.911Z"
     },
     {
       "file": "SpellCategories.csv",
-      "url": "https://wago.tools/db2/SpellCategories/csv?build=1.60.1.70753",
-      "bytes": 340624,
-      "sha256": "5de2947e869f8f4dfc2acc03c7a0a926386b2a4bc765b6ae9af2cc576f01bb5f",
-      "fetchedAt": "2026-11-03T11:50:55.452Z"
+      "url": "https://wago.tools/db2/SpellCategories/csv?build=1.60.1.70862",
+      "bytes": 345052,
+      "sha256": "86a4b4624b3335277e832a16813705231ad8840aadc1ede2844213522dfe7620",
+      "fetchedAt": "2026-11-07T08:43:06.997Z"
     },
     {
       "file": "SpellCategory.csv",
-      "url": "https://wago.tools/db2/SpellCategory/csv?build=1.60.1.70753",
-      "bytes": 8992,
-      "sha256": "beccca8119cc71537499f20f127e6c31982d034aee0b1ffd0361afe610b85fbb",
-      "fetchedAt": "2026-11-03T11:50:55.501Z"
+      "url": "https://wago.tools/db2/SpellCategory/csv?build=1.60.1.70862",
+      "bytes": 9027,
+      "sha256": "4b8e1b6e32f341cd4f437f4ddb93f5edf6d001c8a2285e2cf749ca09718a69bd",
+      "fetchedAt": "2026-11-07T08:43:07.044Z"
     },
     {
       "file": "SpellCastTimes.csv",
-      "url": "https://wago.tools/db2/SpellCastTimes/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/SpellCastTimes/csv?build=1.60.1.70862",
       "bytes": 982,
       "sha256": "f94e1e3a3495d11af875fd7b007124fdd660a19ba626bc1de00a609da81f25d8",
-      "fetchedAt": "2026-11-03T11:50:55.541Z"
+      "fetchedAt": "2026-11-07T08:43:07.084Z"
     },
     {
       "file": "SpellDuration.csv",
-      "url": "https://wago.tools/db2/SpellDuration/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/SpellDuration/csv?build=1.60.1.70862",
       "bytes": 2825,
       "sha256": "4787f303fe8487cd67e5f9e8574fdc6fa2a03516dcfaabba23d9944f937223f5",
-      "fetchedAt": "2026-11-03T11:50:55.583Z"
+      "fetchedAt": "2026-11-07T08:43:07.134Z"
     },
     {
       "file": "SpellRange.csv",
-      "url": "https://wago.tools/db2/SpellRange/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/SpellRange/csv?build=1.60.1.70862",
       "bytes": 2736,
       "sha256": "30734ead3acfb44c57737ed7c9f8ff2feafda2fbffa291711d4c4afef989b1b3",
-      "fetchedAt": "2026-11-03T11:50:55.629Z"
+      "fetchedAt": "2026-11-07T08:43:07.172Z"
     },
     {
       "file": "SpellAuraOptions.csv",
-      "url": "https://wago.tools/db2/SpellAuraOptions/csv?build=1.60.1.70753",
-      "bytes": 402708,
-      "sha256": "15fe336196d5f1fc6354f9d75bfec062481cdc9cfc63a3016eb0a9c879173c1e",
-      "fetchedAt": "2026-11-03T11:50:55.719Z"
+      "url": "https://wago.tools/db2/SpellAuraOptions/csv?build=1.60.1.70862",
+      "bytes": 403595,
+      "sha256": "03a5d023510ebb6e97c60c3d64dbd3879fb9f32ae59d8a21d676e17e29475b56",
+      "fetchedAt": "2026-11-07T08:43:07.270Z"
     },
     {
       "file": "SpellAuraRestrictions.csv",
-      "url": "https://wago.tools/db2/SpellAuraRestrictions/csv?build=1.60.1.70753",
-      "bytes": 14300,
-      "sha256": "e5e9d9c1511d5f7201a2a0901090e843fefe2e1ddb2cd575304fa2838817a1e9",
-      "fetchedAt": "2026-11-03T11:50:55.783Z"
+      "url": "https://wago.tools/db2/SpellAuraRestrictions/csv?build=1.60.1.70862",
+      "bytes": 14813,
+      "sha256": "0a6dc6d1bce435a0eaed90dc31d23e6d4fae35779e2923da33a7c1d768a64322",
+      "fetchedAt": "2026-11-07T08:43:07.323Z"
     },
     {
       "file": "SpellProcsPerMinute.csv",
-      "url": "https://wago.tools/db2/SpellProcsPerMinute/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/SpellProcsPerMinute/csv?build=1.60.1.70862",
       "bytes": 123,
       "sha256": "19c84bbe18e542006cf44e803f528bc604e5bc2bbb469c6b0d517839188bc774",
-      "fetchedAt": "2026-11-03T11:50:55.826Z"
+      "fetchedAt": "2026-11-07T08:43:07.363Z"
     },
     {
       "file": "SpellClassOptions.csv",
-      "url": "https://wago.tools/db2/SpellClassOptions/csv?build=1.60.1.70753",
-      "bytes": 167874,
-      "sha256": "890c8113dc0797efe9762be2343090f264bda998843975a1d416e20606a32463",
-      "fetchedAt": "2026-11-03T11:50:55.888Z"
+      "url": "https://wago.tools/db2/SpellClassOptions/csv?build=1.60.1.70862",
+      "bytes": 168290,
+      "sha256": "9f45a7ce5c91e4f773466204276cdc3a129ceccc325ba55d982db5349c30ff7b",
+      "fetchedAt": "2026-11-07T08:43:07.421Z"
     },
     {
       "file": "SpellItemEnchantment.csv",
-      "url": "https://wago.tools/db2/SpellItemEnchantment/csv?build=1.60.1.70753",
-      "bytes": 205802,
-      "sha256": "ff14ed83b7b0b620489ac785179c9a5d3dc1d12d8eb91d8f34ae7f92770feb75",
-      "fetchedAt": "2026-11-03T11:50:55.954Z"
+      "url": "https://wago.tools/db2/SpellItemEnchantment/csv?build=1.60.1.70862",
+      "bytes": 205902,
+      "sha256": "53bc1debe8f1ee9a10afa03fa7bf7bc507218ad993aec80843059d6b5a7db582",
+      "fetchedAt": "2026-11-07T08:43:07.483Z"
     },
     {
       "file": "SkillLineAbility.csv",
-      "url": "https://wago.tools/db2/SkillLineAbility/csv?build=1.60.1.70753",
-      "bytes": 407768,
-      "sha256": "2853e5aeca9eac78afe4706c1420c55249b8ca1f61725682b65622f41204401b",
-      "fetchedAt": "2026-11-03T11:50:56.044Z"
+      "url": "https://wago.tools/db2/SkillLineAbility/csv?build=1.60.1.70862",
+      "bytes": 407526,
+      "sha256": "13ef58a08253125e3e9dca642a39bc480187987e90cfbe5c8be30e1ab3c8be0a",
+      "fetchedAt": "2026-11-07T08:43:07.575Z"
     },
     {
       "file": "TraitTree.csv",
-      "url": "https://wago.tools/db2/TraitTree/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/TraitTree/csv?build=1.60.1.70862",
       "bytes": 533,
       "sha256": "6f63def42b6b42b7524e36aef48f7afd9a399b6968b5a979e8c3f349f163f3a6",
-      "fetchedAt": "2026-11-03T11:50:56.085Z"
+      "fetchedAt": "2026-11-07T08:43:07.611Z"
     },
     {
       "file": "TraitNode.csv",
-      "url": "https://wago.tools/db2/TraitNode/csv?build=1.60.1.70753",
-      "bytes": 15686,
-      "sha256": "1a9289bcb0babea3a5ed4be71d818019c9fc0ff327a95573dd8896070856b8d0",
-      "fetchedAt": "2026-11-03T11:50:56.137Z"
+      "url": "https://wago.tools/db2/TraitNode/csv?build=1.60.1.70862",
+      "bytes": 15742,
+      "sha256": "f7f37eead7e7641cdbecdb1c548276ae1e5c1776eb5ad0539b88770a78979d44",
+      "fetchedAt": "2026-11-07T08:43:07.659Z"
     },
     {
       "file": "TraitNodeEntry.csv",
-      "url": "https://wago.tools/db2/TraitNodeEntry/csv?build=1.60.1.70753",
-      "bytes": 13294,
-      "sha256": "052f8d708a2a95afcba3c1ac6d972d33a73b971913fedf3641f27b3537cbe7ac",
-      "fetchedAt": "2026-11-03T11:50:56.210Z"
+      "url": "https://wago.tools/db2/TraitNodeEntry/csv?build=1.60.1.70862",
+      "bytes": 13369,
+      "sha256": "dccff303039c45dc3355d8d525a664db2a87de9a17bbec133f5859755e9152b0",
+      "fetchedAt": "2026-11-07T08:43:07.697Z"
     },
     {
       "file": "TraitNodeXTraitNodeEntry.csv",
-      "url": "https://wago.tools/db2/TraitNodeXTraitNodeEntry/csv?build=1.60.1.70753",
-      "bytes": 14021,
-      "sha256": "cf672d42bfda5f5a51ae09f1642b131322e1ef5be273d7bf0191d9280205826b",
-      "fetchedAt": "2026-11-03T11:50:56.254Z"
+      "url": "https://wago.tools/db2/TraitNodeXTraitNodeEntry/csv?build=1.60.1.70862",
+      "bytes": 14071,
+      "sha256": "7e9fb84e1256434748b1763365ea7498e0d6dd4871f789ad2a1c39925c071492",
+      "fetchedAt": "2026-11-07T08:43:07.736Z"
     },
     {
       "file": "TraitDefinition.csv",
-      "url": "https://wago.tools/db2/TraitDefinition/csv?build=1.60.1.70753",
-      "bytes": 15103,
-      "sha256": "42ca30d251b054b095487c9bbdd3db968a6f3e2547c28db5d8b6e41d0ae4d98b",
-      "fetchedAt": "2026-11-03T11:50:56.328Z"
+      "url": "https://wago.tools/db2/TraitDefinition/csv?build=1.60.1.70862",
+      "bytes": 15176,
+      "sha256": "4c29bf0710067d94d87051dfa216ac1dbc96b7651043ce171d787012d92daea7",
+      "fetchedAt": "2026-11-07T08:43:07.776Z"
     },
     {
       "file": "TraitDefinitionEffectPoints.csv",
-      "url": "https://wago.tools/db2/TraitDefinitionEffectPoints/csv?build=1.60.1.70753",
-      "bytes": 15208,
-      "sha256": "a43cfbb44064c02532ca5ea9deec00fe7c06060a54532887245ebd599ddfd945",
-      "fetchedAt": "2026-11-03T11:50:56.371Z"
+      "url": "https://wago.tools/db2/TraitDefinitionEffectPoints/csv?build=1.60.1.70862",
+      "bytes": 15450,
+      "sha256": "82ff4026089957611a31e82af8a7a257de4679c3d0637d13e37a381196cd4157",
+      "fetchedAt": "2026-11-07T08:43:07.815Z"
     },
     {
       "file": "TraitEdge.csv",
-      "url": "https://wago.tools/db2/TraitEdge/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/TraitEdge/csv?build=1.60.1.70862",
       "bytes": 2528,
-      "sha256": "81dbb7ec3094ce888ef39999b5269df6cb8006b3e9f4c90990bdcdff3c25b4f0",
-      "fetchedAt": "2026-11-03T11:50:56.412Z"
+      "sha256": "f9ca4c42cfa671c7e8b7bb80f12854a1a62a8a78d86e18b4205b3015219c2d85",
+      "fetchedAt": "2026-11-07T08:43:07.851Z"
     },
     {
       "file": "Curve.csv",
-      "url": "https://wago.tools/db2/Curve/csv?build=1.60.1.70753",
-      "bytes": 213896,
-      "sha256": "7ce31a05914d763657056c5024da024f0a418f9e27f0e41ca119fb2eeaad8537",
-      "fetchedAt": "2026-11-03T11:50:56.477Z"
+      "url": "https://wago.tools/db2/Curve/csv?build=1.60.1.70862",
+      "bytes": 218428,
+      "sha256": "c8c5a6f53f6353b3861c2590613c13dcbcb89b4c1c658ae1eb8d683d1c04ffb3",
+      "fetchedAt": "2026-11-07T08:43:07.916Z"
     },
     {
       "file": "CurvePoint.csv",
-      "url": "https://wago.tools/db2/CurvePoint/csv?build=1.60.1.70753",
-      "bytes": 1030728,
-      "sha256": "269694030c04fcfd5ab7491aaf6d0548fc3a9a24d165ba2aba1a84d813e63cc6",
-      "fetchedAt": "2026-11-03T11:50:56.654Z"
+      "url": "https://wago.tools/db2/CurvePoint/csv?build=1.60.1.70862",
+      "bytes": 1049903,
+      "sha256": "0c890dd5c116427a72e69c383ae61c5ec1d7ac5764a1da85960490d77482f22e",
+      "fetchedAt": "2026-11-07T08:43:08.085Z"
     },
     {
       "file": "ChrRaces.csv",
-      "url": "https://wago.tools/db2/ChrRaces/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/ChrRaces/csv?build=1.60.1.70862",
       "bytes": 18653,
       "sha256": "8d61c45ec7d23535c3916642ae4b3a8341e38ac0cdca817144536b954488bd23",
-      "fetchedAt": "2026-11-03T11:50:56.698Z"
+      "fetchedAt": "2026-11-07T08:43:08.126Z"
     },
     {
       "file": "ChrClasses.csv",
-      "url": "https://wago.tools/db2/ChrClasses/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/ChrClasses/csv?build=1.60.1.70862",
       "bytes": 5164,
       "sha256": "e08c2f00e1652ff6857734915d649a80d8a2a86419986f59dbe82ba3a6975597",
-      "fetchedAt": "2026-11-03T11:50:56.741Z"
+      "fetchedAt": "2026-11-07T08:43:08.166Z"
     },
     {
       "file": "CreatureFamily.csv",
-      "url": "https://wago.tools/db2/CreatureFamily/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/CreatureFamily/csv?build=1.60.1.70862",
       "bytes": 1666,
       "sha256": "7ba620ec805373038287cce591422996d963b85868c2e1f41a4b89d4e0713a6c",
-      "fetchedAt": "2026-11-03T11:50:56.981Z"
+      "fetchedAt": "2026-11-07T08:43:08.206Z"
     },
     {
       "file": "Item.csv",
-      "url": "https://wago.tools/db2/Item/csv?build=1.60.1.70753",
-      "bytes": 1442682,
-      "sha256": "4f1a1eb5b4c99d9497b8104ebbc7e18d1d01bfd9ea2aca8bdc0b7a1fc9b1a9f5",
-      "fetchedAt": "2026-11-03T11:50:57.220Z"
+      "url": "https://wago.tools/db2/Item/csv?build=1.60.1.70862",
+      "bytes": 1443704,
+      "sha256": "2b54cb5e2ce34b95cf6509fa7f490497ac2f4ffc88d0165bfea85723fa5a437e",
+      "fetchedAt": "2026-11-07T08:43:08.426Z"
     },
     {
       "file": "ItemSparse.csv",
-      "url": "https://wago.tools/db2/ItemSparse/csv?build=1.60.1.70753",
-      "bytes": 5348932,
-      "sha256": "099f086589145f0be35837badd8c73c6d5bcde6fc7b3794d25d6fa7abf9b3931",
-      "fetchedAt": "2026-11-03T11:50:57.945Z"
+      "url": "https://wago.tools/db2/ItemSparse/csv?build=1.60.1.70862",
+      "bytes": 5353706,
+      "sha256": "d175e5ef9f8a2ce87c232351eca34cdf6a9c672a5a3f4dd12d2f72bdcd380eda",
+      "fetchedAt": "2026-11-07T08:43:09.191Z"
     },
     {
       "file": "ItemEffect.csv",
-      "url": "https://wago.tools/db2/ItemEffect/csv?build=1.60.1.70753",
-      "bytes": 411734,
-      "sha256": "33a684bf6cf3c2d7447a16ef99647d62604dce511cb1b76219e3634d5c7f3ec2",
-      "fetchedAt": "2026-11-03T11:50:58.039Z"
+      "url": "https://wago.tools/db2/ItemEffect/csv?build=1.60.1.70862",
+      "bytes": 412611,
+      "sha256": "df9f123861be4e180736e79dcee708151c6f79de9f5e6773ff8e2066430aa434",
+      "fetchedAt": "2026-11-07T08:43:09.344Z"
     },
     {
       "file": "ItemXItemEffect.csv",
-      "url": "https://wago.tools/db2/ItemXItemEffect/csv?build=1.60.1.70753",
-      "bytes": 253887,
-      "sha256": "a4a3ca2962977126a8bf27a706f2cec0436ad7f41491c64d85d7028cae76dcf4",
-      "fetchedAt": "2026-11-03T11:50:58.117Z"
+      "url": "https://wago.tools/db2/ItemXItemEffect/csv?build=1.60.1.70862",
+      "bytes": 254286,
+      "sha256": "15dc36eec90ca5768e00469cb8065aedf82efcf205ca03281daf6aac69ca1885",
+      "fetchedAt": "2026-11-07T08:43:09.413Z"
     },
     {
       "file": "RandPropPoints.csv",
-      "url": "https://wago.tools/db2/RandPropPoints/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/RandPropPoints/csv?build=1.60.1.70862",
       "bytes": 32214,
       "sha256": "e4a41af2ea8dc344c0c1ce36b26cba741b7f393cb74197e52d9893e6cb223db5",
-      "fetchedAt": "2026-11-03T11:50:58.161Z"
+      "fetchedAt": "2026-11-07T08:43:09.463Z"
     },
     {
       "file": "ItemDamageRanged.csv",
-      "url": "https://wago.tools/db2/ItemDamageRanged/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/ItemDamageRanged/csv?build=1.60.1.70862",
       "bytes": 10913,
       "sha256": "8b1516f55d59eaa4e7c42f6ce1d7554dd263224cc7c54e482f6cb84f94a84095",
-      "fetchedAt": "2026-11-03T11:50:58.203Z"
+      "fetchedAt": "2026-11-07T08:43:09.505Z"
     },
     {
       "file": "ItemDamageThrown.csv",
-      "url": "https://wago.tools/db2/ItemDamageThrown/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/ItemDamageThrown/csv?build=1.60.1.70862",
       "bytes": 10947,
       "sha256": "8e22434b5099a25f5bf07807088373d86d3486ecee79168a0c25ebf0e1384626",
-      "fetchedAt": "2026-11-03T11:50:58.244Z"
+      "fetchedAt": "2026-11-07T08:43:09.542Z"
     },
     {
       "file": "ItemDamageOneHand.csv",
-      "url": "https://wago.tools/db2/ItemDamageOneHand/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/ItemDamageOneHand/csv?build=1.60.1.70862",
       "bytes": 10979,
       "sha256": "591fd04d419f2cf878e614bec4c37aed120f00291c82b0c54799a24afbce6f7f",
-      "fetchedAt": "2026-11-03T11:50:58.284Z"
+      "fetchedAt": "2026-11-07T08:43:09.581Z"
     },
     {
       "file": "ItemDamageTwoHand.csv",
-      "url": "https://wago.tools/db2/ItemDamageTwoHand/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/ItemDamageTwoHand/csv?build=1.60.1.70862",
       "bytes": 10984,
       "sha256": "36061d34a6a15fc594be9a69afa0e5f29d1e4892fe88e593e2fac67539ff3f44",
-      "fetchedAt": "2026-11-03T11:50:58.329Z"
+      "fetchedAt": "2026-11-07T08:43:09.630Z"
     },
     {
       "file": "ItemSet.csv",
-      "url": "https://wago.tools/db2/ItemSet/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/ItemSet/csv?build=1.60.1.70862",
       "bytes": 52567,
       "sha256": "227cea07f3595d34662640c5c761e56c6a3ea2867b84ec5ef53cceccab3298db",
-      "fetchedAt": "2026-11-03T11:50:58.411Z"
+      "fetchedAt": "2026-11-07T08:43:09.747Z"
     },
     {
       "file": "ItemSetSpell.csv",
-      "url": "https://wago.tools/db2/ItemSetSpell/csv?build=1.60.1.70753",
+      "url": "https://wago.tools/db2/ItemSetSpell/csv?build=1.60.1.70862",
       "bytes": 33535,
       "sha256": "d41d30ca156592761819d80bea3bb66c7ea2bcc43ecc71639e01c3a3ef9637ea",
-      "fetchedAt": "2026-11-03T11:50:58.454Z"
+      "fetchedAt": "2026-11-07T08:43:09.868Z"
     },
     {
       "file": "talentsforever-hunter.json",
       "url": "https://talentsforever.com/export/hunter.json",
-      "bytes": 248386,
-      "sha256": "5b61d645abc5aeb12e9ae288aa4841b67a8bab96a3b4f79fca8b48075b5fc4d2",
-      "fetchedAt": "2026-11-03T11:50:58.676Z"
+      "bytes": 252414,
+      "sha256": "f04ffc23c95374e4469a838fea85dcb41b039d388890d48dfa11e2b9d4277d00",
+      "fetchedAt": "2026-11-07T08:43:10.246Z"
     },
     {
       "file": "classic-era/ItemSparse.csv",

@@ -1,6 +1,6 @@
 // Upstream data pinned to one client build, so every number traces back to a known version.
 // Bump WOWF_BUILD deliberately and rerun `bun run fetch`; see https://wago.tools/api/builds (product "wowf").
-export const WOWF_BUILD = "1.60.1.70753";
+export const WOWF_BUILD = "1.60.1.70862";
 
 // Client DB2 tables the normalizer reads. wago.tools serves each as CSV.
 export const DB2_TABLES = [

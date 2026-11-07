@@ -14,14 +14,15 @@ test("Aimed Shot is trainable with a 2 sec cast and a cooldown shared with Multi
   const multi = topRank("Multi-Shot");
   expect(ability("Aimed Shot").ranks).toHaveLength(6);
   expect(aimed.castTimeMs).toBe(2000);
-  expect(aimed.effects[0]!.basePoints).toBe(166);
+  // 350 since build 1.60.1.70862, which shipped the 2026-11-03 patch values (166 before).
+  expect(aimed.effects[0]!.basePoints).toBe(350);
   expect(aimed.category).toBe(multi.category);
   expect(aimed.categoryCooldownMs).toBe(6000);
 });
 
 test("instant shots have no cast time", () => {
   expect(topRank("Arcane Shot").castTimeMs).toBe(0);
-  expect(topRank("Arcane Shot").effects[0]!.basePoints).toBe(217);
+  expect(topRank("Arcane Shot").effects[0]!.basePoints).toBe(280);
 });
 
 test("talent rank values come from the trait curves", () => {
