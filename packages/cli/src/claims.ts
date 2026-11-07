@@ -426,6 +426,39 @@ function petCrit(game: GameData, rows: Leveled[], petSheet: PetSheetAt, petName:
   });
 }
 
+// Pet special attacks (Claw, Bite, Lightning Breath) per pet and ability: the model crits them at the
+// owner's sheet crit less the target's suppression, unlike white swings (task 54). Pet crit auras are
+// not counted, so a pet with Ferocity reads high. Pets with no owner sheet are pooled per ability.
+function petSpecials(game: GameData, rows: Leveled[], petSheet: PetSheetAt, petName: PetName): ClaimRow[] {
+  const by = new Map<string, { subject: string; hits: number; crits: number; expected: number; known: number }>();
+  for (const r of rows) {
+    if (r.src_kind !== "pet" || r.event !== "SPELL_DAMAGE" || !r.src || !r.dst?.startsWith("Creature-")) continue;
+    const sheet = petSheet(r.src, r.ts);
+    const subject = `${r.spell_name} by ${sheet ? petName(r.src, r.src_name) : "pets of hunters with no sheet"}`;
+    const g = by.get(subject) ?? { subject, hits: 0, crits: 0, expected: 0, known: 0 };
+    by.set(subject, g);
+    g.hits++;
+    if (r.crit) g.crits++;
+    if (sheet && r.srcLevel && r.dstLevel) {
+      g.expected += Math.max(0, sheet.rangedCritPct - attackTable(game.overrides.formula, r.srcLevel, r.dstLevel).critSuppressionPct);
+      g.known++;
+    }
+  }
+  return [...by.values()].map((g) => {
+    const claimedPct = g.known ? g.expected / g.known : undefined;
+    return {
+      claim: "pet special crit",
+      subject: g.subject,
+      source: claimedPct !== undefined ? "the owner's sheet crit less suppression (pet.ts critPct)" : "no owner sheet",
+      claimed: claimedPct !== undefined ? `${f(claimedPct, 1)}%` : "",
+      observed: rateText(g.crits, g.hits),
+      n: g.hits,
+      stat: { k: g.crits, n: g.hits },
+      verdict: claimedPct !== undefined ? verdictOfRate(claimedPct, g.crits, g.hits) : "observed",
+    };
+  });
+}
+
 // Auto Shot: the time between shots against the bow speed on the sheet (haste included), its
 // wind-up from cast start to shot, and its crit rate against the sheet's ranged crit less the
 // target's suppression. Without sheets only the timings show.
@@ -530,6 +563,7 @@ export function claims(game: GameData, db: Database, scope: ClaimsScope = {}): C
     ...petSwings(game, rows, petSheet, petName),
     ...petAttackTable(game, rows),
     ...petCrit(game, rows, petSheet, petName),
+    ...petSpecials(game, rows, petSheet, petName),
     ...autoShot(game, rows, sheetAt),
   ];
 }
