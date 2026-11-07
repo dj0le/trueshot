@@ -465,9 +465,9 @@ end
 -- decide what Trueshot can show in game. Off until started; it reports after the next fight ends
 -- and saves the findings in TrueshotDB.probe for `sim ingest` and for reading by hand.
 --
--- Checked: whether the combat log event can be registered at all, whether its fields (GUIDs, spell
--- ids, amounts, crit flags) come back as secret values in combat and after it, whether arithmetic
--- on them works, and the same for the spellcast events, mana, the bow's speed and the pet's health.
+-- Checked: whether the spellcast events' spell ids and times come back as secret values in combat,
+-- and the same for mana, the bow's speed, and the pet's and target's health, in combat and after.
+-- The combat log event itself is blocked for addons on Forever, so it is not tried.
 
 local probe = { on = false }
 local frame = CreateFrame("Frame")
@@ -499,36 +499,8 @@ local function count(key)
   probe.results[key .. " count"] = (probe.results[key .. " count"] or 0) + 1
 end
 
-local function onCombatLog()
-  local ok, ts, sub, _, srcGUID, _, _, _, _, _, _, _, a12, _, _, a15, _, _, a18, _, a20, a21 = pcall(CombatLogGetCurrentEventInfo)
-  if not ok then
-    probe.results["CombatLogGetCurrentEventInfo"] = { error = tostring(ts) }
-    return
-  end
-  count("combat log events")
-  note("event timestamp", ts)
-  note("source GUID", srcGUID)
-  local mine = not isSecret(srcGUID) and (srcGUID == UnitGUID("player") or srcGUID == UnitGUID("pet"))
-  if not mine then return end
-  count("own events")
-  if sub == "SWING_DAMAGE" then
-    -- amount, overkill, school, resisted, blocked, absorbed, critical
-    note("swing amount", a12)
-    note("swing crit flag", a18)
-    -- Kept to see whether a value read in combat is still secret once combat ends.
-    if probe.kept == nil and a12 ~= nil then probe.kept = a12 end
-  elseif sub == "RANGE_DAMAGE" or sub == "SPELL_DAMAGE" or sub == "SPELL_PERIODIC_DAMAGE" then
-    note("spell id", a12)
-    note("spell amount", a15)
-    note("spell crit flag", a21)
-    if probe.kept == nil and a15 ~= nil then probe.kept = a15 end
-  end
-end
-
 frame:SetScript("OnEvent", function(_, event, unit, _, spellID)
-  if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-    pcall(onCombatLog)
-  elseif event == "UNIT_SPELLCAST_SUCCEEDED" and unit == "player" then
+  if event == "UNIT_SPELLCAST_SUCCEEDED" and unit == "player" then
     count("own casts")
     note("cast spell id", spellID)
     note("cast time (GetTime)", GetTime())
@@ -544,7 +516,6 @@ frame:SetScript("OnEvent", function(_, event, unit, _, spellID)
     C_Timer.After(1, function()
       note("player mana", UnitPower("player", 0))
       note("bow speed", (UnitRangedDamage("player")))
-      if probe.kept ~= nil then note("combat amount kept until after combat", probe.kept) end
       probe.report()
     end)
   end
@@ -579,10 +550,10 @@ function probe.start()
   end
   probe.on = true
   for _, e in ipairs({ "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" }) do frame:RegisterEvent(e) end
-  local ok, err = pcall(frame.RegisterEvent, frame, "COMBAT_LOG_EVENT_UNFILTERED")
-  probe.results["register combat log"] = ok and "allowed" or ("refused: " .. tostring(err))
+  -- Registering COMBAT_LOG_EVENT_UNFILTERED is a protected action on Forever (2026-11-07: "blocked from
+  -- an action only available to the Blizzard UI", with no Lua error), so the probe no longer tries.
+  probe.results["register combat log"] = "blocked for addons (2026-11-07)"
   print(P .. "on. Fight something; results print when the fight ends. `/ts probe` again shows them.")
-  if not ok then print(P .. "the combat log event was refused: " .. tostring(err)) end
 end
 
 TrueshotProbe = probe
