@@ -184,13 +184,23 @@ local function sheet()
 end
 
 -- The bow's speed as last read out of combat (it is secret in combat), for the after-fight summary.
+-- Not read while Quick Shots or Rapid Fire hastes it, or every normal shot after would look late.
 local bowSpeed
+local HASTE_AURAS = { 6150, 3045 }
+
+local function hasted()
+  if not (C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID) then return false end
+  for _, id in ipairs(HASTE_AURAS) do
+    if C_UnitAuras.GetPlayerAuraBySpellID(id) then return true end
+  end
+  return false
+end
 
 local function flush()
   local at = pendingAt or GetTime()
   pendingAt = nil
   local ok, speed = pcall(UnitRangedDamage, "player")
-  if ok and speed ~= nil and not (issecretvalue ~= nil and issecretvalue(speed)) and speed > 0 then bowSpeed = speed end
+  if ok and speed ~= nil and not (issecretvalue ~= nil and issecretvalue(speed)) and speed > 0 and not hasted() then bowSpeed = speed end
   if not session then return end
   -- A value this client guards in a new way must not stop the recorder.
   sawSecret = false
