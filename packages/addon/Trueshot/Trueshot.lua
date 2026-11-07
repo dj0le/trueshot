@@ -183,9 +183,14 @@ local function sheet()
   return table.concat(v, ";")
 end
 
+-- The bow's speed as last read out of combat (it is secret in combat), for the after-fight summary.
+local bowSpeed
+
 local function flush()
   local at = pendingAt or GetTime()
   pendingAt = nil
+  local ok, speed = pcall(UnitRangedDamage, "player")
+  if ok and speed ~= nil and not (issecretvalue ~= nil and issecretvalue(speed)) and speed > 0 then bowSpeed = speed end
   if not session then return end
   -- A value this client guards in a new way must not stop the recorder.
   sawSecret = false
@@ -434,6 +439,118 @@ end)
 remindEvents:RegisterEvent("PLAYER_LOGIN")
 TrueshotReminders = reminders
 
+-- After-fight summary ========================================================
+-- Your own casts and the game clock stay readable in combat (`/ts probe`, 2026-11-07); damage does
+-- not (the combat log event is blocked for addons, and amounts, health and mana are secret). So at
+-- the end of a fight Trueshot prints one line from timing alone: Auto Shots fired against what the
+-- bow allowed, the late ones and the time they cost, and your casts. Haste it cannot see (Quick
+-- Shots, the quiver) makes shots look early, never late, so "late" stays honest; Rapid Fire's 40% is
+-- counted. Each summary is also saved, so `sim review` can check it against the log.
+-- `/ts summary off` turns it off.
+
+local AUTO_SHOT = 75
+local RAPID_FIRE = 3045
+local RAPID_FIRE_SEC = 15
+local RAPID_FIRE_HASTE = 1.4
+local LATE_SLACK = 0.3   -- seconds over the bow's speed before a shot counts as late
+local STOPPED = 5        -- a gap longer than this is a stop (moving, out of range), not a late shot
+local MIN_FIGHT = 8      -- seconds; shorter fights get no summary
+
+local fight
+
+local function fightStart()
+  fight = { start = GetTime(), shots = {}, casts = {}, rapid = {}, speed = bowSpeed }
+end
+
+local function fightCast(spellID)
+  if not fight or not spellID then return end
+  local now = GetTime()
+  if spellID == AUTO_SHOT then
+    fight.shots[#fight.shots + 1] = now
+    return
+  end
+  if spellID == RAPID_FIRE then fight.rapid[#fight.rapid + 1] = now end
+  local name = spellName(spellID) or tostring(spellID)
+  fight.casts[name] = (fight.casts[name] or 0) + 1
+end
+
+-- The bow's speed at a moment, with Rapid Fire's haste when it was up.
+local function speedAt(f, t)
+  for _, r in ipairs(f.rapid) do
+    if t >= r and t <= r + RAPID_FIRE_SEC then return f.speed / RAPID_FIRE_HASTE end
+  end
+  return f.speed
+end
+
+-- The summary of a finished fight, or nil when there is nothing worth saying.
+local function summarize(f, now)
+  local length = now - f.start
+  if length < MIN_FIGHT then return nil end
+  local n = #f.shots
+  local parts = {}
+  local saved = { start = f.start, length = length, shots = n }
+  if n >= 2 and f.speed then
+    local late, lost, stops, stopped = 0, 0, 0, 0
+    -- Shots the bow allowed between the first and the last, from the time each gap could hold.
+    local possible = 1
+    for i = 2, n do
+      local gap = f.shots[i] - f.shots[i - 1]
+      local speed = speedAt(f, f.shots[i - 1])
+      possible = possible + math.max(1, math.floor(gap / speed + 0.25))
+      if gap > STOPPED then
+        stops = stops + 1
+        stopped = stopped + gap
+      elseif gap > speed + LATE_SLACK then
+        late = late + 1
+        lost = lost + gap - speed
+      end
+    end
+    parts[#parts + 1] = string.format("Auto Shot %d of %d", n, possible)
+    if late > 0 then parts[#parts + 1] = string.format("%d late (%.1f sec lost)", late, lost) end
+    if stops > 0 then parts[#parts + 1] = string.format("stopped %d %s (%.0f sec)", stops, stops == 1 and "time" or "times", stopped) end
+    saved.possible, saved.late, saved.lost, saved.stops = possible, late, lost, stops
+  elseif n >= 2 then
+    parts[#parts + 1] = string.format("Auto Shot %d (bow speed unknown)", n)
+  end
+  local casts = {}
+  for name, c in pairs(f.casts) do casts[#casts + 1] = { name, c } end
+  table.sort(casts, function(a, b) return a[2] > b[2] end)
+  local list = {}
+  for i = 1, math.min(5, #casts) do list[i] = casts[i][1] .. " " .. casts[i][2] end
+  if #list > 0 then parts[#parts + 1] = table.concat(list, ", ") end
+  if #parts == 0 then return nil end
+  return string.format("%.0f sec: %s", length, table.concat(parts, "; ")), saved
+end
+
+local summaryEvents = CreateFrame("Frame")
+summaryEvents:SetScript("OnEvent", function(_, event, unit, _, spellID)
+  if event == "PLAYER_LOGIN" then
+    TrueshotDB = TrueshotDB or {}
+    if TrueshotDB.summary == nil then TrueshotDB.summary = true end
+    if select(2, UnitClass("player")) ~= "HUNTER" then return end
+    for _, e in ipairs({ "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "UNIT_SPELLCAST_SUCCEEDED" }) do summaryEvents:RegisterEvent(e) end
+  elseif event == "PLAYER_REGEN_DISABLED" then
+    pcall(fightStart)
+  elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
+    if unit == "player" then pcall(fightCast, spellID) end
+  elseif event == "PLAYER_REGEN_ENABLED" then
+    local f = fight
+    fight = nil
+    if not f or not TrueshotDB.summary then return end
+    local ok, line, saved = pcall(summarize, f, GetTime())
+    if not ok or not line then return end
+    print("|cffabd473Trueshot|r: " .. line)
+    if session then
+      session.fights = session.fights or {}
+      saved.t = math.floor((saved.start - session.gt) * 1000 + 0.5)
+      saved.start = nil
+      session.fights[#session.fights + 1] = saved
+    end
+  end
+end)
+summaryEvents:RegisterEvent("PLAYER_LOGIN")
+TrueshotSummarize = summarize
+
 SLASH_TRUESHOT1 = "/trueshot"
 SLASH_TRUESHOT2 = "/ts"
 SlashCmdList.TRUESHOT = function(msg)
@@ -441,6 +558,9 @@ SlashCmdList.TRUESHOT = function(msg)
   if msg == "probe" then
     TrueshotProbe.start()
     return
+  end
+  if msg == "summary off" or msg == "summary on" then
+    db.summary = msg == "summary on"
   end
   if msg == "remind off" or msg == "remind on" then
     db.remind = msg == "remind on"
@@ -455,9 +575,9 @@ SlashCmdList.TRUESHOT = function(msg)
     if db.autolog then autolog() end
   end
   print(string.format(
-    "|cffabd473Trueshot|r: %d rows and %d presses this session, %d sessions saved, combat logging %s, autolog %s, reminders %s",
+    "|cffabd473Trueshot|r: %d rows and %d presses this session, %d sessions saved, combat logging %s, autolog %s, reminders %s, fight summary %s",
     session and #session.rows or 0, session and #session.presses or 0, #db.sessions, LoggingCombat() and "on" or "off", db.autolog and "on" or "off",
-    db.remind and "on" or "off"
+    db.remind and "on" or "off", db.summary and "on" or "off"
   ))
 end
 

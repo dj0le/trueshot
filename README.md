@@ -40,12 +40,15 @@ Configs are TOML. Copy one from `configs/` and change it.
 
 ## The addon
 
-The addon does three things:
+The addon does four things:
 
 - reminds you before a pull: when you target something hostile out of combat, it shows one line in
   the middle of the screen if your pet is missing, dead or unhappy, you have no Aspect (or Cheetah
   or Pack is still on), your mana is under half before an elite or a dungeon pull, or you are low on
   arrows
+- after each fight of 8 seconds or more, prints one line: Auto Shots fired against what your bow
+  allowed, the late ones and the time they cost, the times you stopped shooting, and your casts. It
+  works from timing alone, since Forever hides damage, health and mana from addons in combat
 - turns combat logging (with advanced logging) on every time you log in, so you don't forget
 - saves your character sheet whenever it changes: level, ranged attack power, bow speed, crit, hit,
   buffs, gear, talents and pet, plus your button presses
@@ -61,6 +64,7 @@ Install it from CurseForge, or copy `packages/addon/Trueshot` into your
 
 - `/ts`: status
 - `/ts remind`: what it would remind you of right now; `/ts remind off` and `/ts remind on`
+- `/ts summary off` and `/ts summary on`: the after-fight line
 - `/ts autolog off` and `/ts autolog on`: whether it turns combat logging on
 - `/ts probe`: a test of which combat data the game lets addons read, reported after your next fight
 

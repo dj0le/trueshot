@@ -15,6 +15,18 @@ Target something hostile out of combat and Trueshot shows one line in the middle
 Each reminder shows at most once every 30 seconds. `/ts remind` lists what it would remind you of
 right now, and `/ts remind off` turns them off.
 
+## After a fight
+
+After each fight of 8 seconds or more, one line in chat:
+
+> 42 sec: Auto Shot 18 of 21; 2 late (1.4 sec lost); stopped 1 time (6 sec); Arcane Shot 4, Serpent Sting 2
+
+"18 of 21" is the shots you fired against what your bow allowed from your first shot to your last.
+A late shot came more than 0.3 seconds after the bow was ready; a stop is a gap over 5 seconds
+(moving, out of range, Feign Death). Rapid Fire's haste is counted. Forever hides damage, health and
+mana from addons during combat, so this works from the timing of your own casts alone.
+`/ts summary off` turns it off.
+
 ## Recording
 
 - Turns combat logging (with advanced logging) on every time you log in. The game turns it off at
@@ -35,6 +47,7 @@ Combat logs grow fast: an evening of dungeons can write 50 MB. Delete old logs f
 
 - `/ts`: status
 - `/ts remind`, `/ts remind off`, `/ts remind on`
+- `/ts summary off`, `/ts summary on`
 - `/ts autolog off`, `/ts autolog on`
 - `/ts probe`: tests which combat data the game lets addons read and reports after your next fight.
   It helps decide what Trueshot can show in game later.
