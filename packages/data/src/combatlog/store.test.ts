@@ -60,3 +60,17 @@ test("an encounter is one fight, whatever the gaps inside it", async () => {
   expect(db.query("SELECT name, success FROM encounters").all()).toEqual([{ name: "Hogger", success: 1 }]);
   expect(db.query("SELECT label, hits FROM fights").all()).toEqual([{ label: "Hogger", hits: 2 }]);
 });
+
+test("a hit just after the boss dies stays in the encounter; a new pull does not", async () => {
+  const db = openStore(":memory:");
+  const start = '10/17/2026 18:28:52.000-6  ENCOUNTER_START,1144,"Hogger",1,5,0';
+  const end = '10/17/2026 18:29:30.000-6  ENCOUNTER_END,1144,"Hogger",1,5,1,38000';
+  const tail = PET_SWING.replace("18:28:53.062", "18:29:30.700");
+  const late = PET_SWING.replace("18:28:53.062", "18:29:34.000");
+  const trash = PET_SWING.replace("18:28:53.062", "18:29:30.500").replace('"Defias Bandit"', '"Spider"');
+  await ingest(db, tempLog([OWNER_SHOT, start, PET_SWING, LATER_SWING, end, trash, tail, late]));
+  expect(db.query("SELECT label, hits FROM fights ORDER BY start_ts").all()).toEqual([
+    { label: "Hogger", hits: 3 },
+    { label: "Spider", hits: 2 },
+  ]);
+});

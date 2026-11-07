@@ -24,6 +24,9 @@ export const DEFAULT_LOGS_DIR =
 const AUTO_SHOT = '75,"Auto Shot"';
 // A new fight starts after this long without damage from a hunter or its pets.
 const FIGHT_GAP_MS = 10_000;
+// A hit this soon after ENCOUNTER_END, on a target hit during the encounter, still belongs to it: a
+// sting tick or a swing already under way when the boss died (PLAN.md task 55).
+const ENCOUNTER_TAIL_MS = 3_000;
 // Read this much of a file at a time.
 const CHUNK_BYTES = 16 << 20;
 
@@ -229,9 +232,9 @@ export function forget(db: Database, path: string): void {
   })();
 }
 
-// Each hunter's fights in one file: an encounter's whole window, else a run of damage by the hunter
-// and its pets on creatures with no gap over FIGHT_GAP_MS. Labelled by the encounter, or by the
-// creature that took the most damage.
+// Each hunter's fights in one file: an encounter's whole window (and its tail, ENCOUNTER_TAIL_MS),
+// else a run of damage by the hunter and its pets on creatures with no gap over FIGHT_GAP_MS.
+// Labelled by the encounter, or by the creature that took the most damage.
 export function rebuildFights(db: Database, path: string): number {
   type Hit = { ts: number; hunter: string; dst_name: string; amount: number | null };
   const hits = db
@@ -250,8 +253,21 @@ export function rebuildFights(db: Database, path: string): number {
   type Fight = { hunter: string; start: number; end: number; encounter: { id: number; name: string } | undefined; damage: number; hits: number; byTarget: Map<string, number> };
   const open = new Map<string, Fight>();
   const done: Fight[] = [];
+  // Each hunter's last encounter fight, for the hits in its tail.
+  const lastEncounter = new Map<string, Fight>();
   for (const h of hits) {
     const enc = encounterAt(h.ts);
+    if (!enc) {
+      const last = lastEncounter.get(h.hunter);
+      const ended = last && encounters.find((x) => x.id === last.encounter!.id)?.end_ts;
+      if (last && ended != null && h.ts - ended <= ENCOUNTER_TAIL_MS && last.byTarget.has(h.dst_name)) {
+        last.end = h.ts;
+        last.hits++;
+        last.damage += h.amount ?? 0;
+        last.byTarget.set(h.dst_name, last.byTarget.get(h.dst_name)! + (h.amount ?? 0));
+        continue;
+      }
+    }
     let f = open.get(h.hunter);
     if (f && (f.encounter?.id !== enc?.id || (!enc && h.ts - f.end > FIGHT_GAP_MS))) {
       done.push(f);
@@ -260,6 +276,7 @@ export function rebuildFights(db: Database, path: string): number {
     if (!f) {
       f = { hunter: h.hunter, start: h.ts, end: h.ts, encounter: enc, damage: 0, hits: 0, byTarget: new Map() };
       open.set(h.hunter, f);
+      if (enc) lastEncounter.set(h.hunter, f);
     }
     f.end = h.ts;
     f.hits++;
