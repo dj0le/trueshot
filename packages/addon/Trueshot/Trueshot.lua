@@ -444,8 +444,11 @@ remindEvents:RegisterEvent("PLAYER_LOGIN")
 TrueshotReminders = reminders
 
 -- After-fight summary ========================================================
--- Your own casts and the game clock stay readable in combat (`/ts probe`, 2026-11-07); damage does
--- not (the combat log event is blocked for addons, and amounts, health and mana are secret). So at
+-- What Forever lets an addon read (tested in game 2026-11-07): your own casts (UNIT_SPELLCAST_*
+-- spell ids) and GetTime() stay plain in combat. Registering COMBAT_LOG_EVENT_UNFILTERED is a
+-- protected action ("blocked from an action only available to the Blizzard UI", no Lua error). The
+-- bow's speed, pet and target health are secret in combat; the player's mana is secret even out of
+-- combat. So damage never reaches an addon. So at
 -- the end of a fight Trueshot prints one line from timing alone: Auto Shots fired against what the
 -- bow allowed, the late ones and the time they cost, and your casts. Haste it cannot see (Quick
 -- Shots, the quiver) makes shots look early, never late, so "late" stays honest; Rapid Fire's 40% is
@@ -559,10 +562,6 @@ SLASH_TRUESHOT1 = "/trueshot"
 SLASH_TRUESHOT2 = "/ts"
 SlashCmdList.TRUESHOT = function(msg)
   local db = TrueshotDB
-  if msg == "probe" then
-    TrueshotProbe.start()
-    return
-  end
   if msg == "summary off" or msg == "summary on" then
     db.summary = msg == "summary on"
   end
@@ -584,100 +583,3 @@ SlashCmdList.TRUESHOT = function(msg)
     db.remind and "on" or "off", db.summary and "on" or "off"
   ))
 end
-
--- `/ts probe`: finds out which game data this client lets an addon read, in and out of combat, to
--- decide what Trueshot can show in game. Off until started; it reports after the next fight ends
--- and saves the findings in TrueshotDB.probe for `sim ingest` and for reading by hand.
---
--- Checked: whether the spellcast events' spell ids and times come back as secret values in combat,
--- and the same for mana, the bow's speed, and the pet's and target's health, in combat and after.
--- The combat log event itself is blocked for addons on Forever, so it is not tried.
-
-local probe = { on = false }
-local frame = CreateFrame("Frame")
-local P = "|cffabd473Trueshot probe|r: "
-
-local function isSecret(x)
-  return issecretvalue ~= nil and issecretvalue(x) or false
-end
-
--- "plain", "secret", "nil", or "secret, math ok" style notes for one value.
-local function describe(x)
-  if x == nil then return "nil" end
-  if isSecret(x) then
-    local ok = pcall(function() return x + 0 end)
-    return ok and "secret, math works" or "secret"
-  end
-  return "plain"
-end
-
-local function note(key, value)
-  local r = probe.results
-  r[key] = r[key] or {}
-  local phase = InCombatLockdown() and "combat" or "out"
-  -- The first answer per phase stands, except nil (a crit flag on a hit that did not crit).
-  if r[key][phase] == nil or r[key][phase] == "nil" then r[key][phase] = describe(value) end
-end
-
-local function count(key)
-  probe.results[key .. " count"] = (probe.results[key .. " count"] or 0) + 1
-end
-
-frame:SetScript("OnEvent", function(_, event, unit, _, spellID)
-  if event == "UNIT_SPELLCAST_SUCCEEDED" and unit == "player" then
-    count("own casts")
-    note("cast spell id", spellID)
-    note("cast time (GetTime)", GetTime())
-  elseif event == "PLAYER_REGEN_DISABLED" then
-    probe.results.fights = (probe.results.fights or 0) + 1
-    C_Timer.After(2, function()
-      note("player mana", UnitPower("player", 0))
-      note("bow speed", (UnitRangedDamage("player")))
-      note("pet health", UnitHealth("pet"))
-      note("target health", UnitHealth("target"))
-    end)
-  elseif event == "PLAYER_REGEN_ENABLED" then
-    C_Timer.After(1, function()
-      note("player mana", UnitPower("player", 0))
-      note("bow speed", (UnitRangedDamage("player")))
-      probe.report()
-    end)
-  end
-end)
-
-function probe.report()
-  local r = probe.results
-  print(P .. "results so far (also saved in TrueshotDB.probe):")
-  local keys = {}
-  for k in pairs(r) do keys[#keys + 1] = k end
-  table.sort(keys)
-  for _, k in ipairs(keys) do
-    local v = r[k]
-    if type(v) == "table" then
-      local parts = {}
-      for phase, d in pairs(v) do parts[#parts + 1] = phase .. ": " .. d end
-      table.sort(parts)
-      print("  " .. k .. " = " .. table.concat(parts, ", "))
-    else
-      print("  " .. k .. " = " .. tostring(v))
-    end
-  end
-end
-
-function probe.start()
-  TrueshotDB.probe = TrueshotDB.probe or {}
-  probe.results = TrueshotDB.probe
-  probe.results.client = (GetBuildInfo())
-  if probe.on then
-    probe.report()
-    return
-  end
-  probe.on = true
-  for _, e in ipairs({ "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" }) do frame:RegisterEvent(e) end
-  -- Registering COMBAT_LOG_EVENT_UNFILTERED is a protected action on Forever (2026-11-07: "blocked from
-  -- an action only available to the Blizzard UI", with no Lua error), so the probe no longer tries.
-  probe.results["register combat log"] = "blocked for addons (2026-11-07)"
-  print(P .. "on. Fight something; results print when the fight ends. `/ts probe` again shows them.")
-end
-
-TrueshotProbe = probe

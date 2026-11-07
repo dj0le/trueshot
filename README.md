@@ -65,7 +65,6 @@ Install it from CurseForge, or copy `packages/addon/Trueshot` into your
 - `/ts remind`: what it would remind you of right now; `/ts remind off` and `/ts remind on`
 - `/ts summary off` and `/ts summary on`: the after-fight line
 - `/ts autolog off` and `/ts autolog on`: whether it turns combat logging on
-- `/ts probe`: a test of which combat data the game lets addons read, reported after your next fight
 
 ## Checking the sim against your logs
 
