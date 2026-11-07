@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Trueshot
-## Notes: Pre-pull reminders (pet, Aspect, mana, ammo) and an after-fight Auto Shot summary. Saves your character sheet and button presses and keeps combat logging on, for Trueshot's fight reviews, claims and benchmarks.
+## Notes: Pre-pull reminders (pet, Aspect, ammo) and an after-fight Auto Shot summary. Saves your character sheet and button presses and keeps combat logging on, for Trueshot's fight reviews, claims and benchmarks.
 ## Author: dj0le
 ## IconTexture: Interface\AddOns\Trueshot\Icon
 ## X-Website: https://github.com/dj0le/trueshot

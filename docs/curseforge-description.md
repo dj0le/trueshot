@@ -9,7 +9,6 @@ Target something hostile out of combat and Trueshot shows one line in the middle
 
 - your pet is missing, dead or unhappy
 - you have no Aspect up, or Cheetah or Pack is still on
-- your mana is under half before an elite or a dungeon pull
 - you're low on arrows
 
 Each reminder shows at most once every 30 seconds. `/ts remind` lists what it would remind you of

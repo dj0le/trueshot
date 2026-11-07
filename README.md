@@ -44,8 +44,7 @@ The addon does four things:
 
 - reminds you before a pull: when you target something hostile out of combat, it shows one line in
   the middle of the screen if your pet is missing, dead or unhappy, you have no Aspect (or Cheetah
-  or Pack is still on), your mana is under half before an elite or a dungeon pull, or you are low on
-  arrows
+  or Pack is still on), or you are low on arrows
 - after each fight of 8 seconds or more, prints one line: Auto Shots fired against what your bow
   allowed, the late ones and the time they cost, the times you stopped shooting, and your casts. It
   works from timing alone, since Forever hides damage, health and mana from addons in combat

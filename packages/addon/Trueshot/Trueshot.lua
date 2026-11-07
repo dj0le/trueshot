@@ -337,7 +337,6 @@ frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 -- read, so Forever's secret values never get in the way. `/ts remind off` turns it off.
 
 local REMIND_EVERY = 30 -- seconds before the same reminder shows again
-local LOW_MANA = 0.5    -- share of mana under which a big pull gets a "drink first"
 local LOW_AMMO = 200
 local CALL_PET = 883
 local HAWK_ASPECT = 13165
@@ -405,12 +404,7 @@ local function reminders()
       out[#out + 1] = aspect .. " is on"
     end
   end
-  local mana, maxMana = UnitPower("player", 0), UnitPowerMax("player", 0)
-  local classification = UnitClassification("target")
-  local big = classification == "elite" or classification == "worldboss" or classification == "rareelite" or IsInInstance()
-  if big and plain(mana) and plain(maxMana) and maxMana > 0 and mana / maxMana < LOW_MANA then
-    out[#out + 1] = string.format("mana %d%%: drink first", math.floor(100 * mana / maxMana))
-  end
+  -- No mana reminder: the player's mana is a secret value even out of combat (2026-11-07).
   local ok, ammo = pcall(GetInventoryItemCount, "player", 0)
   if ok and plain(ammo) and GetInventoryItemID("player", 0) and ammo < LOW_AMMO then
     out[#out + 1] = string.format("%d arrows left", ammo)
