@@ -49,8 +49,6 @@ Combat logs grow fast: an evening of dungeons can write 50 MB. Delete old logs f
 - `/ts remind`, `/ts remind off`, `/ts remind on`
 - `/ts summary off`, `/ts summary on`
 - `/ts autolog off`, `/ts autolog on`
-- `/ts probe`: tests which combat data the game lets addons read and reports after your next fight.
-  It helps decide what Trueshot can show in game later.
 
 ## The sim
 
