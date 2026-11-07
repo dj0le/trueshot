@@ -321,7 +321,10 @@ spells = [20355]
 confidence = "guess"
 source = "A raid with Blessing of Might instead of Wisdom and no shaman: Judgement of Wisdom alone (wowsims-compare.json)"
 
-# Server-side changes the client tables do not have. Each one replaces one spell effect's base points.
+# Server-side changes the client tables do not have. Each one replaces one value of a spell or effect.
+# `patch` names the patches.toml patch the evidence comes from; when a client build carries the value,
+# the loader rejects the override as stale and it is deleted (build 1.60.1.70862 retired the
+# 2026-11-03 base points that way).
 
 # Summon Hawk's dive: the tooltip adds 5% of ranged attack power; the client effect has no coefficient.
 [[auraState]]
@@ -343,6 +346,7 @@ spell = 3044
 effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
+patch = "launch"
 source = "Arcane Shot rank 1: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -350,6 +354,7 @@ spell = 14281
 effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
+patch = "launch"
 source = "Arcane Shot rank 2: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -357,6 +362,7 @@ spell = 14282
 effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
+patch = "launch"
 source = "Arcane Shot rank 3: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -364,6 +370,7 @@ spell = 14283
 effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
+patch = "launch"
 source = "Arcane Shot rank 4: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -371,6 +378,7 @@ spell = 14284
 effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
+patch = "launch"
 source = "Arcane Shot rank 5: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -378,6 +386,7 @@ spell = 14285
 effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
+patch = "launch"
 source = "Arcane Shot rank 6: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -385,6 +394,7 @@ spell = 14286
 effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
+patch = "launch"
 source = "Arcane Shot rank 7: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -392,6 +402,7 @@ spell = 14287
 effectIndex = 0
 apCoefficient = 0.15
 confidence = "reported"
+patch = "launch"
 source = "Arcane Shot rank 8: 15% of attack power, up from 10%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -399,6 +410,7 @@ spell = 1978
 effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
+patch = "launch"
 source = "Serpent Sting rank 1: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -406,6 +418,7 @@ spell = 13549
 effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
+patch = "launch"
 source = "Serpent Sting rank 2: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -413,6 +426,7 @@ spell = 13550
 effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
+patch = "launch"
 source = "Serpent Sting rank 3: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -420,6 +434,7 @@ spell = 13551
 effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
+patch = "launch"
 source = "Serpent Sting rank 4: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -427,6 +442,7 @@ spell = 13552
 effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
+patch = "launch"
 source = "Serpent Sting rank 5: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -434,6 +450,7 @@ spell = 13553
 effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
+patch = "launch"
 source = "Serpent Sting rank 6: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -441,6 +458,7 @@ spell = 13554
 effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
+patch = "launch"
 source = "Serpent Sting rank 7: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -448,6 +466,7 @@ spell = 13555
 effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
+patch = "launch"
 source = "Serpent Sting rank 8: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 [[hotfix]]
@@ -455,6 +474,7 @@ spell = 25295
 effectIndex = 0
 apCoefficient = 0.05
 confidence = "reported"
+patch = "launch"
 source = "Serpent Sting rank 9: each tick gains 5% of attack power, up from 3%. Hunter patch notes the user pasted on 2026-11-03 (server-side; client build 1.60.1.70753 still has Classic's values)"
 
 # Multi-Shot has a 0.5 sec cast that ranged haste shortens, like Aimed Shot; the client row has none.
@@ -462,6 +482,7 @@ source = "Serpent Sting rank 9: each tick gains 5% of attack power, up from 3%. 
 spell = 2643
 castTimeMs = 500
 confidence = "reported"
+patch = "beta"
 source = "wowsims/forever PR 661: every Multi-Shot in three beta logs has a cast start, median 0.44-0.45 sec with a 10% quiver (0.32 under Rapid Fire). A public beta log (ArcSim's gist) also shows a Multi-Shot cast start"
 
 # Talents whose client data does more than their tooltip says. The tooltip wins (PLAN.md, task 16).

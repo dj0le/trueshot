@@ -8,6 +8,7 @@
 // hunter as owner, or that a hunter summons.
 import { Database } from "bun:sqlite";
 import { join } from "node:path";
+import { type Patch, patchAt } from "../patches";
 import { type LogEvent, parseLine } from "./parse";
 
 export const LOGS_CACHE = join(import.meta.dir, "..", "..", "logs-cache");
@@ -27,7 +28,8 @@ const FIGHT_GAP_MS = 10_000;
 const CHUNK_BYTES = 16 << 20;
 
 const SCHEMA = `
-CREATE TABLE IF NOT EXISTS files (path TEXT PRIMARY KEY, offset INTEGER NOT NULL, build TEXT, advanced INTEGER, ingested_at TEXT);
+-- utc_offset_min: the log's clock against UTC; NULL means this machine's zone.
+CREATE TABLE IF NOT EXISTS files (path TEXT PRIMARY KEY, offset INTEGER NOT NULL, build TEXT, advanced INTEGER, ingested_at TEXT, utc_offset_min INTEGER);
 CREATE TABLE IF NOT EXISTS units (guid TEXT PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL, owner TEXT NOT NULL DEFAULT '');
 CREATE TABLE IF NOT EXISTS events (
   id INTEGER PRIMARY KEY, file TEXT NOT NULL, ts INTEGER NOT NULL, event TEXT NOT NULL,
@@ -61,6 +63,9 @@ export function openStore(path = DEFAULT_DB): Database {
   // Stores made before positions were kept.
   const columns = new Set(db.query<{ name: string }, []>("PRAGMA table_info(events)").all().map((c) => c.name));
   for (const c of ["st_x", "st_y"]) if (!columns.has(c)) db.exec(`ALTER TABLE events ADD COLUMN ${c} REAL`);
+  // Stores made before patches were tracked.
+  const fileColumns = new Set(db.query<{ name: string }, []>("PRAGMA table_info(files)").all().map((c) => c.name));
+  if (!fileColumns.has("utc_offset_min")) db.exec("ALTER TABLE files ADD COLUMN utc_offset_min INTEGER");
   return db;
 }
 
@@ -91,7 +96,9 @@ async function* chunks(path: string, from: number, to: number): AsyncGenerator<{
 
 // Reads what is new in one log file into the store. A file shorter than what was ingested has been
 // replaced, and is read again from the start.
-export async function ingest(db: Database, path: string): Promise<IngestResult> {
+// `utcOffsetMin` is the log writer's offset from UTC, for logs from another time zone; left out, the
+// file keeps what it had (else this machine's zone).
+export async function ingest(db: Database, path: string, utcOffsetMin?: number): Promise<IngestResult> {
   const size = Bun.file(path).size;
   const seen = db.query<{ offset: number }, [string]>("SELECT offset FROM files WHERE path = ?").get(path);
   let from = seen?.offset ?? 0;
@@ -100,6 +107,9 @@ export async function ingest(db: Database, path: string): Promise<IngestResult> 
     from = 0;
   }
   const result: IngestResult = { path, bytes: size - from, lines: 0, kept: 0, hunters: 0, fights: 0 };
+  if (utcOffsetMin !== undefined) {
+    db.run("INSERT INTO files (path, offset, utc_offset_min) VALUES (?, 0, ?) ON CONFLICT (path) DO UPDATE SET utc_offset_min = excluded.utc_offset_min", [path, utcOffsetMin]);
+  }
   if (from === size) return result;
 
   const units = new Map(db.query<{ guid: string; kind: string }, []>("SELECT guid, kind FROM units").all().map((u) => [u.guid, u.kind]));
@@ -202,6 +212,12 @@ export async function ingest(db: Database, path: string): Promise<IngestResult> 
   result.hunters = hunters.size;
   result.fights = rebuildFights(db, path);
   return result;
+}
+
+// The patch of a stored line, from its file's clock offset and its stamp.
+export function patchOfLine(db: Database, patches: Patch[]): (file: string, ts: number) => Patch {
+  const offsets = new Map(db.query<{ path: string; utc_offset_min: number | null }, []>("SELECT path, utc_offset_min FROM files").all().map((f) => [f.path, f.utc_offset_min]));
+  return (file, ts) => patchAt(patches, ts, offsets.get(file));
 }
 
 // Drops everything read from one file.

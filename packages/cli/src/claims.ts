@@ -9,10 +9,14 @@
 // the Trueshot addon's sheets, stored next to the events. Creatures and pets log their
 // real level.
 import type { Database } from "bun:sqlite";
-import { type GameData, type Sheet, sheetsAt } from "@trueshot/data";
+import { type GameData, type Patch, patchOfLine, type Sheet, sheetsAt } from "@trueshot/data";
 import { attackTable, Aura, DefenseType, resolveEffects } from "@trueshot/engine";
 
 export type Verdict = "fits" | "differs" | "too few" | "observed";
+
+// The number behind an observation, for comparing patches: a mean with its 95% half-width, or a
+// rate as k of n.
+export type Stat = { mean: number; ci: number } | { k: number; n: number };
 
 export type ClaimRow = {
   claim: string;
@@ -22,9 +26,11 @@ export type ClaimRow = {
   observed: string;
   n: number;
   verdict: Verdict;
+  stat?: Stat;
 };
 
 type Row = {
+  file: string;
   ts: number;
   event: string;
   src: string | null;
@@ -108,15 +114,17 @@ const rateText = (k: number, n: number) => {
 // A clean hit: nothing resisted, blocked or absorbed, and no overkill cutting the amount.
 const clean = (r: Row) => !r.resisted && !r.blocked && !r.absorbed && (r.overkill ?? -1) <= 0 && (r.unmitigated ?? 0) > 0;
 
-export function loadRows(db: Database, hunter?: string): Row[] {
-  const rows = db
+export function loadRows(db: Database, hunter?: string, patches?: Patch[], patch?: Patch): Row[] {
+  const all = db
     .query<Row, []>(
-      `SELECT e.ts, e.event, e.src, e.src_name, u.kind AS src_kind, e.dst, e.dst_name, e.spell_id, e.spell_name, e.school,
+      `SELECT e.file, e.ts, e.event, e.src, e.src_name, u.kind AS src_kind, e.dst, e.dst_name, e.spell_id, e.spell_name, e.school,
         e.st_guid, e.st_armor, e.st_level, e.amount, e.unmitigated, e.overkill, e.dmg_school, e.resisted, e.blocked,
         e.absorbed, e.crit, e.glancing, e.miss_type
        FROM events e LEFT JOIN units u ON u.guid = e.src ORDER BY e.ts, e.id`,
     )
     .all();
+  const patchOf = patches && patch ? patchOfLine(db, patches) : undefined;
+  const rows = patchOf ? all.filter((r) => patchOf(r.file, r.ts).id === patch!.id) : all;
   if (!hunter) return rows;
   const owners = new Map(db.query<{ guid: string; owner: string; name: string; kind: string }, []>("SELECT * FROM units").all().map((u) => [u.guid, u]));
   const mine = (guid: string | null) => {
@@ -142,6 +150,17 @@ function withLevels(rows: Row[], petSheet: PetSheetAt): Leveled[] {
     if (r.st_guid && !r.st_guid.startsWith("Player-") && !r.st_guid.startsWith("Pet-") && r.st_level) at.set(r.st_guid, r.st_level);
     return { ...r, srcLevel: level(r.src, r.ts), dstLevel: level(r.dst, r.ts) };
   });
+}
+
+// A pet as "name (owner)": a pet gets a new GUID each time it is summoned, so claims group its
+// GUIDs by owner and name.
+type PetName = (guid: string, name: string | null) => string;
+function petNames(db: Database): PetName {
+  const units = new Map(db.query<{ guid: string; name: string; owner: string }, []>("SELECT guid, name, owner FROM units").all().map((u) => [u.guid, u]));
+  return (guid, name) => {
+    const owner = units.get(units.get(guid)?.owner ?? "")?.name;
+    return `${name ?? guid}${owner ? ` (${owner})` : ""}`;
+  };
 }
 
 // A pet's owner's sheet at a time: its pet block gives the pet's level and shown swing speed.
@@ -187,6 +206,7 @@ function periodic(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[]
         claimed: scales ? `${f(effect.value, 0)} + ${effect.apCoefficient} x RAP` : `${f(effect.value, 0)}, no attack power`,
         observed: `${f(mean(amounts), 1)} ± ${f(ci95(amounts), 1)} (${Math.min(...amounts)}-${Math.max(...amounts)})`,
         n: amounts.length,
+        stat: { mean: mean(amounts), ci: ci95(amounts) },
         // A tick that scales needs the hunter's ranged attack power: the fit below.
         verdict: scales ? "observed" : verdictOfMean(effect.value, amounts, 0.5),
       });
@@ -200,6 +220,7 @@ function periodic(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[]
           claimed: `${effect.apCoefficient} a tick`,
           observed: `${f(line.b, 4)} ± ${f(line.bCi, 4)} (tick ${f(line.a, 1)} at no RAP)`,
           n: known.length,
+          stat: { mean: line.b, ci: line.bCi },
           verdict: known.length < MIN_N ? "too few" : Math.abs(line.b - effect.apCoefficient) <= line.bCi ? "fits" : "differs",
         });
       }
@@ -222,6 +243,7 @@ function periodic(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[]
       claimed: `${f(claimedPct, 1)}%`,
       observed: rateText(crits, ticks.length),
       n: ticks.length,
+      stat: { k: crits, n: ticks.length },
       verdict: verdictOfRate(claimedPct, crits, ticks.length),
     });
   }
@@ -245,6 +267,7 @@ function critMultiplier(game: GameData, rows: Row[]): ClaimRow[] {
     claimed: f(claimed),
     observed: `${f(mean(ratios), 3)} ± ${f(ci95(ratios), 3)}`,
     n: ratios.length,
+    stat: { mean: mean(ratios), ci: ci95(ratios) },
     verdict: verdictOfMean(claimed, ratios, 0.02),
   }));
 }
@@ -288,6 +311,7 @@ function armor(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[] {
       claimed: `${f(100 * mean(petClaimed), 1)}%`,
       observed: `${f(100 * mean(pet), 1)}% (gap ${f(100 * mean(diffs), 1)} ± ${f(100 * ci95(diffs), 1)})`,
       n: pet.length,
+      stat: { mean: mean(diffs), ci: ci95(diffs) },
       // Integer rounding moves a single hit's reduction by up to 1 / hit; half a point covers it on average.
       verdict: verdictOfMean(0, diffs, 0.005),
     });
@@ -301,6 +325,7 @@ function armor(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[] {
       claimed: `${f(100 * mean(shotsClaimed), 1)}%`,
       observed: `${f(100 * mean(shots), 1)}% (gap ${f(100 * mean(diffs), 1)} ± ${f(100 * ci95(diffs), 1)})`,
       n: shots.length,
+      stat: { mean: mean(diffs), ci: ci95(diffs) },
       verdict: verdictOfMean(0, diffs, 0.005),
     });
   }
@@ -322,7 +347,7 @@ function armor(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[] {
 // With the owner's sheet the claim is the speed the game shows for the pet (UnitAttackSpeed), else
 // the override. The mean is the verdict: a fast pet swings in pairs (short gap, long gap), so its
 // median lands on the long gap and says nothing about damage.
-function petSwings(game: GameData, rows: Row[], petSheet: PetSheetAt): ClaimRow[] {
+function petSwings(game: GameData, rows: Row[], petSheet: PetSheetAt, petName: PetName): ClaimRow[] {
   const fallback = game.overrides.pet.attackSpeedSec.value;
   const last = new Map<string, number>();
   const gaps = new Map<string, { name: string; gaps: number[]; shown: number[] }>();
@@ -331,11 +356,12 @@ function petSwings(game: GameData, rows: Row[], petSheet: PetSheetAt): ClaimRow[
     const prev = last.get(r.src);
     last.set(r.src, r.ts);
     if (prev === undefined || r.ts - prev > 4000 || r.ts === prev) continue;
-    const g = gaps.get(r.src) ?? { name: r.src_name ?? r.src, gaps: [], shown: [] };
+    const name = petName(r.src, r.src_name);
+    const g = gaps.get(name) ?? { name, gaps: [], shown: [] };
     g.gaps.push((r.ts - prev) / 1000);
     const speed = petSheet(r.src, r.ts)?.pet?.speed;
     if (speed) g.shown.push(speed);
-    gaps.set(r.src, g);
+    gaps.set(name, g);
   }
   return [...gaps.values()].map((g) => {
     const claimed = g.shown.length ? median(g.shown) : fallback;
@@ -347,8 +373,46 @@ function petSwings(game: GameData, rows: Row[], petSheet: PetSheetAt): ClaimRow[
       claimed: `${f(claimed)} sec`,
       observed: `${f(mean)} sec mean, ${f(median(g.gaps))} median`,
       n: g.gaps.length,
+      stat: { mean, ci: ci95(g.gaps) },
       verdict: g.gaps.length < MIN_N ? "too few" : Math.abs(mean - claimed) <= 0.1 ? "fits" : "differs",
     };
+  });
+}
+
+// Pet melee crits and glancing blows per pet. The model gives a pet its owner's sheet melee crit
+// (task 40); live logs show pets almost never crit (task 54). Glancing is not modelled.
+function petCrit(rows: Leveled[], petSheet: PetSheetAt, petName: PetName): ClaimRow[] {
+  const byPet = new Map<string, { name: string; hits: number; crits: number; glancing: number; expected: number; sheets: number }>();
+  for (const r of rows) {
+    if (r.src_kind !== "pet" || r.event !== "SWING_DAMAGE" || !r.src || !r.dst?.startsWith("Creature-")) continue;
+    // Pets with no owner sheet are pooled: one by one their samples are too small to say anything.
+    const sheet = petSheet(r.src, r.ts);
+    const name = sheet ? petName(r.src, r.src_name) : "pets of hunters with no sheet";
+    const p = byPet.get(name) ?? { name, hits: 0, crits: 0, glancing: 0, expected: 0, sheets: 0 };
+    byPet.set(name, p);
+    p.hits++;
+    if (r.crit) p.crits++;
+    if (r.glancing) p.glancing++;
+    if (sheet) {
+      p.expected += sheet.meleeCritPct;
+      p.sheets++;
+    }
+  }
+  return [...byPet.values()].flatMap((p): ClaimRow[] => {
+    const claimedPct = p.sheets ? p.expected / p.sheets : undefined;
+    return [
+      {
+        claim: "pet crit",
+        subject: p.name,
+        source: claimedPct !== undefined ? "our model: the owner's sheet melee crit (task 40)" : "no owner sheet",
+        claimed: claimedPct !== undefined ? `${f(claimedPct, 1)}%` : "",
+        observed: rateText(p.crits, p.hits),
+        n: p.hits,
+        stat: { k: p.crits, n: p.hits },
+        verdict: claimedPct !== undefined ? verdictOfRate(claimedPct, p.crits, p.hits) : "observed",
+      },
+      { claim: "pet glancing", subject: p.name, source: "not modelled", claimed: "", observed: rateText(p.glancing, p.hits), n: p.hits, stat: { k: p.glancing, n: p.hits }, verdict: "observed" },
+    ];
   });
 }
 
@@ -389,13 +453,14 @@ function autoShot(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[]
           claimed: "+0.00 sec",
           observed: `${h.overSpeed.length && median(h.overSpeed) >= 0 ? "+" : ""}${f(median(h.overSpeed))} sec median over the bow`,
           n: h.overSpeed.length,
+          stat: { mean: mean(h.overSpeed), ci: ci95(h.overSpeed) },
           verdict: h.overSpeed.length < MIN_N ? "too few" : Math.abs(median(h.overSpeed)) <= 0.05 ? "fits" : "differs",
         } as const]
       : h.gaps.length
         ? [{ claim: "Auto Shot interval", subject: h.name, source: "bow speed (no sheet)", claimed: "", observed: `${f(median(h.gaps))} sec median`, n: h.gaps.length, verdict: "observed" as const }]
         : []),
     ...(h.windups.length
-      ? [{ claim: "Auto Shot wind-up", subject: h.name, source: "cast start to shot", claimed: "", observed: `${f(median(h.windups))} sec median`, n: h.windups.length, verdict: "observed" as const }]
+      ? [{ claim: "Auto Shot wind-up", subject: h.name, source: "cast start to shot", claimed: "", observed: `${f(median(h.windups))} sec median`, n: h.windups.length, stat: { mean: mean(h.windups), ci: ci95(h.windups) }, verdict: "observed" as const }]
       : []),
     ...(h.hits
       ? [{
@@ -405,6 +470,7 @@ function autoShot(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[]
           claimed: `${f((100 * h.expected) / h.hits, 1)}%`,
           observed: rateText(h.crits, h.hits),
           n: h.hits,
+          stat: { k: h.crits, n: h.hits },
           verdict: verdictOfRate((100 * h.expected) / h.hits, h.crits, h.hits),
         }]
       : []),
@@ -433,22 +499,65 @@ function petAttackTable(game: GameData, rows: Leveled[]): ClaimRow[] {
       const t = attackTable(game.overrides.formula, g.petLevel, g.targetLevel);
       const subject = `pet vs ${gap >= 0 ? "+" : ""}${gap} levels`;
       return [
-        { claim: "pet miss", subject, source: "levels.ts attackTable, no hit", claimed: `${f(t.missPct, 1)}%`, observed: rateText(g.miss, g.swings), n: g.swings, verdict: verdictOfRate(t.missPct, g.miss, g.swings) },
-        { claim: "pet dodge", subject, source: "levels.ts attackTable", claimed: `${f(t.dodgePct, 1)}%`, observed: rateText(g.dodge, g.swings), n: g.swings, verdict: verdictOfRate(t.dodgePct, g.dodge, g.swings) },
+        { claim: "pet miss", subject, source: "levels.ts attackTable, no hit", claimed: `${f(t.missPct, 1)}%`, observed: rateText(g.miss, g.swings), n: g.swings, stat: { k: g.miss, n: g.swings }, verdict: verdictOfRate(t.missPct, g.miss, g.swings) },
+        { claim: "pet dodge", subject, source: "levels.ts attackTable", claimed: `${f(t.dodgePct, 1)}%`, observed: rateText(g.dodge, g.swings), n: g.swings, stat: { k: g.dodge, n: g.swings }, verdict: verdictOfRate(t.dodgePct, g.dodge, g.swings) },
       ];
     });
 }
 
-export function claims(game: GameData, db: Database, hunter?: string): ClaimRow[] {
+export type ClaimsScope = { hunter?: string | undefined; patches?: Patch[]; patch?: Patch | undefined };
+
+// Every claim on the stored events; with a patch, only that patch's lines.
+export function claims(game: GameData, db: Database, scope: ClaimsScope = {}): ClaimRow[] {
   const sheetAt = sheetsAt(db);
   const petSheet = petSheets(db, sheetAt);
-  const rows = withLevels(loadRows(db, hunter), petSheet);
+  const rows = withLevels(loadRows(db, scope.hunter, scope.patches, scope.patch), petSheet);
+  const petName = petNames(db);
   return [
     ...periodic(game, rows, sheetAt),
     ...critMultiplier(game, rows),
     ...armor(game, rows, sheetAt),
-    ...petSwings(game, rows, petSheet),
+    ...petSwings(game, rows, petSheet, petName),
     ...petAttackTable(game, rows),
+    ...petCrit(rows, petSheet, petName),
     ...autoShot(game, rows, sheetAt),
   ];
+}
+
+export type Drift = { claim: string; subject: string; before: ClaimRow; after: ClaimRow; moved: boolean | undefined; change: string };
+
+// Two proportions differ at 95% (pooled z test).
+function ratesDiffer(a: { k: number; n: number }, b: { k: number; n: number }): boolean {
+  const p = (a.k + b.k) / (a.n + b.n);
+  const se = Math.sqrt(p * (1 - p) * (1 / a.n + 1 / b.n));
+  return se > 0 && Math.abs(a.k / a.n - b.k / b.n) / se > 1.96;
+}
+
+// A side needs this many samples before a move counts: the rate test is not valid on fewer.
+const DRIFT_MIN_N = 30;
+
+// Each claim measured on both sides, matched by claim and subject. `moved` is whether the two
+// differ at 95%; undefined when either side has too few samples to tell.
+export function drift(before: ClaimRow[], after: ClaimRow[]): Drift[] {
+  const key = (r: ClaimRow) => `${r.claim}|${r.subject}`;
+  const old = new Map(before.map((r) => [key(r), r]));
+  const out: Drift[] = [];
+  for (const b of after) {
+    const a = old.get(key(b));
+    if (!a?.stat || !b.stat) continue;
+    let moved: boolean | undefined;
+    let change = "";
+    if ("k" in a.stat && "k" in b.stat) {
+      const pa = (100 * a.stat.k) / Math.max(1, a.stat.n);
+      const pb = (100 * b.stat.k) / Math.max(1, b.stat.n);
+      change = `${pb - pa >= 0 ? "+" : ""}${f(pb - pa, 1)} points`;
+      if (a.stat.n >= DRIFT_MIN_N && b.stat.n >= DRIFT_MIN_N) moved = ratesDiffer(a.stat, b.stat);
+    } else if ("mean" in a.stat && "mean" in b.stat) {
+      const d = b.stat.mean - a.stat.mean;
+      change = `${d >= 0 ? "+" : ""}${f(d, 3)}`;
+      if (a.n >= DRIFT_MIN_N && b.n >= DRIFT_MIN_N && Number.isFinite(a.stat.ci) && Number.isFinite(b.stat.ci)) moved = Math.abs(d) > Math.hypot(a.stat.ci, b.stat.ci);
+    }
+    out.push({ claim: b.claim, subject: b.subject, before: a, after: b, moved, change });
+  }
+  return out;
 }

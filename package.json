@@ -11,6 +11,7 @@
     "wowsims": "bun packages/cli/src/wowsims.ts",
     "foreverlogs": "bun packages/data/src/foreverlogs.ts",
     "gearquest": "bun packages/data/src/gearquest.ts",
+    "diff-build": "bun packages/data/src/diff-build.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit -p ."
   },

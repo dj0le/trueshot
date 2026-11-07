@@ -1,0 +1,28 @@
+# Game patches, oldest first (PLAN.md task 57). Combat logs only write BUILD_VERSION 1.60.1, and
+# server-side changes do not touch the client at all, so the patch a log line belongs to comes from
+# its time: a patch runs from its `start` until the next patch's.
+#
+# `start` is UTC. When the exact go-live time is unknown, it is the first moment the patch was seen
+# live, and `window` says how early it could have been. `build` is the Forever client build on
+# wago.tools (product wowf) that went with it.
+
+[[patch]]
+id = "beta"
+start = "2026-09-01T00:00:00Z"
+build = "1.60.1.70532"
+summary = "Closed beta, capped at level 30. Ended before launch."
+
+[[patch]]
+id = "launch"
+start = "2026-11-04T00:00:00Z"
+window = "Launch day 2026-11-04; the first local launch log starts 2026-11-05 07:21 CET"
+build = "1.60.1.70790"
+summary = "Launch. Includes the 2026-11-03 hunter patch (server-side: shot, sting, aspect and aura base points, attack power coefficients, Barrage and Lightning Reflexes)."
+
+[[patch]]
+id = "2026-11-07"
+start = "2026-11-07T08:37:36Z"
+window = "Live some time after 2026-11-06 23:25 UTC (the last old log line) and by 2026-11-07 08:37 UTC (the first new log)"
+build = "1.60.1.70862"
+notes = "https://us.forums.blizzard.com/en/wow/t/wow-forever-hotfixes-november-6-2026/2403040"
+summary = "First client patch after launch. The client catches up to the 2026-11-03 values. Hunter notes: The Quick and the Dead fix only. Unannounced: new hunter Shoot spell 1283679, Great Stamina tooltip says Health, [DNT] Hunter Pet Scaling test spell."

@@ -109,6 +109,8 @@ const Overrides = z.object({
         procPpm: z.number().optional(),
         // The spell's base cast time.
         castTimeMs: z.number().min(0).optional(),
+        // The patch (patches.toml id) the evidence comes from, so a later patch can retire it.
+        patch: z.string().optional(),
         ...provenance,
       })
       .refine(
@@ -122,7 +124,7 @@ const Overrides = z.object({
   ),
   // A talent's value per rank for one effect, where the server changed it and the client did not.
   talentHotfix: z
-    .array(z.object({ talent: z.string(), effectIndex: z.number(), values: z.array(z.number()), ...provenance }))
+    .array(z.object({ talent: z.string(), effectIndex: z.number(), values: z.array(z.number()), patch: z.string().optional(), ...provenance }))
     .default([]),
 });
 export type Overrides = z.infer<typeof Overrides> & { levels: Levels };

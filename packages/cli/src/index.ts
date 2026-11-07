@@ -7,14 +7,19 @@ import {
   actors,
   DEFAULT_DB,
   DEFAULT_LOGS_DIR,
+  currentPatch,
   defaultSheetFiles,
+  findPatch,
   type GameData,
   hitsBy,
   hunters,
   ingest,
   ingestSheets,
   loadGameData,
+  loadPatches,
   openStore,
+  type Patch,
+  patchOfLine,
   parseLog,
   pressesIn,
   unconfirmed,
@@ -39,7 +44,7 @@ import {
   type SimConfigInput,
   type SimResult,
 } from "@trueshot/engine";
-import { claims } from "./claims";
+import { claims, drift } from "./claims";
 import { type FightReview, listFights, review } from "./review";
 import { actionsToml, buildToml, loadConfig } from "./toml";
 
@@ -93,11 +98,15 @@ const USAGE = [
   "  bun run sim pets <config.toml> [--iterations N]       every pet family, and none, with these talents",
   "  bun run sim calibrate <calibration.toml> <config.toml>  damage shares against recorded fights",
   "  bun run sim log <WoWCombatLog.txt> [--actor name]     hunters and pets in a combat log; --actor lists every hit",
-  "  bun run sim ingest [WoWCombatLog.txt...] [--watch] [--db file] [--sheets Trueshot.lua]",
+  "  bun run sim ingest [WoWCombatLog.txt...] [--watch] [--db file] [--sheets Trueshot.lua] [--utc-offset +HH:MM]",
   "                                                        new lines of the logs (default: the launch client's Logs folder) and the",
-  "                                                        recorder addon's character sheets into the local store; --watch: every 30 sec",
-  "  bun run sim claims [--hunter name] [--db file]        claimed vs reality: client data, tooltips and our model against the store",
-  "  bun run sim review [fight] [--hunter name] [--config file.toml] [--db file]",
+  "                                                        recorder addon's character sheets into the local store; --watch: every 30 sec;",
+  "                                                        --utc-offset: the log writer's zone, for another player's logs",
+  "  bun run sim patches [--db file]                       the patches in patches.toml and how many stored fights each has",
+  "  bun run sim claims [--hunter name] [--patch id|all] [--compare id] [--db file]",
+  "                                                        claimed vs reality on one patch (default the current one); --compare:",
+  "                                                        each measurement on that patch against --patch's, and what moved",
+  "  bun run sim review [fight] [--hunter name] [--patch id] [--config file.toml] [--db file]",
   "                                                        the stored fights, or one fight's casts, Auto Shot timing, uptimes, mana",
   "                                                        and movement; --config also sims it at the logged length and target level",
   "  bun run sim presses [--hunter name] [--db file]       button presses the addon recorded, most used first, for keybinds",
@@ -304,7 +313,16 @@ Average share over ${fights.length} fights`);
 }
 
 // The given logs, or every WoWCombatLog file in the launch client's Logs folder, into the store.
-async function ingestLogs(paths: string[], dbPath: string, watch: boolean, sheets: string | undefined): Promise<void> {
+// "+01:00", "-5", "-0430" or minutes ("60") as minutes east of UTC.
+function parseUtcOffset(text: string): number {
+  const m = /^([+-])?(\d{1,2})(?::?(\d{2}))?$/.exec(text.trim());
+  if (m && (m[3] !== undefined || Number(m[2]) <= 14)) return (m[1] === "-" ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3] ?? 0));
+  const minutes = Number(text);
+  if (Number.isInteger(minutes) && Math.abs(minutes) <= 14 * 60) return minutes;
+  throw new Error(`--utc-offset: "${text}" is not an offset like +01:00 or -5`);
+}
+
+async function ingestLogs(paths: string[], dbPath: string, watch: boolean, sheets: string | undefined, utcOffsetMin?: number): Promise<void> {
   const db = openStore(dbPath);
   const sheetFiles = sheets ? [sheets] : defaultSheetFiles();
   const files = () =>
@@ -316,7 +334,7 @@ async function ingestLogs(paths: string[], dbPath: string, watch: boolean, sheet
           .map((f) => join(DEFAULT_LOGS_DIR, f));
   for (;;) {
     for (const path of files()) {
-      const r = await ingest(db, path);
+      const r = await ingest(db, path, utcOffsetMin);
       if (r.bytes) console.log(`${path}: ${r.lines} lines, ${r.kept} kept, ${r.hunters} hunters, ${r.fights} fights`);
     }
     // The recorder addon's sheets; WoW rewrites the file at logout and /reload.
@@ -333,9 +351,33 @@ async function ingestLogs(paths: string[], dbPath: string, watch: boolean, sheet
 
 const VERDICT_ORDER = { differs: 0, fits: 1, "too few": 2, observed: 3 } as const;
 
-function printClaims(game: GameData, dbPath: string, hunter: string | undefined): void {
-  const rows = claims(game, openStore(dbPath), hunter).sort((a, b) => VERDICT_ORDER[a.verdict] - VERDICT_ORDER[b.verdict]);
-  console.log(`\nClaimed vs reality${hunter ? ` for ${hunter}` : ""}, from ${dbPath}\n`);
+// --patch: a patch id, "all", or the current patch when left out.
+function patchFlag(patches: Patch[], flag: string | undefined): Patch | undefined {
+  if (flag === "all") return undefined;
+  return flag ? findPatch(patches, flag) : currentPatch(patches);
+}
+
+function printClaims(game: GameData, dbPath: string, hunter: string | undefined, patches: Patch[], patchId: string | undefined, compare: string | undefined): void {
+  const db = openStore(dbPath);
+  const patch = patchFlag(patches, patchId);
+  const rows = claims(game, db, { hunter, patches, patch }).sort((a, b) => VERDICT_ORDER[a.verdict] - VERDICT_ORDER[b.verdict]);
+  const scope = patch ? `patch ${patch.id}` : "every patch";
+  if (compare) {
+    const before = findPatch(patches, compare);
+    const changes = drift(claims(game, db, { hunter, patches, patch: before }), rows).sort((a, b) => Number(b.moved === true) - Number(a.moved === true));
+    console.log(`\nPatch ${before.id} against ${scope}${hunter ? ` for ${hunter}` : ""}, from ${dbPath}\n`);
+    console.log(
+      table(
+        [
+          ["Moved", "Claim", "Subject", before.id, patch?.id ?? "all", "Change", "n before", "n after"],
+          ...changes.map((d) => [d.moved === undefined ? "too few" : d.moved ? "MOVED" : "same", d.claim, d.subject, d.before.observed, d.after.observed, d.change, String(d.before.n), String(d.after.n)]),
+        ],
+        6,
+      ),
+    );
+    return;
+  }
+  console.log(`\nClaimed vs reality on ${scope}${hunter ? ` for ${hunter}` : ""}, from ${dbPath}\n`);
   console.log(
     table(
       [["Verdict", "Claim", "Subject", "Claimed", "Observed (95%)", "Source", "n"], ...rows.map((r) => [r.verdict, r.claim, r.subject, r.claimed, r.observed, r.source, String(r.n)])],
@@ -344,20 +386,40 @@ function printClaims(game: GameData, dbPath: string, hunter: string | undefined)
   );
 }
 
-function printFights(db: ReturnType<typeof openStore>, hunter: string | undefined): void {
-  const fights = listFights(db, hunter);
+function printFights(db: ReturnType<typeof openStore>, hunter: string | undefined, patches: Patch[], patchId: string | undefined): void {
+  const patchOf = patchOfLine(db, patches);
+  const fights = listFights(db, hunter).filter((f) => !patchId || patchId === "all" || patchOf(f.file, f.startTs).id === patchId);
   console.log(`\n${fights.length} fights${hunter ? ` for ${hunter}` : ""}; \`sim review <fight>\` for one\n`);
   console.log(
     table(
       [
-        ["Fight", "Hunter", "Target", "Sec", "Damage", "DPS"],
+        ["Fight", "Patch", "Hunter", "Target", "Sec", "Damage", "DPS"],
         ...fights.map((f) => {
           const sec = Math.max(1, (f.endTs - f.startTs) / 1000);
-          return [String(f.id), f.hunterName, f.label, fmt(sec), String(f.damage), fmt(f.damage / sec)];
+          return [String(f.id), patchOf(f.file, f.startTs).id, f.hunterName, f.label, fmt(sec), String(f.damage), fmt(f.damage / sec)];
         }),
       ],
-      3,
+      4,
     ),
+  );
+}
+
+// Each patch with its stored fights and hunters.
+function printPatches(db: ReturnType<typeof openStore>, patches: Patch[]): void {
+  const patchOf = patchOfLine(db, patches);
+  const fights = listFights(db);
+  console.log(
+    "\n" +
+      table(
+        [
+          ["Patch", "Start (UTC)", "Build", "Fights", "Hunters", "Summary"],
+          ...patches.map((p) => {
+            const mine = fights.filter((f) => patchOf(f.file, f.startTs).id === p.id);
+            return [p.id, p.start.replace("T", " ").replace(/:\d\d(\.\d+)?Z$/, ""), p.build ?? "", String(mine.length), String(new Set(mine.map((f) => f.hunter)).size), p.summary];
+          }),
+        ],
+        3,
+      ),
   );
 }
 
@@ -496,6 +558,9 @@ async function main(argv: string[]): Promise<void> {
       sheets: { type: "string" },
       hunter: { type: "string" },
       config: { type: "string" },
+      patch: { type: "string" },
+      compare: { type: "string" },
+      "utc-offset": { type: "string" },
     },
   });
   const [command, ...paths] = positionals;
@@ -579,12 +644,15 @@ async function main(argv: string[]): Promise<void> {
   } else if (command === "beta" && paths.length >= 1) {
     for (const path of paths) await beta(game, await loadConfig(path, flags), path);
   } else if (command === "ingest") {
-    await ingestLogs(paths, flags.db ?? DEFAULT_DB, flags.watch ?? false, flags.sheets);
+    const offset = flags["utc-offset"] !== undefined ? parseUtcOffset(flags["utc-offset"]) : undefined;
+    await ingestLogs(paths, flags.db ?? DEFAULT_DB, flags.watch ?? false, flags.sheets, offset);
+  } else if (command === "patches" && paths.length === 0) {
+    printPatches(openStore(flags.db ?? DEFAULT_DB), await loadPatches());
   } else if (command === "claims" && paths.length === 0) {
-    printClaims(game, flags.db ?? DEFAULT_DB, flags.hunter);
+    printClaims(game, flags.db ?? DEFAULT_DB, flags.hunter, await loadPatches(), flags.patch, flags.compare);
   } else if (command === "review" && paths.length <= 1) {
     const db = openStore(flags.db ?? DEFAULT_DB);
-    if (paths.length === 0) printFights(db, flags.hunter);
+    if (paths.length === 0) printFights(db, flags.hunter, await loadPatches(), flags.patch);
     else {
       const r = review(game, db, Number(paths[0]));
       printReview(r);

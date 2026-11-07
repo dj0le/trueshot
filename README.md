@@ -73,6 +73,22 @@ more you play.
 If your game isn't installed in the default Steam/Proton location, point it at your logs with
 `FOREVER_LOGS_DIR`, or pass log files directly to `sim ingest`.
 
+## Patches
+
+The game changes under us, often without patch notes, and the combat log doesn't say which patch it
+was written on. `packages/data/patches.toml` lists each patch with the time it went live, and every
+stored fight belongs to the patch that was live at the time.
+
+- `sim patches` lists them, with how many stored fights each one has.
+- `sim claims` uses the current patch unless you pass `--patch <id>` or `--patch all`.
+- `sim claims --compare <id>` puts each measurement from that patch next to the current one and marks
+  what moved. This is how changes nobody announced show up.
+- Logs from someone in another time zone need `sim ingest --utc-offset -05:00 <their log>`, so their
+  fights land in the right patch.
+
+When wago.tools shows a new Forever client build, `bun run diff-build <old> <new>` lists what changed
+for hunters before you move the data to it.
+
 ## License
 
 MIT

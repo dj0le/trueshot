@@ -4,6 +4,7 @@ import type { Enchant, HunterData, Item, Suffix } from "./schema";
 
 export * from "./schema";
 export * from "./overrides";
+export * from "./patches";
 
 export const GENERATED_PATH = join(import.meta.dir, "..", "generated", "hunter.json");
 export const ITEMS_PATH = join(import.meta.dir, "..", "generated", "items.json");
