@@ -727,12 +727,16 @@ test("a random suffix adds its enchants' stats to the item's slot", () => {
   expect(() => ch({ neck: suffix.id })).toThrow(/no item/);
 });
 
-test("the pet inherits the hunter's crit and hit, and swings a creature's weapon of its level", () => {
-  const melee = (stats: Record<string, number>) =>
+test("the pet's specials inherit the hunter's crit, its white swings do not, and it swings a creature's weapon of its level", () => {
+  const pet = (stats: Record<string, number>, name = "Pet: Melee") =>
     simulate(game, { ...base, level: 30, gear: { rangedWeapon: { min: 20, max: 38, speed: 2.8 }, stats }, target: { preset: "normal" }, pet: { active: true, family: "Wolf" }, fight: { durationSec: 600, iterations: 30 } })
-      .abilities.find((a) => a.name === "Pet: Melee")!;
+      .abilities.find((a) => a.name === name)!;
+  const melee = (stats: Record<string, number>) => pet(stats);
   const plain = melee({});
-  expect(melee({ critPct: 20 }).critPct - plain.critPct).toBeGreaterThan(15);
+  // White swings crit at pet.whiteCritPct (0.35%, measured on launch logs, task 54) whatever the hunter's crit.
+  expect(plain.critPct).toBeLessThan(1);
+  expect(melee({ critPct: 20 }).critPct - plain.critPct).toBeLessThan(1);
+  expect(pet({ critPct: 20 }, "Pet: Bite").critPct - pet({}, "Pet: Bite").critPct).toBeGreaterThan(15);
   expect(melee({ hitPct: 5 }).missPct).toBeLessThan(plain.missPct);
   // Level 30: 2 x 24.69 creature DPS plus (103.7 own + 10% of the hunter's) attack power / 7, happy
   // (x1.25), before armor; the normal target's armor at 30 takes about a fifth.
