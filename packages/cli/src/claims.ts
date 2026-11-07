@@ -79,7 +79,8 @@ const wilson = (k: number, n: number): [number, number] => {
   const p = k / n;
   const c = (p + (z * z) / (2 * n)) / (1 + (z * z) / n);
   const h = (z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n))) / (1 + (z * z) / n);
-  return [100 * Math.max(0, c - h), 100 * Math.min(1, c + h)];
+  // Exact ends: none seen can still be 0%, all seen can still be 100% (rounding left 1e-15 there).
+  return [k === 0 ? 0 : 100 * Math.max(0, c - h), k === n ? 100 : 100 * Math.min(1, c + h)];
 };
 const f = (x: number, digits = 2) => x.toFixed(digits);
 
@@ -153,14 +154,26 @@ function withLevels(rows: Row[], petSheet: PetSheetAt): Leveled[] {
   });
 }
 
-// A pet as "name (owner)": a pet gets a new GUID each time it is summoned, so claims group its
-// GUIDs by owner and name.
+// A pet as "name (owner)". Its GUID changes with each summon and zone, but the last 8 characters
+// (its pet number) stay, through renames too, so claims group GUIDs by owner and pet number and name
+// the row with every name it had ("The Rake / waffles (Flipp)").
 type PetName = (guid: string, name: string | null) => string;
 function petNames(db: Database): PetName {
-  const units = new Map(db.query<{ guid: string; name: string; owner: string }, []>("SELECT guid, name, owner FROM units").all().map((u) => [u.guid, u]));
+  const units = db.query<{ guid: string; name: string; owner: string }, []>("SELECT guid, name, owner FROM units").all();
+  const byGuid = new Map(units.map((u) => [u.guid, u]));
+  const petKey = (guid: string, owner: string) => `${owner}|${guid.slice(-8)}`;
+  const names = new Map<string, Set<string>>();
+  for (const u of units) {
+    if (!u.guid.startsWith("Pet-") || !u.owner) continue;
+    const k = petKey(u.guid, u.owner);
+    names.set(k, (names.get(k) ?? new Set()).add(u.name));
+  }
   return (guid, name) => {
-    const owner = units.get(units.get(guid)?.owner ?? "")?.name;
-    return `${name ?? guid}${owner ? ` (${owner})` : ""}`;
+    const u = byGuid.get(guid);
+    const owner = byGuid.get(u?.owner ?? "")?.name;
+    const all = u?.owner ? names.get(petKey(guid, u.owner)) : undefined;
+    const label = all ? [...all].sort().join(" / ") : (name ?? guid);
+    return `${label}${owner ? ` (${owner})` : ""}`;
   };
 }
 
