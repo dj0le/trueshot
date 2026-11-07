@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Trueshot
-## Notes: Saves your character sheet whenever it changes, records your action bar and pet bar presses, and keeps combat logging on, for Trueshot's fight reviews, claims and benchmarks.
+## Notes: Pre-pull reminders (pet, Aspect, mana, ammo). Saves your character sheet and button presses and keeps combat logging on, for Trueshot's fight reviews, claims and benchmarks.
 ## Author: dj0le
 ## IconTexture: Interface\AddOns\Trueshot\Icon
 ## X-Website: https://github.com/dj0le/trueshot

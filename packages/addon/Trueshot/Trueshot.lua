@@ -1,4 +1,5 @@
--- Trueshot: saves the hunter's character sheet (level, ranged attack power, bow speed and damage,
+-- Trueshot: reminds the hunter before a pull of what is easy to forget (see Reminders below), and
+-- saves the hunter's character sheet (level, ranged attack power, bow speed and damage,
 -- crit, hit, stats, buffs, gear, talents, pet) whenever any of it changes, for Trueshot's
 -- `sim ingest` to line up with the combat log by time. The combat log lacks these: it logs a
 -- player's item level, not level, and an attack power that is not ranged attack power.
@@ -15,7 +16,9 @@
 -- differs from the row before. Presses are "t;slot;kind;spell;combat;name" on the same clock. WoW
 -- writes SavedVariables at logout or /reload.
 
-local MAX_SESSIONS = 200
+-- Sessions kept: at most this many, and none older than MAX_SESSION_DAYS, so SavedVariables stay small.
+local MAX_SESSIONS = 60
+local MAX_SESSION_DAYS = 30
 -- Presses kept per session; hours of play stay well under it.
 local MAX_PRESSES = 50000
 -- Events that can change the sheet. Ones this client does not know are skipped.
@@ -262,6 +265,7 @@ local function startSession()
     ticker:Cancel()
     session = {
       wall = date("%m/%d/%Y %H:%M:%S"),
+      started = second + 1,
       gt = GetTime(),
       guid = UnitGUID("player"),
       name = UnitName("player"),
@@ -270,7 +274,11 @@ local function startSession()
       presses = {},
     }
     db.sessions[#db.sessions + 1] = session
-    while #db.sessions > MAX_SESSIONS do table.remove(db.sessions, 1) end
+    -- Sessions saved before `started` existed age out by count alone.
+    local oldest = time() - MAX_SESSION_DAYS * 86400
+    while #db.sessions > 1 and (#db.sessions > MAX_SESSIONS or (db.sessions[1].started or oldest) < oldest) do
+      table.remove(db.sessions, 1)
+    end
     flush()
   end)
 end
@@ -308,16 +316,273 @@ end)
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
+-- Reminders ==================================================================
+-- Before a pull: when you target something hostile out of combat, Trueshot checks what is easy to
+-- forget and shows one short line in the middle of the screen. Only plain values out of combat are
+-- read, so Forever's secret values never get in the way. `/ts remind off` turns it off.
+
+local REMIND_EVERY = 30 -- seconds before the same reminder shows again
+local LOW_MANA = 0.5    -- share of mana under which a big pull gets a "drink first"
+local LOW_AMMO = 200
+local CALL_PET = 883
+local HAWK_ASPECT = 13165
+
+local remindFrame = CreateFrame("Frame", nil, UIParent)
+remindFrame:SetSize(600, 60)
+remindFrame:SetPoint("TOP", UIParent, "TOP", 0, -180)
+remindFrame:Hide()
+local remindText = remindFrame:CreateFontString(nil, "OVERLAY")
+remindText:SetFont(STANDARD_TEXT_FONT, 20, "OUTLINE")
+remindText:SetPoint("CENTER")
+remindText:SetTextColor(0.67, 0.83, 0.45)
+local remindHide
+local lastShown = {}
+
+local function plain(x)
+  return x ~= nil and not (issecretvalue ~= nil and issecretvalue(x))
+end
+
+local function knows(id)
+  if IsPlayerSpell then return IsPlayerSpell(id) end
+  return IsSpellKnown and IsSpellKnown(id)
+end
+
+-- The names of the player's buffs, or nil when they cannot be read.
+local function buffNames()
+  local names = {}
+  for i = 1, 40 do
+    local name
+    if C_UnitAuras and C_UnitAuras.GetAuraDataByIndex then
+      local a = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
+      name = a and a.name
+    elseif UnitBuff then
+      name = UnitBuff("player", i)
+    end
+    if name == nil then break end
+    if not plain(name) then return nil end
+    names[#names + 1] = name
+  end
+  return names
+end
+
+-- What to remind about right now, most important first.
+local function reminders()
+  local out = {}
+  if knows(CALL_PET) then
+    if not UnitExists("pet") then
+      out[#out + 1] = "no pet out"
+    elseif UnitIsDead("pet") then
+      out[#out + 1] = "pet is dead"
+    elseif GetPetHappiness then
+      local happiness = GetPetHappiness()
+      if plain(happiness) and happiness == 1 then out[#out + 1] = "pet is unhappy, feed it" end
+    end
+  end
+  local names = buffNames()
+  if names and knows(HAWK_ASPECT) then
+    local aspect
+    for _, n in ipairs(names) do
+      if n:find("^Aspect of the") then aspect = n end
+    end
+    if not aspect then
+      out[#out + 1] = "no Aspect"
+    elseif aspect:find("Cheetah") or aspect:find("Pack") then
+      out[#out + 1] = aspect .. " is on"
+    end
+  end
+  local mana, maxMana = UnitPower("player", 0), UnitPowerMax("player", 0)
+  local classification = UnitClassification("target")
+  local big = classification == "elite" or classification == "worldboss" or classification == "rareelite" or IsInInstance()
+  if big and plain(mana) and plain(maxMana) and maxMana > 0 and mana / maxMana < LOW_MANA then
+    out[#out + 1] = string.format("mana %d%%: drink first", math.floor(100 * mana / maxMana))
+  end
+  local ok, ammo = pcall(GetInventoryItemCount, "player", 0)
+  if ok and plain(ammo) and GetInventoryItemID("player", 0) and ammo < LOW_AMMO then
+    out[#out + 1] = string.format("%d arrows left", ammo)
+  end
+  return out
+end
+
+local function remind()
+  if not TrueshotDB.remind or InCombatLockdown() then return end
+  if not UnitExists("target") or not UnitCanAttack("player", "target") or UnitIsDead("target") then return end
+  local now = GetTime()
+  local fresh = {}
+  for _, r in ipairs(reminders()) do
+    if not lastShown[r] or now - lastShown[r] > REMIND_EVERY then
+      fresh[#fresh + 1] = r
+      lastShown[r] = now
+    end
+  end
+  if #fresh == 0 then return end
+  remindText:SetText(table.concat(fresh, "   /   "))
+  remindFrame:Show()
+  if remindHide then remindHide:Cancel() end
+  remindHide = C_Timer.NewTimer(4, function() remindFrame:Hide() end)
+end
+
+local remindEvents = CreateFrame("Frame")
+remindEvents:SetScript("OnEvent", function(_, event)
+  if event == "PLAYER_LOGIN" then
+    TrueshotDB = TrueshotDB or {}
+    if TrueshotDB.remind == nil then TrueshotDB.remind = true end
+    if select(2, UnitClass("player")) == "HUNTER" then remindEvents:RegisterEvent("PLAYER_TARGET_CHANGED") end
+  elseif event == "PLAYER_TARGET_CHANGED" then
+    pcall(remind)
+  end
+end)
+remindEvents:RegisterEvent("PLAYER_LOGIN")
+TrueshotReminders = reminders
+
 SLASH_TRUESHOT1 = "/trueshot"
 SLASH_TRUESHOT2 = "/ts"
 SlashCmdList.TRUESHOT = function(msg)
   local db = TrueshotDB
+  if msg == "probe" then
+    TrueshotProbe.start()
+    return
+  end
+  if msg == "remind off" or msg == "remind on" then
+    db.remind = msg == "remind on"
+  end
+  if msg == "remind" then
+    local list = TrueshotReminders()
+    print("|cffabd473Trueshot|r: " .. (#list > 0 and table.concat(list, ", ") or "nothing to remind you of"))
+    return
+  end
   if msg == "autolog off" or msg == "autolog on" then
     db.autolog = msg == "autolog on"
     if db.autolog then autolog() end
   end
   print(string.format(
-    "|cffabd473Trueshot|r: %d rows and %d presses this session, %d sessions saved, combat logging %s, autolog %s",
-    session and #session.rows or 0, session and #session.presses or 0, #db.sessions, LoggingCombat() and "on" or "off", db.autolog and "on" or "off"
+    "|cffabd473Trueshot|r: %d rows and %d presses this session, %d sessions saved, combat logging %s, autolog %s, reminders %s",
+    session and #session.rows or 0, session and #session.presses or 0, #db.sessions, LoggingCombat() and "on" or "off", db.autolog and "on" or "off",
+    db.remind and "on" or "off"
   ))
 end
+
+-- `/ts probe`: finds out which game data this client lets an addon read, in and out of combat, to
+-- decide what Trueshot can show in game. Off until started; it reports after the next fight ends
+-- and saves the findings in TrueshotDB.probe for `sim ingest` and for reading by hand.
+--
+-- Checked: whether the combat log event can be registered at all, whether its fields (GUIDs, spell
+-- ids, amounts, crit flags) come back as secret values in combat and after it, whether arithmetic
+-- on them works, and the same for the spellcast events, mana, the bow's speed and the pet's health.
+
+local probe = { on = false }
+local frame = CreateFrame("Frame")
+local P = "|cffabd473Trueshot probe|r: "
+
+local function isSecret(x)
+  return issecretvalue ~= nil and issecretvalue(x) or false
+end
+
+-- "plain", "secret", "nil", or "secret, math ok" style notes for one value.
+local function describe(x)
+  if x == nil then return "nil" end
+  if isSecret(x) then
+    local ok = pcall(function() return x + 0 end)
+    return ok and "secret, math works" or "secret"
+  end
+  return "plain"
+end
+
+local function note(key, value)
+  local r = probe.results
+  r[key] = r[key] or {}
+  local phase = InCombatLockdown() and "combat" or "out"
+  -- The first answer per phase stands, except nil (a crit flag on a hit that did not crit).
+  if r[key][phase] == nil or r[key][phase] == "nil" then r[key][phase] = describe(value) end
+end
+
+local function count(key)
+  probe.results[key .. " count"] = (probe.results[key .. " count"] or 0) + 1
+end
+
+local function onCombatLog()
+  local ok, ts, sub, _, srcGUID, _, _, _, _, _, _, _, a12, _, _, a15, _, _, a18, _, a20, a21 = pcall(CombatLogGetCurrentEventInfo)
+  if not ok then
+    probe.results["CombatLogGetCurrentEventInfo"] = { error = tostring(ts) }
+    return
+  end
+  count("combat log events")
+  note("event timestamp", ts)
+  note("source GUID", srcGUID)
+  local mine = not isSecret(srcGUID) and (srcGUID == UnitGUID("player") or srcGUID == UnitGUID("pet"))
+  if not mine then return end
+  count("own events")
+  if sub == "SWING_DAMAGE" then
+    -- amount, overkill, school, resisted, blocked, absorbed, critical
+    note("swing amount", a12)
+    note("swing crit flag", a18)
+    -- Kept to see whether a value read in combat is still secret once combat ends.
+    if probe.kept == nil and a12 ~= nil then probe.kept = a12 end
+  elseif sub == "RANGE_DAMAGE" or sub == "SPELL_DAMAGE" or sub == "SPELL_PERIODIC_DAMAGE" then
+    note("spell id", a12)
+    note("spell amount", a15)
+    note("spell crit flag", a21)
+    if probe.kept == nil and a15 ~= nil then probe.kept = a15 end
+  end
+end
+
+frame:SetScript("OnEvent", function(_, event, unit, _, spellID)
+  if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+    pcall(onCombatLog)
+  elseif event == "UNIT_SPELLCAST_SUCCEEDED" and unit == "player" then
+    count("own casts")
+    note("cast spell id", spellID)
+    note("cast time (GetTime)", GetTime())
+  elseif event == "PLAYER_REGEN_DISABLED" then
+    probe.results.fights = (probe.results.fights or 0) + 1
+    C_Timer.After(2, function()
+      note("player mana", UnitPower("player", 0))
+      note("bow speed", (UnitRangedDamage("player")))
+      note("pet health", UnitHealth("pet"))
+      note("target health", UnitHealth("target"))
+    end)
+  elseif event == "PLAYER_REGEN_ENABLED" then
+    C_Timer.After(1, function()
+      note("player mana", UnitPower("player", 0))
+      note("bow speed", (UnitRangedDamage("player")))
+      if probe.kept ~= nil then note("combat amount kept until after combat", probe.kept) end
+      probe.report()
+    end)
+  end
+end)
+
+function probe.report()
+  local r = probe.results
+  print(P .. "results so far (also saved in TrueshotDB.probe):")
+  local keys = {}
+  for k in pairs(r) do keys[#keys + 1] = k end
+  table.sort(keys)
+  for _, k in ipairs(keys) do
+    local v = r[k]
+    if type(v) == "table" then
+      local parts = {}
+      for phase, d in pairs(v) do parts[#parts + 1] = phase .. ": " .. d end
+      table.sort(parts)
+      print("  " .. k .. " = " .. table.concat(parts, ", "))
+    else
+      print("  " .. k .. " = " .. tostring(v))
+    end
+  end
+end
+
+function probe.start()
+  TrueshotDB.probe = TrueshotDB.probe or {}
+  probe.results = TrueshotDB.probe
+  probe.results.client = (GetBuildInfo())
+  if probe.on then
+    probe.report()
+    return
+  end
+  probe.on = true
+  for _, e in ipairs({ "UNIT_SPELLCAST_SUCCEEDED", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" }) do frame:RegisterEvent(e) end
+  local ok, err = pcall(frame.RegisterEvent, frame, "COMBAT_LOG_EVENT_UNFILTERED")
+  probe.results["register combat log"] = ok and "allowed" or ("refused: " .. tostring(err))
+  print(P .. "on. Fight something; results print when the fight ends. `/ts probe` again shows them.")
+  if not ok then print(P .. "the combat log event was refused: " .. tostring(err)) end
+end
+
+TrueshotProbe = probe

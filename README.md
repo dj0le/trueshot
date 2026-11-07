@@ -40,18 +40,29 @@ Configs are TOML. Copy one from `configs/` and change it.
 
 ## The addon
 
-The addon doesn't show anything in game yet. It does two things:
+The addon does three things:
 
+- reminds you before a pull: when you target something hostile out of combat, it shows one line in
+  the middle of the screen if your pet is missing, dead or unhappy, you have no Aspect (or Cheetah
+  or Pack is still on), your mana is under half before an elite or a dungeon pull, or you are low on
+  arrows
 - turns combat logging (with advanced logging) on every time you log in, so you don't forget
 - saves your character sheet whenever it changes: level, ranged attack power, bow speed, crit, hit,
-  buffs, gear, talents and pet
+  buffs, gear, talents and pet, plus your button presses
 
 The combat log is missing most of that (it logs your item level instead of your level, for one), so
 the sim needs it to make sense of your logs.
 
+Combat logs grow fast: an evening of dungeons wrote about 50 MB. Delete old ones from
+`_forever_/Logs` now and then, or turn the logging off with `/ts autolog off`.
+
 Install it from CurseForge, or copy `packages/addon/Trueshot` into your
-`World of Warcraft/_forever_/Interface/AddOns` folder. `/ts` shows its status, and `/ts autolog off`
-stops it turning combat logging on.
+`World of Warcraft/_forever_/Interface/AddOns` folder. Commands:
+
+- `/ts`: status
+- `/ts remind`: what it would remind you of right now; `/ts remind off` and `/ts remind on`
+- `/ts autolog off` and `/ts autolog on`: whether it turns combat logging on
+- `/ts probe`: a test of which combat data the game lets addons read, reported after your next fight
 
 ## Checking the sim against your logs
 
