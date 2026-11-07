@@ -379,9 +379,9 @@ function petSwings(game: GameData, rows: Row[], petSheet: PetSheetAt, petName: P
   });
 }
 
-// Pet melee crits and glancing blows per pet. The model gives a pet its owner's sheet melee crit
-// (task 40); live logs show pets almost never crit (task 54). Glancing is not modelled.
-function petCrit(rows: Leveled[], petSheet: PetSheetAt, petName: PetName): ClaimRow[] {
+// Pet white swing crits and glancing blows per pet: crit against pet.whiteCritPct (task 54), glancing
+// against levels.ts's attack table.
+function petCrit(game: GameData, rows: Leveled[], petSheet: PetSheetAt, petName: PetName): ClaimRow[] {
   const byPet = new Map<string, { name: string; hits: number; crits: number; glancing: number; expected: number; sheets: number }>();
   for (const r of rows) {
     if (r.src_kind !== "pet" || r.event !== "SWING_DAMAGE" || !r.src || !r.dst?.startsWith("Creature-")) continue;
@@ -393,25 +393,35 @@ function petCrit(rows: Leveled[], petSheet: PetSheetAt, petName: PetName): Claim
     p.hits++;
     if (r.crit) p.crits++;
     if (r.glancing) p.glancing++;
-    if (sheet) {
-      p.expected += sheet.meleeCritPct;
+    if (r.srcLevel && r.dstLevel) {
+      p.expected += attackTable(game.overrides.formula, r.srcLevel, r.dstLevel).glancingPct;
       p.sheets++;
     }
   }
+  const critPct = game.overrides.pet.whiteCritPct.value;
   return [...byPet.values()].flatMap((p): ClaimRow[] => {
-    const claimedPct = p.sheets ? p.expected / p.sheets : undefined;
+    const glancePct = p.sheets ? p.expected / p.sheets : undefined;
     return [
       {
         claim: "pet crit",
         subject: p.name,
-        source: claimedPct !== undefined ? "our model: the owner's sheet melee crit (task 40)" : "no owner sheet",
-        claimed: claimedPct !== undefined ? `${f(claimedPct, 1)}%` : "",
+        source: "overrides.toml pet.whiteCritPct, no pet crit auras counted",
+        claimed: `${f(critPct, 2)}%`,
         observed: rateText(p.crits, p.hits),
         n: p.hits,
         stat: { k: p.crits, n: p.hits },
-        verdict: claimedPct !== undefined ? verdictOfRate(claimedPct, p.crits, p.hits) : "observed",
+        verdict: verdictOfRate(critPct, p.crits, p.hits),
       },
-      { claim: "pet glancing", subject: p.name, source: "not modelled", claimed: "", observed: rateText(p.glancing, p.hits), n: p.hits, stat: { k: p.glancing, n: p.hits }, verdict: "observed" },
+      {
+        claim: "pet glancing",
+        subject: p.name,
+        source: glancePct !== undefined ? "levels.ts attackTable at the pet's level" : "no pet level (needs the owner's sheet)",
+        claimed: glancePct !== undefined ? `${f(glancePct, 1)}%` : "",
+        observed: rateText(p.glancing, p.hits),
+        n: p.hits,
+        stat: { k: p.glancing, n: p.hits },
+        verdict: glancePct !== undefined ? verdictOfRate(glancePct, p.glancing, p.hits) : "observed",
+      },
     ];
   });
 }
@@ -519,7 +529,7 @@ export function claims(game: GameData, db: Database, scope: ClaimsScope = {}): C
     ...armor(game, rows, sheetAt),
     ...petSwings(game, rows, petSheet, petName),
     ...petAttackTable(game, rows),
-    ...petCrit(rows, petSheet, petName),
+    ...petCrit(game, rows, petSheet, petName),
     ...autoShot(game, rows, sheetAt),
   ];
 }

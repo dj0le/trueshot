@@ -235,12 +235,20 @@ source = "Classic beta testing, 60k+ hits: ~1.8% more on aura crit, ~4.8% total 
 # Pets =======================================================================
 
 # What the pet gains from the hunter (the client's Hunter Pet Scaling, 415429, lists the stats without
-# amounts; the server sets them). Its crit is the hunter's (Blizzard, Oct 16: "Fixed an issue where pets
-# were only ever inheriting the player's Melee Critical Strike chance"), and its melee hit the hunter's.
+# amounts; the server sets them). Its special attacks crit at the hunter's crit (Blizzard, Oct 16: "Fixed
+# an issue where pets were only ever inheriting the player's Melee Critical Strike chance"), and its
+# melee hit is the hunter's. Its white swings do not: see pet.whiteCritPct.
 [pet.inheritAttackPowerPct]
 value = 10
 confidence = "reported"
 source = "10% of the higher of melee and ranged attack power: Warcraft Tavern's Forever hunter guide; Blizzard's deep dive: pets get increased stats based on their hunter's gear; beta pet sheets read the owner's 10% beside the pet's own"
+
+# Pets' white swings crit far below the hunter's crit on live (PLAN.md task 54). Crit auras on the pet
+# (Ferocity) still add on top, as the tooltips say; no log has a pet with them yet.
+[pet.whiteCritPct]
+value = 0.35
+confidence = "confirmed"
+source = "Launch logs to 2026-11-07: 21 crits in 6109 pet white swings (0.34%), The Rake 0.3% (0.2-0.6) against 8.1% sheet crit, other hunters' pets pooled 0.4% (0.2-0.8); Claw crits 3.5% (4 of 113), so specials keep the hunter's crit. Hunters at levels 7 to 20, no pet crit talents"
 
 [pet.spellHitPerHit]
 value = 2.125

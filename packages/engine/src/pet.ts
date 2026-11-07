@@ -162,6 +162,15 @@ export class Pet {
     return happy * (1 + this.host.calc.sharedDamagePct() / 100) * this.auras.damageMultiplier(school);
   }
 
+  // White swings: the measured rate (pet.whiteCritPct) plus the pet's own crit auras less the
+  // suppression on aura crit. Hawks keep the hunter's crit until a log measures them.
+  private whiteCritPct(own: boolean): number {
+    if (!own) return this.critPct(false);
+    const t = this.stats.table;
+    const auras = this.auras.sum(Aura.ModCritPct);
+    return this.o.whiteCritPct.value + Math.max(0, auras - t.critSuppressionPct - Math.min(auras, t.auraCritSuppressionPct));
+  }
+
   // The hunter's sheet crit plus the pet's own crit auras (Ferocity), less the target's suppression,
   // which takes extra off crit that is not from Agility. Pets have no crit of their own.
   private critPct(own: boolean): number {
@@ -196,7 +205,7 @@ export class Pet {
     const t = this.stats.table;
     const dodge = this.missPct() + t.dodgePct;
     const glance = dodge + t.glancingPct;
-    const crit = glance + this.critPct(own);
+    const crit = glance + this.whiteCritPct(own);
     if (rng < dodge) {
       this.host.record(name, "miss");
       return;
