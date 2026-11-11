@@ -1,5 +1,6 @@
 # Pushing a tag like v0.1.1 (or v0.1.1-alpha, v0.1.1-beta) builds the addon zip, attaches it to a
-# GitHub release and uploads it to CurseForge. The release type follows the tag's suffix.
+# GitHub release and uploads it to CurseForge. The release type follows the tag's suffix. An
+# annotated tag (git tag -a) supplies the changelog as its message body, in markdown.
 name: Release addon
 
 on:
@@ -29,10 +30,18 @@ jobs:
             *beta*) type=beta ;;
             *) type=release ;;
           esac
-          previous=$(git describe --tags --abbrev=0 "${tag}^" 2>/dev/null || true)
-          range="${previous:+$previous..}$tag"
-          git log --no-merges --pretty='- %s' "$range" -- packages/addon > changelog.md
-          [ -s changelog.md ] || echo "- No addon changes since ${previous:-the start}." > changelog.md
+          # An annotated tag's message is the changelog; a lightweight tag falls back to the addon's
+          # commit subjects since the last tag. Checkout can leave the tag lightweight, so fetch it.
+          git fetch --force origin "refs/tags/$tag:refs/tags/$tag"
+          if [ "$(git cat-file -t "$tag")" = tag ]; then
+            git tag -l --format='%(contents:body)' "$tag" > changelog.md
+            [ -s changelog.md ] || git tag -l --format='%(contents:subject)' "$tag" > changelog.md
+          else
+            previous=$(git describe --tags --abbrev=0 "${tag}^" 2>/dev/null || true)
+            range="${previous:+$previous..}$tag"
+            git log --no-merges --pretty='- %s' "$range" -- packages/addon > changelog.md
+            [ -s changelog.md ] || echo "- No addon changes since ${previous:-the start}." > changelog.md
+          fi
           {
             echo "VERSION=$version"
             echo "RELEASE_TYPE=$type"
