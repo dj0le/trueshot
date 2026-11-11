@@ -103,11 +103,24 @@ confidence = "classic"
 source = "Classic: ranged and melee crits deal 200% damage before talents"
 
 # 1 when the ticks of a ranged periodic effect (Serpent Sting) roll crit at the hunter's ranged crit,
-# 0 for Classic's ticks that never crit. Traps (magic) and bleeds are not measured and stay non-crit.
+# 0 for Classic's ticks that never crit. Bleeds are not measured and stay non-crit.
 [formula.rangedTicksCrit]
 value = 1
 confidence = "confirmed"
 source = "Measured in launch logs 2026-11-05/06 (Flipp, levels 7-13): Serpent Sting rank 1 ticks crit 5.7% (3.4-9.4), rank 2 8.1% (5.4-12.1), against 4.9-6.4% sheet ranged crit; crits about 2.0-2.1x"
+
+# 1 when the ticks of the hunter's magic periodic effects (Immolation Trap, Explosive Trap's burn)
+# roll crit, at the hunter's ranged crit; 0 for Classic's ticks that never crit.
+[formula.magicTicksCrit]
+value = 1
+confidence = "confirmed"
+source = "Measured in launch logs 2026-11-06 to 2026-11-11 (Flipp, levels 17-31, task 67): Immolation Trap rank 1 ticks crit 10 of 138 (7.2%), rank 2 5 of 57 (8.8%); 15 of 195 pooled (7.7%, 4.7-12.4) against 10.4% mean sheet ranged crit. Ranged crit fits better than a hunter spell crit of a few percent, but the sample cannot rule that out"
+
+# Crit damage bonus of spell (magic) crits: trap fire ticks crit for 1.5x, not the 2.0x of shots.
+[formula.spellCritDamageBonusPct]
+value = 50
+confidence = "confirmed"
+source = "Classic: spell crits deal 150%. Measured on Immolation Trap ticks (Flipp, 2026-11-06 to 2026-11-10): 15 crits at 1.52x their non-crit tick (rank 1 36-43 against 24-28; rank 2 74-79 against 49-52)"
 
 [formula.armorConstantBase]
 value = 400
@@ -146,8 +159,8 @@ source = "Chance-on-hit weapons (Dark Iron Rifle, Blunderflame Bone Bow) and equ
 
 [formula.rangedHasteAffectsCastTime]
 value = 1
-confidence = "guess"
-source = "Whether Rapid Fire and quiver haste shorten Aimed Shot's cast. 1 = yes, 0 = no"
+confidence = "confirmed"
+source = "Whether Rapid Fire and quiver haste shorten Aimed Shot's cast. 1 = yes, 0 = no. Measured 2026-11-08 (Flipp, level 24, 10% quiver): 22 rank 1 casts, client 2.0 sec, median 1.81 cast start to success (2.0 / 1.1 = 1.82); two at 1.38 and 1.40 under Quick Shots (2.0 / 1.1 / 1.3 = 1.40)"
 
 [formula.manaPerTickBase]
 value = 15
@@ -276,7 +289,11 @@ confidence = "classic"
 source = "Classic: a happy pet deals 125% damage"
 
 # The pet's miss, dodge and glancing follow from the level gap like the hunter's (attackTable in
-# the engine). Whether pets glance is not confirmed.
+# the engine), except the glancing chance per point of defense over skill.
+[pet.glancingPerSkillPct]
+value = 2.5
+confidence = "confirmed"
+source = "Flipp's pet, all logs to 2026-11-10 (task 66): glancing +0 9.7%, +1 22.7%, +2 34%, +3 51%, +4 63%, +5 80%, +6 82%, +7 98%, none against lower mobs; 10 + 2.5 x (defense over skill) fits within the noise, Classic's 10 + 2 x does not. Glancing damage fits the Classic range exactly, so the pet's weapon skill is right"
 
 [pet.attackSpeedSec]
 value = 2.0

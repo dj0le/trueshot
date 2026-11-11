@@ -54,7 +54,8 @@ export type FightReview = {
     speedSec: number | undefined;
     speedFromSheet: boolean;
     // Time Auto Shots came late by (each gap past the bow speed), and time with Auto Shot off
-    // (gaps over STOPPED_GAPS bow speeds).
+    // (gaps over STOPPED_GAPS bow speeds), the pull to the first shot and the last shot to the end
+    // counted as gaps.
     delaySec: number;
     stoppedSec: number;
     avgDamage: number;
@@ -238,12 +239,20 @@ export function review(game: GameData, db: Database, fightId: number): FightRevi
   const fallback = gaps.length >= 3 ? percentile(gaps.map((g) => g.gap), 0.1) : undefined;
   let delaySec = 0;
   let stoppedSec = 0;
-  for (const g of gaps) {
-    const speed = g.speed ?? fallback;
-    if (!speed) continue;
-    const late = Math.max(0, g.gap - speed);
-    if (g.gap > STOPPED_GAPS * speed) stoppedSec += late;
+  const count = (gap: number, speed: number | undefined) => {
+    if (!speed) return;
+    const late = Math.max(0, gap - speed);
+    if (gap > STOPPED_GAPS * speed) stoppedSec += late;
     else delaySec += late;
+  };
+  for (const g of gaps) count(g.gap, g.speed ?? fallback);
+  // The ends count as gaps too: from the pull (the first hit) to the first shot, and from the last
+  // shot to the fight's end, so Auto Shot stopping early (a boss in melee) shows as time off.
+  if (shots.length) {
+    const first = shots[0]!.ts;
+    const last = shots.at(-1)!.ts;
+    count((first - from) / 1000, sheetAt(hunter, first)?.rangedSpeed || fallback);
+    count((to - last) / 1000, sheetAt(hunter, last)?.rangedSpeed || fallback);
   }
   const autoHits = events.filter((e) => mine(e) && e.spell_id === 75 && inFight(e) && (e.event === "RANGE_DAMAGE" || e.event === "RANGE_MISSED"));
   const speeds = gaps.map((g) => g.speed).filter((s): s is number => s !== undefined);

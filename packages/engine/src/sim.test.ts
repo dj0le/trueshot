@@ -251,6 +251,8 @@ test("the attack table follows the level gap", () => {
   expect(boss.glancingPenaltyPct).toBeCloseTo(35, 5);
   expect(attackTable(f, 30, 32)).toMatchObject({ missPct: 6, hitPenaltyPct: 0, critSuppressionPct: 2, auraCritSuppressionPct: 0 });
   expect(attackTable(f, 30, 30)).toMatchObject({ missPct: 5, spellMissPct: 4, critSuppressionPct: 0, glancingPct: 10 });
+  // Pets glance more against higher targets than Classic's 2% per point (task 66).
+  expect(attackTable(f, 30, 33, game.overrides.pet.glancingPerSkillPct.value).glancingPct).toBe(47.5);
 });
 
 test("a level 30 hunter knows level 30 ranks, has level 30 stats, and fights a level 30 target", () => {
@@ -631,6 +633,25 @@ test("fire traps spring only when placed in melee, and Clever Traps and Survival
   // Survival Tactics: 10% less to miss.
   const tactics = run("melee", { ...sv, "Survival Tactics": 2 })!;
   expect(plain.missPct - tactics.missPct).toBeGreaterThan(7);
+});
+
+test("Immolation Trap ticks crit at ranged crit for 1.5x, and not when formula.magicTicksCrit is 0", () => {
+  const input: SimConfigInput = {
+    ...base,
+    position: "melee",
+    gear: { items: { mainHand: 18520, ranged: 18680 }, stats: { hitPct: 9, critPct: 40, mp5: 10000 } },
+    fight: { durationSec: 300, iterations: 60 },
+    rotation: { actions: [{ action: "immolation_trap" }] },
+  };
+  const trap = (g: typeof game) => simulate(g, input).abilities.find((a) => a.name === "Immolation Trap")!;
+  const on = trap(game);
+  expect(on.critPct).toBeGreaterThan(25);
+  const formula = { ...game.overrides.formula, magicTicksCrit: { ...game.overrides.formula.magicTicksCrit, value: 0 } };
+  const off = trap({ ...game, overrides: { ...game.overrides, formula } });
+  expect(off.critPct).toBe(0);
+  // About 37% of ticks crit for half again: 1.18x, not the 1.37x of a 2.0x crit.
+  expect(on.dps / off.dps).toBeGreaterThan(1.12);
+  expect(on.dps / off.dps).toBeLessThan(1.25);
 });
 
 test("Lacerating Strikes bleeds 40% of each Mongoose Bite, rolling what is left into a refresh", () => {

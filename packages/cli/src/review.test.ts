@@ -87,3 +87,23 @@ test("a fight review finds late and stopped Auto Shots, the sting lost to the de
     { name: "Hunter's Mark", presses: 1, casts: 1 },
   ]);
 });
+
+test("Auto Shot stopped before the fight ends counts as time off", async () => {
+  // The same fight with no Auto Shot after 8 sec, and a sting tick at 13 sec still in the fight.
+  const log = [
+    ...LOG.filter((l) => !l.startsWith(stamp(14000)) && !l.startsWith(stamp(14300))),
+    line(13000, `SPELL_PERIODIC_DAMAGE,${H},${W},13551,"Serpent Sting",0x8,${wolf},20,20,-1,8,0,0,0,nil,nil,nil`),
+  ];
+  const dir = mkdtempSync(join(tmpdir(), "trueshot-"));
+  writeFileSync(join(dir, "WoWCombatLog.txt"), `${log.join("\n")}\n`);
+  writeFileSync(join(dir, "Trueshot.lua"), SAVED);
+  const db = openStore(":memory:");
+  await ingest(db, join(dir, "WoWCombatLog.txt"));
+  await ingestSheets(db, join(dir, "Trueshot.lua"));
+  const [fight] = listFights(db, "Me");
+  const r = review(game, db, fight!.id);
+  // Gaps of 3 and 3 sec, then 5 sec from the last shot to the end: 0.4 sec late, 2.2 sec off.
+  expect(r.autoShot.shots).toBe(3);
+  expect(r.autoShot.delaySec).toBeCloseTo(0.4, 5);
+  expect(r.autoShot.stoppedSec).toBeCloseTo(2.2, 5);
+});

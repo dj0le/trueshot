@@ -18,7 +18,9 @@ export type AttackTable = {
   glancingPenaltyPct: number;
 };
 
-export function attackTable(f: Overrides["formula"], attackerLevel: number, targetLevel: number): AttackTable {
+// `glancingPerSkillPct`: glancing chance per point of defense over skill; Classic's 2 for the hunter,
+// overrides.toml pet.glancingPerSkillPct for the pet.
+export function attackTable(f: Overrides["formula"], attackerLevel: number, targetLevel: number, glancingPerSkillPct = 2): AttackTable {
   // Defense over weapon skill.
   const gap = 5 * (targetLevel - attackerLevel);
   const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
@@ -28,7 +30,8 @@ export function attackTable(f: Overrides["formula"], attackerLevel: number, targ
   // 0.04% per point. Aura crit loses more against +3 and up (overrides.toml).
   const levels = targetLevel - attackerLevel;
   const critSuppressionPct = levels > 0 ? levels * f.critSuppressionPerLevelPct.value : 0.04 * gap;
-  // Glancing: 10% plus 2% per point of defense over skill; damage between low and high, here the mean.
+  // Glancing: 10% plus 2% (pets 2.5%) per point of defense over skill; damage between low and high,
+  // here the mean.
   const low = clamp(1.3 - 0.05 * gap, 0.01, 0.91);
   const high = clamp(1.2 - 0.03 * gap, 0.2, 0.99);
   // vmangos Unit::MagicSpellHitResult against a creature: 96% hit minus 1% per level up to +2, then
@@ -41,7 +44,7 @@ export function attackTable(f: Overrides["formula"], attackerLevel: number, targ
     critSuppressionPct,
     auraCritSuppressionPct: levels >= 3 ? f.auraCritSuppressionPct.value : 0,
     dodgePct: clamp(5 + 0.1 * gap, 0, 100),
-    glancingPct: clamp(10 + 2 * gap, 0, 100),
+    glancingPct: clamp(10 + glancingPerSkillPct * gap, 0, 100),
     glancingPenaltyPct: 100 * (1 - (low + high) / 2),
   };
 }

@@ -186,7 +186,8 @@ export class Fight implements PetHost {
       const family = game.data.petFamilies.find((p) => p.name === ch.config.pet.family);
       if (!family) throw new Error(`pet: unknown family "${ch.config.pet.family}"`);
       const attackingUntil = (durationMs * ch.config.pet.attackingPct) / 100;
-      const pet = { level: ch.level, creatureDps: atLevel(lv, lv.pet.creatureDps.values, ch.level), table: this.target.table };
+      const table = attackTable(game.overrides.formula, ch.level, targetLevel, game.overrides.pet.glancingPerSkillPct.value);
+      const pet = { level: ch.level, creatureDps: atLevel(lv, lv.pet.creatureDps.values, ch.level), table };
       this.pet = new Pet(this, game.data, game.overrides.pet, family, pet, ch.config.pet.abilities, attackingUntil);
       for (const a of ch.config.rotation.actions) {
         if (a.pet && !this.pet.knows(a.pet)) throw new Error(`rotation: a ${family.name} does not know "${a.pet}" (${a.action})`);
@@ -854,13 +855,17 @@ export class Fight implements PetHost {
           const endsAt = this.now + duration;
           if (triggered) each(e, () => this.trigger(triggered, endsAt - this.now));
         }
-        // Periodic damage snapshots its tick when applied. Ranged ticks (stings) can crit in
-        // Forever (overrides.toml formula.rangedTicksCrit); each tick rolls on its own.
+        // Periodic damage snapshots its tick when applied. Ranged ticks (stings) and magic ticks
+        // (trap fire) can crit in Forever (overrides.toml formula.rangedTicksCrit, magicTicksCrit),
+        // both at the hunter's ranged crit; each tick rolls on its own.
         else if (e.aura === Aura.PeriodicDamage) {
           const tick =
             this.calc.modded(e.value + e.apCoefficient * this.calc.rangedAttackPower(), spell, SpellModOp.PeriodicDamage) *
             this.calc.damageDone(spell.school);
-          const canCrit = spell.defenseType === DefenseType.Ranged && this.game.overrides.formula.rangedTicksCrit.value > 0;
+          const fo = this.game.overrides.formula;
+          const canCrit =
+            (spell.defenseType === DefenseType.Ranged && fo.rangedTicksCrit.value > 0) ||
+            (spell.defenseType === DefenseType.Magic && fo.magicTicksCrit.value > 0);
           each(e, () => {
             // A crit tick still counts as a tick, and as a crit.
             const crit = canCrit && this.rng.stream("tick-crit").chance(this.calc.critPct(spell));

@@ -52,6 +52,8 @@ const Overrides = z.object({
     baseCritPct: Value,
     critDamageBonusPct: Value,
     rangedTicksCrit: Value,
+    magicTicksCrit: Value,
+    spellCritDamageBonusPct: Value,
     armorConstantBase: Value,
     armorConstantPerLevel: Value,
     normalizedRangedSpeed: Value,
@@ -75,6 +77,8 @@ const Overrides = z.object({
     inheritAttackPowerPct: Value,
     // White swings' crit chance before the pet's own crit auras (specials use the hunter's crit).
     whiteCritPct: Value,
+    // Glancing chance per point of defense over the pet's weapon skill (the hunter's is Classic's 2).
+    glancingPerSkillPct: Value,
     // Share of the hunter's hit the pet gains as spell hit (melee hit is the hunter's whole).
     spellHitPerHit: Value,
     // How far either side of twice the creature DPS a 2.0 sec swing's damage spreads.

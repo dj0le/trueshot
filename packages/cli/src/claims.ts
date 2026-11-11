@@ -239,9 +239,13 @@ function periodic(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[]
         });
       }
     }
-    // The model crits ranged ticks at the sheet's ranged crit less suppression (formula.rangedTicksCrit).
+    // The model crits ranged and magic ticks at the sheet's ranged crit less suppression
+    // (formula.rangedTicksCrit, magicTicksCrit).
     const crits = ticks.filter((t) => t.crit).length;
-    const ticksCrit = game.overrides.formula.rangedTicksCrit.value > 0 && spell?.defenseType === DefenseType.Ranged;
+    const fo = game.overrides.formula;
+    const ticksCrit =
+      (fo.rangedTicksCrit.value > 0 && spell?.defenseType === DefenseType.Ranged) ||
+      (fo.magicTicksCrit.value > 0 && spell?.defenseType === DefenseType.Magic);
     let expected = 0;
     if (ticksCrit) {
       for (const t of ticks) {
@@ -253,7 +257,7 @@ function periodic(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[]
     out.push({
       claim: "ticks crit",
       subject: name,
-      source: ticksCrit ? "sheet ranged crit less levels.ts crit suppression (formula.rangedTicksCrit)" : "our model: ticks never crit",
+      source: ticksCrit ? "sheet ranged crit less levels.ts crit suppression (formula.rangedTicksCrit, magicTicksCrit)" : "our model: ticks never crit",
       claimed: `${f(claimedPct, 1)}%`,
       observed: rateText(crits, ticks.length),
       n: ticks.length,
@@ -267,23 +271,29 @@ function periodic(game: GameData, rows: Leveled[], sheetAt: SheetAt): ClaimRow[]
 // Crit damage where armor plays no part (non-physical schools): the log's amount over its amount
 // before crit.
 function critMultiplier(game: GameData, rows: Row[]): ClaimRow[] {
-  const claimed = 1 + game.overrides.formula.critDamageBonusPct.value / 100;
-  const bySpell = new Map<string, number[]>();
+  const fo = game.overrides.formula;
+  const bySpell = new Map<string, { magic: boolean; ratios: number[] }>();
   for (const r of rows) {
     if (!r.crit || !r.src_kind || r.event.endsWith("_LANDED") || r.dmg_school === PHYSICAL || !clean(r)) continue;
     const key = r.spell_name ?? "Melee";
-    bySpell.set(key, [...(bySpell.get(key) ?? []), r.amount! / r.unmitigated!]);
+    const magic = r.spell_id != null && game.data.spells[String(r.spell_id)]?.defenseType === DefenseType.Magic;
+    const s = bySpell.get(key) ?? { magic, ratios: [] };
+    s.ratios.push(r.amount! / r.unmitigated!);
+    bySpell.set(key, s);
   }
-  return [...bySpell].map(([name, ratios]) => ({
-    claim: "crit multiplier",
-    subject: name,
-    source: "overrides.toml formula.critDamageBonusPct (Classic)",
-    claimed: f(claimed),
-    observed: `${f(mean(ratios), 3)} ± ${f(ci95(ratios), 3)}`,
-    n: ratios.length,
-    stat: { mean: mean(ratios), ci: ci95(ratios) },
-    verdict: verdictOfMean(claimed, ratios, 0.02),
-  }));
+  return [...bySpell].map(([name, { magic, ratios }]) => {
+    const claimed = 1 + (magic ? fo.spellCritDamageBonusPct : fo.critDamageBonusPct).value / 100;
+    return {
+      claim: "crit multiplier",
+      subject: name,
+      source: magic ? "overrides.toml formula.spellCritDamageBonusPct (Classic spell crit)" : "overrides.toml formula.critDamageBonusPct (Classic)",
+      claimed: f(claimed),
+      observed: `${f(mean(ratios), 3)} ± ${f(ci95(ratios), 3)}`,
+      n: ratios.length,
+      stat: { mean: mean(ratios), ci: ci95(ratios) },
+      verdict: verdictOfMean(claimed, ratios, 0.02),
+    };
+  });
 }
 
 // Armor on pet swings: SWING_DAMAGE_LANDED carries the target's live armor (debuffs included), the
@@ -408,7 +418,7 @@ function petCrit(game: GameData, rows: Leveled[], petSheet: PetSheetAt, petName:
     if (r.crit) p.crits++;
     if (r.glancing) p.glancing++;
     if (r.srcLevel && r.dstLevel) {
-      p.expected += attackTable(game.overrides.formula, r.srcLevel, r.dstLevel).glancingPct;
+      p.expected += attackTable(game.overrides.formula, r.srcLevel, r.dstLevel, game.overrides.pet.glancingPerSkillPct.value).glancingPct;
       p.sheets++;
     }
   }

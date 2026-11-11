@@ -172,7 +172,9 @@ export class HunterStats {
   // Endurance and Earth Fury: "critical strike bonus to damage increased by 2%", read as 2% more
   // total critical damage, as the same aura worked on TBC's meta gems. A spell adds its own modifiers.
   critMultiplier(spell: Spell | null): number {
-    const bonus = this.game.overrides.formula.critDamageBonusPct.value / 100;
+    // Magic (trap fire ticks) crits as a spell: a smaller bonus (formula.spellCritDamageBonusPct).
+    const fo = this.game.overrides.formula;
+    const bonus = (spell?.defenseType === DefenseType.Magic ? fo.spellCritDamageBonusPct : fo.critDamageBonusPct).value / 100;
     const own = spell ? this.mods(spell, SpellModOp.CritDamageBonus).pct / 100 : 0;
     return (1 + bonus * (1 + own)) * this.selfAuras.product([Aura.ModCritDamageBonus]);
   }
